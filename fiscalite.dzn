@@ -1,6 +1,9 @@
 N = 6; %nombre d'années dans le futur où on a besoin du plus gros cashdown
 LIQUIDE_NOW = 4500;
 INFLATION = 0.02;
+RENDEMENT = 0.08;
+DROITS_CELIAPP_RESTANTS = 0;
+ANNEES_CELIAPP_ACCUMULEES = 2;
 SALAIRES_FUTURS_IMPOT = [
 60000,
 102000,
@@ -42,4 +45,3 @@ PALIERS_IMPOTS_RATES = [
 0.4997,
 0.5331
 ];
-EPS = 0.01;

@@ -1,40 +1,49 @@
 include "fiscalite.dzn";
 
 %%% Constantes
+% LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
 int: N;
 int: N_PALIERS;
-float: EPS;
+float: BIG = 1000000000;
 float: INFLATION;
+float: RENDEMENT;
 float: LIQUIDE_NOW;
+float: DROITS_CELIAPP_RESTANTS;
+int: ANNEES_CELIAPP_ACCUMULEES;
 array[1..N] of float: SALAIRES_FUTURS_IMPOT;
 array[1..N] of float: DEPENSES;
 array[1..N_PALIERS] of float: PALIERS_IMPOTS;
 array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 
+%%% functions
+
 %%% Variables
 
-
 % variables fixées par data et contraintes
-array[1..(N+1)] of var float: LIQUIDE;
-var float: CASHDOWN;
-array[1..N] of var float: SALAIRE_IMPOSABLE;
-array[1..N] of var float: IMPOT;
-array[1..N] of var float: RQAP;
-array[1..N] of var float: AE;
-array[1..N] of var float: RRQ;
-array[1..N] of var float: FOND_RETRAITE;
-array[1..N, 1..N_PALIERS] of var float: PALIERS_IMPOTS_TO_PAY;
+array[1..(N+1)] of var -BIG..BIG: LIQUIDE;
+var -BIG..BIG: CASHDOWN;
+array[1..N] of var -BIG..BIG: SALAIRE_IMPOSABLE;
+array[1..N] of var -BIG..BIG: IMPOT;
+array[1..N] of var -BIG..BIG: RQAP;
+array[1..N] of var -BIG..BIG: AE;
+array[1..N] of var -BIG..BIG: RRQ;
+array[1..N] of var -BIG..BIG: FOND_RETRAITE;
+array[1..N] of var -BIG..BIG: COTIS_CELIAPP;
+array[1..N] of var -BIG..BIG: CUMUL_CELIAPP;
+array[1..N] of var -BIG..BIG: DROITS_CELIAPP;
+array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
 
 %%% Contraintes
+
 
 %% contraintes pour fixer les variables déterministes
 constraint LIQUIDE[1] = LIQUIDE_NOW;
 constraint forall(k in 1..N) ( % Cluster
-  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k]
+  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k]
 );
 
 constraint forall(k in 1..N) (
-  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] % TODO retirer celiapp, reer, ajouter gain capital
+  SALAIRE_IMPOSABLE[k] <= SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] + 0.01 /\ SALAIRE_IMPOSABLE[k] >= SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] - 18331% TODO retirer celiapp, reer, ajouter gain capital
 );
 constraint forall(k in 1..N) (
     forall(j in 1..(N_PALIERS-1))(
@@ -44,10 +53,6 @@ constraint forall(k in 1..N) (
     PALIERS_IMPOTS_TO_PAY[k, N_PALIERS] = max(SALAIRE_IMPOSABLE[k] - PALIERS_IMPOTS[N_PALIERS], 0) * PALIERS_IMPOTS_RATES[N_PALIERS]
 );
 
-constraint forall(k in 1..N)(
-  forall(j in 1..N_PALIERS)(
-      PALIERS_IMPOTS_TO_PAY[k, j] >= 0
-));
 constraint forall(k in 1..N) (
     IMPOT[k] = sum(j in 1..N_PALIERS)(PALIERS_IMPOTS_TO_PAY[k, j])
 );
@@ -69,9 +74,20 @@ constraint CASHDOWN >= 0;
 constraint forall(k in 1..(N+1)) (
   LIQUIDE[k] >= 0
 );
+constraint DROITS_CELIAPP[1] = DROITS_CELIAPP_RESTANTS;
+constraint forall(k in 2..N)(
+    DROITS_CELIAPP[k] = DROITS_CELIAPP[k-1] - COTIS_CELIAPP[k-1] %+ if k <= 5+1-ANNEES_CELIAPP_ACCUMULEES then 8000 else 0 endif
+);
+constraint forall(k in 1..N)(
+  COTIS_CELIAPP[k] >= 0 /\ COTIS_CELIAPP[k] <= DROITS_CELIAPP[k] /\ COTIS_CELIAPP[k] <= SALAIRES_FUTURS_IMPOT[k]
+);
+constraint CUMUL_CELIAPP[1] = COTIS_CELIAPP[1] * (1 + RENDEMENT);
+constraint forall(k in 2..N)(
+  CUMUL_CELIAPP[k] = (COTIS_CELIAPP[k] + CUMUL_CELIAPP[k-1]) * (1 + RENDEMENT)
+);
 
 %%% variable à maximiser
-constraint CASHDOWN = LIQUIDE[N+1] - 10000;
+constraint CASHDOWN = LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N];
 
 solve 
   %::seq_search([
@@ -84,5 +100,13 @@ solve
 output ["CASHDOWN = ", show(CASHDOWN), "\n"];
 output ["LIQUIDE = ", join(" ", [show(LIQUIDE[i]) | i in 1..(N+1)]), "\n"];
 output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(SALAIRES_FUTURS_IMPOT[i]) | i in 1..N]), "\n"];
+output ["SALAIRE_IMPOSABLE = ", join(" ", [show(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
+output ["IMPOT = ", join(" ", [show(IMPOT[i]) | i in 1..N]), "\n"];
+output ["RQAP = ", join(" ", [show(RQAP[i]) | i in 1..N]), "\n"];
+output ["AE = ", join(" ", [show(AE[i]) | i in 1..N]), "\n"];
+output ["RRQ = ", join(" ", [show(RRQ[i]) | i in 1..N]), "\n"];
+output ["FOND_RETRAITE = ", join(" ", [show(FOND_RETRAITE[i]) | i in 1..N]), "\n"];
 output ["NET = ", join(" ", [show(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k]) | k in 1..N]), "\n"];
 output ["IMPOT = ", join(" ", [show(IMPOT[i]) | i in 1..N]), "\n"];
+output ["CELIAPP = ", join(" ", [show(COTIS_CELIAPP[i]) | i in 1..N]), "\n"];
+output [join(" ", [show(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];
