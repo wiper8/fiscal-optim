@@ -1,5 +1,3 @@
-Créer la var objective : le cashdown
-
 Trouver les données en inputs :
 salaires,
 dépenses,
