@@ -97,16 +97,15 @@ solve
 
 
 %%% Afficher
-output ["CASHDOWN = ", show(CASHDOWN), "\n"];
-output ["LIQUIDE = ", join(" ", [show(LIQUIDE[i]) | i in 1..(N+1)]), "\n"];
-output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(SALAIRES_FUTURS_IMPOT[i]) | i in 1..N]), "\n"];
-output ["SALAIRE_IMPOSABLE = ", join(" ", [show(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
-output ["IMPOT = ", join(" ", [show(IMPOT[i]) | i in 1..N]), "\n"];
-output ["RQAP = ", join(" ", [show(RQAP[i]) | i in 1..N]), "\n"];
-output ["AE = ", join(" ", [show(AE[i]) | i in 1..N]), "\n"];
-output ["RRQ = ", join(" ", [show(RRQ[i]) | i in 1..N]), "\n"];
-output ["FOND_RETRAITE = ", join(" ", [show(FOND_RETRAITE[i]) | i in 1..N]), "\n"];
-output ["NET = ", join(" ", [show(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k]) | k in 1..N]), "\n"];
-output ["IMPOT = ", join(" ", [show(IMPOT[i]) | i in 1..N]), "\n"];
-output ["CELIAPP = ", join(" ", [show(COTIS_CELIAPP[i]) | i in 1..N]), "\n"];
-output [join(" ", [show(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];
+output ["CASHDOWN = ", show(round(CASHDOWN)), "\n"];
+output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"];
+output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[i])) | i in 1..N]), "\n"];
+output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i in 1..N]), "\n"];
+output ["IMPOT = ", join(" ", [show(round(IMPOT[i])) | i in 1..N]), "\n"];
+output ["RQAP = ", join(" ", [show(round(RQAP[i])) | i in 1..N]), "\n"];
+output ["AE = ", join(" ", [show(round(AE[i])) | i in 1..N]), "\n"];
+output ["RRQ = ", join(" ", [show(round(RRQ[i])) | i in 1..N]), "\n"];
+output ["FOND_RETRAITE = ", join(" ", [show(round(FOND_RETRAITE[i])) | i in 1..N]), "\n"];
+output ["NET = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k])) | k in 1..N]), "\n"];
+output ["CELIAPP = ", join(" ", [show(round(COTIS_CELIAPP[i])) | i in 1..N]), "\n"];
+output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];
