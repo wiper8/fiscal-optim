@@ -24,6 +24,7 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 % variables fixées par data et contraintes
 array[1..(N+1)] of var -BIG..BIG: LIQUIDE;
 var -BIG..BIG: CASHDOWN;
+array[1..N] of var float: SHARE_PRICE;
 array[1..N] of var -BIG..BIG: SALAIRE_IMPOSABLE;
 array[1..N] of var -BIG..BIG: IMPOT;
 array[1..N] of var -BIG..BIG: RQAP;
@@ -36,6 +37,18 @@ array[1..N] of var -BIG..BIG: DROITS_CELIAPP;
 array[1..N] of var -BIG..BIG: COTIS_CELI;
 array[1..N] of var -BIG..BIG: CUMUL_CELI;
 array[1..N] of var -BIG..BIG: DROITS_CELI;
+array[1..N] of var 0..BIG: COTIS_NONENR;
+array[1..N] of var 0..BIG: SELL_NONENR;
+array[1..N] of var 0..BIG: SHARES_BOUGHT_NONENR;
+array[1..N] of var 0..BIG: SHARES_SOLD_NONENR;
+array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_START;
+array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END;
+array[1..N] of var 0..BIG: CUMUL_CAPITAL_NONENR_START;
+array[1..N] of var 0..BIG: CUMUL_CAPITAL_NONENR_END;
+array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR;
+array[1..N] of var -BIG..BIG: CUMUL_GAIN_NONENR;
+array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR;
+array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR;
 array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
 
 %%% Contraintes
