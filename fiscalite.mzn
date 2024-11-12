@@ -5,6 +5,7 @@ include "fiscalite.dzn";
 int: N;
 int: N_PALIERS;
 float: BIG = 1000000000;
+float: share_price_theorical = 140;
 float: INFLATION;
 float: RENDEMENT;
 float: LIQUIDE_NOW;
@@ -22,7 +23,6 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 
 % variables fixées par data et contraintes
 array[1..(N+1)] of var -BIG..BIG: LIQUIDE;
-var float: TEST;
 var -BIG..BIG: CASHDOWN;
 array[1..N] of var -BIG..BIG: SALAIRE_IMPOSABLE;
 array[1..N] of var -BIG..BIG: IMPOT;
@@ -44,11 +44,11 @@ array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
 %% contraintes pour fixer les variables déterministes
 constraint LIQUIDE[1] = LIQUIDE_NOW;
 constraint forall(k in 1..N) (
-  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k]
+  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k]
 );
 
 constraint forall(k in 1..N) (
-  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k]% TODO retirer reer, ajouter gain capital
+  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k]% TODO retirer reer
 );
 constraint forall(k in 1..N) (
     forall(j in 1..(N_PALIERS-1))(
@@ -103,7 +103,6 @@ constraint CUMUL_CELI[1] = COTIS_CELI[1] * (1 + RENDEMENT);
 constraint forall(k in 2..N)(
   CUMUL_CELI[k] = (COTIS_CELI[k] + CUMUL_CELI[k-1]) * (1 + RENDEMENT)
 );
-
 
 %%% variable à maximiser
 constraint CASHDOWN = LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N];
