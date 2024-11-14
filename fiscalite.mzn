@@ -25,7 +25,7 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 array[1..(N+1)] of var -BIG..BIG: LIQUIDE;
 var -BIG..BIG: CASHDOWN;
 array[1..N] of var float: SHARE_PRICE;
-array[1..N] of var -BIG..BIG: SALAIRE_IMPOSABLE;
+array[1..N] of var 0..BIG: SALAIRE_IMPOSABLE;
 array[1..N] of var -BIG..BIG: IMPOT;
 array[1..N] of var -BIG..BIG: RQAP;
 array[1..N] of var -BIG..BIG: AE;
@@ -44,7 +44,7 @@ array[1..N] of var 0..BIG: SHARES_SOLD_NONENR;
 array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_START;
 array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END;
 array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR;
-array[1..N] of var int: AVG_BOUGHT_SHAREPRICE_NONENR;
+array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR;
 array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR;
 array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
 
@@ -136,13 +136,13 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     CUMUL_VALUE_NONENR[k] = CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k]
 );
-%constraint AVG_BOUGHT_SHAREPRICE_NONENR[1] = round(SHARE_PRICE[1]);
-%constraint forall(k in 2..N) (
-%    AVG_BOUGHT_SHAREPRICE_NONENR[k] = round((AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) / CUMUL_SHARES_NONENR_START[k])
-%);
-%constraint forall(k in 1..N)(
-%    GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
-%);
+constraint AVG_BOUGHT_SHAREPRICE_NONENR[1] = SHARE_PRICE[1];
+constraint forall(k in 2..N) (
+    AVG_BOUGHT_SHAREPRICE_NONENR[k] = ((AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) / CUMUL_SHARES_NONENR_START[k])
+);
+constraint forall(k in 1..N)(
+    GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
+);
 
 constraint forall(k in 1..N) (
     LIQUIDE[k] >= COTIS_CELIAPP[k] + COTIS_CELI[k] + COTIS_NONENR[k] - SELL_NONENR[k]
