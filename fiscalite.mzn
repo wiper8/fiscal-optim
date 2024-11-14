@@ -154,9 +154,12 @@ constraint forall(k in 1..N) (
     LIQUIDE[k] >= COTIS_CELIAPP[k] + COTIS_CELI[k] + COTIS_NONENR[k] - SELL_NONENR[k]
 );
 
-constraint HEUR1 = 0 \/ HEUR1 = 1;
+constraint HEUR1 = 0 \/ HEUR1 = 1 \/ HEUR1 = 2;
 constraint forall(k in 1..N)(
   HEUR1 = 1 -> PENNY = 0 /\ SELL_NONENR[k] = 0 /\ COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
+);
+constraint forall(k in 1..N)(
+  HEUR1 = 2 -> COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
 );
 
 %%% variable à maximiser
