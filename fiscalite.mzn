@@ -4,6 +4,7 @@ include "fiscalite.dzn";
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
 int: N;
 int: N_PALIERS;
+float: PENNY = 0.01;
 float: BIG = 1000000000;
 float: share_price_theorical = 140;
 float: INFLATION;
@@ -69,19 +70,23 @@ constraint forall(k in 1..N) (
 );
 
 constraint forall(k in 1..N) (
-    IMPOT[k] = sum(j in 1..N_PALIERS)(PALIERS_IMPOTS_TO_PAY[k, j])
+    IMPOT[k] <= sum(j in 1..N_PALIERS)(PALIERS_IMPOTS_TO_PAY[k, j]) + PENNY /\
+    IMPOT[k] >= sum(j in 1..N_PALIERS)(PALIERS_IMPOTS_TO_PAY[k, j]) - PENNY
 );
 constraint forall(k in 1..N) (
-    RQAP[k] = min(SALAIRES_FUTURS_IMPOT[k], 94000 * (1 + INFLATION)^(k-1)) * 0.00494
+    RQAP[k] <= min(SALAIRES_FUTURS_IMPOT[k], 94000 * (1 + INFLATION)^(k-1)) * 0.00494 + PENNY /\
+    RQAP[k] >= min(SALAIRES_FUTURS_IMPOT[k], 94000 * (1 + INFLATION)^(k-1)) * 0.00494 - PENNY
 );
 constraint forall(k in 1..N) (
-    AE[k] = min(SALAIRES_FUTURS_IMPOT[k], 65700 * (1 + INFLATION)^(k-1)) * 0.0164
+    AE[k] <= min(SALAIRES_FUTURS_IMPOT[k], 65700 * (1 + INFLATION)^(k-1)) * 0.0164 + PENNY /\
+    AE[k] >= min(SALAIRES_FUTURS_IMPOT[k], 65700 * (1 + INFLATION)^(k-1)) * 0.0164 - PENNY
 );
 constraint forall(k in 1..N) (
-    RRQ[k] = (min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) * 0.054 + max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.04)
+    RRQ[k] <= (min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) * 0.054 + max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.04) + PENNY /\
+    RRQ[k] >= (min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) * 0.054 + max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.04) - PENNY
 );
 constraint forall(k in 1..N) (
-    FOND_RETRAITE[k] <= (min(SALAIRE_IMPOSABLE[k], 68500 * (1 + INFLATION)^(k-1)) * 0.0705 + max(0, SALAIRE_IMPOSABLE[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.0855) /\ FOND_RETRAITE[k] >= min(SALAIRE_IMPOSABLE[k], 68500 * (1 + INFLATION)^(k-1)) * 0.0705 + max(0, SALAIRE_IMPOSABLE[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.0855
+    FOND_RETRAITE[k] <= (min(SALAIRE_IMPOSABLE[k], 68500 * (1 + INFLATION)^(k-1)) * 0.0705 + max(0, SALAIRE_IMPOSABLE[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.0855) + PENNY /\ FOND_RETRAITE[k] >= min(SALAIRE_IMPOSABLE[k], 68500 * (1 + INFLATION)^(k-1)) * 0.0705 + max(0, SALAIRE_IMPOSABLE[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.0855 - PENNY
 );
 
 %% vraies contraintes libres
@@ -134,27 +139,38 @@ constraint forall(k in 1..N) (
     CUMUL_VALUE_NONENR[k] >= SELL_NONENR[k]
 );
 constraint forall(k in 1..N) (
-    CUMUL_VALUE_NONENR[k] = CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k]
+    CUMUL_VALUE_NONENR[k] <= CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k] + PENNY /\
+    CUMUL_VALUE_NONENR[k] >= CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k] - PENNY
 );
 constraint AVG_BOUGHT_SHAREPRICE_NONENR[1] = SHARE_PRICE[1];
 constraint forall(k in 2..N) (
-    AVG_BOUGHT_SHAREPRICE_NONENR[k] = ((AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) / CUMUL_SHARES_NONENR_START[k])
+  CUMUL_SHARES_NONENR_START[k] <= PENNY -> AVG_BOUGHT_SHAREPRICE_NONENR[k] = 0
+);
+constraint forall(k in 2..N) (
+    CUMUL_SHARES_NONENR_START[k] > PENNY -> AVG_BOUGHT_SHAREPRICE_NONENR[k] * CUMUL_SHARES_NONENR_START[k] = (AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) 
 );
 constraint forall(k in 1..N)(
-    GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
+  SHARES_SOLD_NONENR[k] <= PENNY -> GAIN_REALISED_NONENR[k] = 0
+);
+constraint forall(k in 1..N)(
+    SHARES_SOLD_NONENR[k] > PENNY -> GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
 );
 
 constraint forall(k in 1..N) (
     LIQUIDE[k] >= COTIS_CELIAPP[k] + COTIS_CELI[k] + COTIS_NONENR[k] - SELL_NONENR[k]
 );
 
+constraint SHARES_SOLD_NONENR[1] = 0;
+constraint SHARES_SOLD_NONENR[2] = 0;
+constraint SHARES_SOLD_NONENR[5] = 0;
+constraint SHARES_SOLD_NONENR[6] = 0;
 
 %%% variable à maximiser
 constraint CASHDOWN = LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N];
 
 solve 
   %::seq_search([
-  %int_search(INVEST_CELI, input_order, indomain_min)
+  %float_search(SHARES_SOLD_NONENR, PENNY, input_order, indomain_min)
   %])
   maximize CASHDOWN;
 
@@ -178,10 +194,10 @@ output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), 
 output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
 output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
 output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
-output ["SHARES_BOUGHT_NONENR = ", join(" ", [show(round(SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
-output ["SHARES_SOLD_NONENR = ", join(" ", [show(round(SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
-output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show(round(CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
-output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show(round(CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
+output ["SHARES_BOUGHT_NONENR = ", join(" ", [show((SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
+output ["SHARES_SOLD_NONENR = ", join(" ", [show((SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
+output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show((CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
+output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show((CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
 output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
 output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
 output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
