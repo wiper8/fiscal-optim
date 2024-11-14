@@ -161,7 +161,7 @@ constraint forall(k in 1..N)(
 constraint forall(k in 1..N)(
   HEUR1 = 2 -> COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
 );
-
+constraint COTIS_NONENR[3] > 1;
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N])) / 100;
 
@@ -190,12 +190,12 @@ output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\
 %output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
 output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
 output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
-%output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
+output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
 %output ["SHARES_BOUGHT_NONENR = ", join(" ", [show((SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
-%output ["SHARES_SOLD_NONENR = ", join(" ", [show((SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
+output ["SHARES_SOLD_NONENR = ", join(" ", [show((SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show((CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show((CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
-%output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
+output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
 output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
 
