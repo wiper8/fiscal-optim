@@ -141,9 +141,12 @@ constraint forall(k in 1..N) (
     CUMUL_VALUE_NONENR[k] = CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k]
 );
 constraint AVG_BOUGHT_SHAREPRICE_NONENR[1] = SHARE_PRICE[1];
-
 constraint forall(k in 2..N) (
     AVG_BOUGHT_SHAREPRICE_NONENR[k] * CUMUL_SHARES_NONENR_START[k] = (AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) 
+);
+% pour éviter 0*x = 0*y
+constraint forall(k in 2..N) (
+  (AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) <= PENNY -> CUMUL_SHARES_NONENR_START[k] = 0 /\ AVG_BOUGHT_SHAREPRICE_NONENR[k] = 0
 );
 constraint forall(k in 1..N)(
     GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
@@ -154,14 +157,15 @@ constraint forall(k in 1..N) (
     LIQUIDE[k] >= COTIS_CELIAPP[k] + COTIS_CELI[k] + COTIS_NONENR[k] - SELL_NONENR[k]
 );
 
-constraint HEUR1 = 0 \/ HEUR1 = 1 \/ HEUR1 = 2;
+constraint HEUR1 = 1 \/ HEUR1 = 1 \/ HEUR1 = 2;
 constraint forall(k in 1..N)(
   HEUR1 = 1 -> PENNY = 0 /\ SELL_NONENR[k] = 0 /\ COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
 );
 constraint forall(k in 1..N)(
   HEUR1 = 2 -> COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
 );
-constraint COTIS_NONENR[3] > 1;
+%constraint SHARES_SOLD_NONENR[3] >= 1;
+
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N])) / 100;
 
@@ -191,10 +195,10 @@ output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\
 output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
 output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
 output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
-%output ["SHARES_BOUGHT_NONENR = ", join(" ", [show((SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
+output ["SHARES_BOUGHT_NONENR = ", join(" ", [show((SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
 output ["SHARES_SOLD_NONENR = ", join(" ", [show((SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show((CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show((CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
+output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show((CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
+output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show((CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
 output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
 output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
