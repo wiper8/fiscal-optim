@@ -44,7 +44,6 @@ array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR;
 array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR;
 array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR;
 array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
-var 0..2: HEUR1;
 
 array[1..N] of var -BIG..BIG: COTIS_CELIAPP;
 array[1..N] of var -BIG..BIG: COTIS_CELI;
@@ -59,6 +58,9 @@ array[1..N] of var 0..BIG: SELL_NONENR;
 constraint LIQUIDE[1] = LIQUIDE_NOW;
 constraint forall(k in 1..N) (
   LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_NONENR[k] + SELL_NONENR[k]
+);
+constraint forall(k in 1..N) (
+  LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_NONENR[k] >= 0
 );
 
 constraint forall(k in 1..N) (
@@ -132,10 +134,7 @@ constraint forall(k in 2..N) (
     CUMUL_SHARES_NONENR_START[k] = SHARES_BOUGHT_NONENR[k] + CUMUL_SHARES_NONENR_END[k-1]
 );
 constraint forall(k in 1..N) (
-    CUMUL_SHARES_NONENR_END[k] = CUMUL_SHARES_NONENR_START[k] - SELL_NONENR[k]
-);
-constraint forall(k in 1..N) (
-    CUMUL_VALUE_NONENR[k] >= SELL_NONENR[k]
+    CUMUL_SHARES_NONENR_END[k] = CUMUL_SHARES_NONENR_START[k] - SHARES_SOLD_NONENR[k]
 );
 constraint forall(k in 1..N) (
     CUMUL_VALUE_NONENR[k] = CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k]
@@ -152,18 +151,6 @@ constraint forall(k in 1..N)(
     GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
 );
 
-% pour avoir assez d'argent pour investir
-constraint forall(k in 1..N) (
-    LIQUIDE[k] >= COTIS_CELIAPP[k] + COTIS_CELI[k] + COTIS_NONENR[k] - SELL_NONENR[k]
-);
-
-constraint forall(k in 1..N)(
-  HEUR1 = 1 -> SELL_NONENR[k] = 0 /\ COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
-);
-constraint forall(k in 1..N)(
-  HEUR1 = 2 -> COTIS_CELIAPP[k] = 0 /\ COTIS_CELI[k] = 0
-);
-constraint HEUR1 = 2;
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N])) / 100;
 
@@ -171,16 +158,15 @@ solve
   ::seq_search([
   float_search(COTIS_NONENR, 1, input_order, indomain_max),
   float_search(SELL_NONENR, 1, input_order, indomain_max),
-  float_search(COTIS_CELI, 1, input_order, indomain_min),
   float_search(SHARES_BOUGHT_NONENR, 0.01, input_order, indomain_min),
   float_search(SHARES_SOLD_NONENR, 0.01, input_order, indomain_min)
   ])
   maximize CASHDOWN;
 
 %%% Afficher
-output ["CASHDOWN = ", show(CASHDOWN), " | HEUR1 = ", show(HEUR1), "\n"];
+output ["CASHDOWN = ", show(CASHDOWN), "\n"];
 output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"];
-output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[i])) | i in 1..N]), "\n"];
+%output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[i])) | i in 1..N]), "\n"];
 output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i in 1..N]), "\n"];
 %output ["IMPOT = ", join(" ", [show(round(IMPOT[i])) | i in 1..N]), "\n"];
 %output ["RQAP = ", join(" ", [show(round(RQAP[i])) | i in 1..N]), "\n"];
@@ -189,18 +175,18 @@ output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i
 %output ["FOND_RETRAITE = ", join(" ", [show(round(FOND_RETRAITE[i])) | i in 1..N]), "\n"];
 %output ["NET = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k])) | k in 1..N]), "\n"];
 output ["COTIS_CELIAPP = ", join(" ", [show(round(COTIS_CELIAPP[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
+output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
 output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
+output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
 %output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
-output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i] * 100) / 100) | i in 1..N]), "\n"];
-output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i] * 100) / 100) | i in 1..N]), "\n"];
+output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
+output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
 %output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
-output ["SHARES_BOUGHT_NONENR = ", join(" ", [show((SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
-output ["SHARES_SOLD_NONENR = ", join(" ", [show((SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
-output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show((CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
-output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show((CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
-output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
-output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
+%output ["SHARES_BOUGHT_NONENR = ", join(" ", [show(round(SHARES_BOUGHT_NONENR[i])) | i in 1..N]), "\n"];
+%output ["SHARES_SOLD_NONENR = ", join(" ", [show(round(SHARES_SOLD_NONENR[i])) | i in 1..N]), "\n"];
+%output ["CUMUL_SHARES_NONENR_START = ", join(" ", [show(round(CUMUL_SHARES_NONENR_START[i])) | i in 1..N]), "\n"];
+%output ["CUMUL_SHARES_NONENR_END = ", join(" ", [show(round(CUMUL_SHARES_NONENR_END[i])) | i in 1..N]), "\n"];
+%output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
+%output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
 output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
 
