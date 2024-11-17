@@ -9,7 +9,8 @@ both are available for free
 You can customize various hypotheses in the DZN file and modify some constraints and the objective function in MZN file.
 
 The Excel file serves as a solution validator. The workflow proposed is :
-1. Set your values in DZN and objective variable in MZN ->
-2. Optimize using SCIP in MiniZinc ->
-3. Input the solution obtained into the Excel file ->
-4. Verify whether the solution produces the same result as MiniZinc.
+1. Copy fiscalite_private_template.dzn and rename it as fiscalite_private.dzn
+2. Set your values in both DZN and objective variable in MZN ->
+3. Optimize using SCIP in MiniZinc ->
+4. Input the solution obtained into the Excel file ->
+5. Verify whether the solution produces the same result as MiniZinc.
