@@ -1,6 +1,6 @@
-TODO MiniZinc
+# TODO MiniZinc
 
-non enregistré et effets sur impôts
+----------------------------
 cotisation REER et effet sur l'impôt
 RAP
 maximum REER, facteur d'équivalence
