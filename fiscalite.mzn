@@ -1,4 +1,5 @@
 include "fiscalite.dzn";
+include "fiscalite_private.dzn";
 
 %%% Constantes
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
@@ -12,6 +13,10 @@ float: PLAFOND_RAP;
 float: INFLATION;
 float: RENDEMENT;
 float: LIQUIDE_NOW;
+float: NONENR_NOW;
+float: CELI_NOW;
+float: CELIAPP_NOW;
+float: REER_NOW;
 float: DROITS_CELIAPP_RESTANTS;
 float: DROITS_CELI_RESTANTS;
 float: DROITS_REER_RESTANTS;
@@ -28,34 +33,34 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 % variables fixées par data et contraintes
 array[1..(N+1)] of var -BIG..BIG: LIQUIDE;
 var -BIG..BIG: CASHDOWN;
-array[1..N] of var float: SHARE_PRICE;
-array[1..N] of var 0..BIG: SALAIRE_IMPOSABLE;
-array[1..N] of var 0..BIG: IMPOT;
-array[1..N] of var 0..BIG: RQAP;
-array[1..N] of var 0..BIG: AE;
-array[1..N] of var 0..BIG: RRQ;
-array[1..N] of var 0..BIG: FOND_RETRAITE;
-array[1..N] of var 0..BIG: CUMUL_CELIAPP;
-array[1..N] of var 0..BIG: DROITS_CELIAPP;
-array[1..N] of var 0..BIG: CUMUL_CELI;
-array[1..N] of var 0..BIG: DROITS_CELI;
-array[1..N] of var 0..BIG: DROITS_REER;
-array[1..N] of var 0..BIG: SHARES_BOUGHT_REER;
-array[1..N] of var 0..BIG: SHARES_SOLD_REER;
-array[1..N] of var 0..BIG: CUMUL_SHARES_REER_START;
-array[1..N] of var 0..BIG: CUMUL_SHARES_REER_END;
-array[1..N] of var 0..BIG: CUMUL_VALUE_REER;
-array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_REER;
-array[1..N] of var -BIG..BIG: GAIN_REALISED_REER;
-array[1..N] of var 0..BIG: FACTEUR_EQUIVALENCE;
-array[1..N] of var 0..BIG: SHARES_BOUGHT_NONENR;
-array[1..N] of var 0..BIG: SHARES_SOLD_NONENR;
-array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_START;
-array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END;
-array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR;
-array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR;
-array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR;
-array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
+array[1..N] of var float: SHARE_PRICE :: is_defined_var;
+array[1..N] of var 0..BIG: SALAIRE_IMPOSABLE :: is_defined_var;
+array[1..N] of var 0..BIG: IMPOT :: is_defined_var;
+array[1..N] of var 0..BIG: RQAP :: is_defined_var;
+array[1..N] of var 0..BIG: AE :: is_defined_var;
+array[1..N] of var 0..BIG: RRQ :: is_defined_var;
+array[1..N] of var 0..BIG: FOND_RETRAITE :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_CELIAPP :: is_defined_var;
+array[1..N] of var 0..BIG: DROITS_CELIAPP :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_CELI :: is_defined_var;
+array[1..N] of var 0..BIG: DROITS_CELI :: is_defined_var;
+array[1..N] of var 0..BIG: DROITS_REER :: is_defined_var;
+array[1..N] of var 0..BIG: SHARES_BOUGHT_REER :: is_defined_var;
+array[1..N] of var 0..BIG: SHARES_SOLD_REER :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_SHARES_REER_START :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_SHARES_REER_END :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_VALUE_REER :: is_defined_var;
+array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_REER :: is_defined_var;
+array[1..N] of var -BIG..BIG: GAIN_REALISED_REER :: is_defined_var;
+array[1..N] of var 0..BIG: FACTEUR_EQUIVALENCE :: is_defined_var;
+array[1..N] of var 0..BIG: SHARES_BOUGHT_NONENR :: is_defined_var;
+array[1..N] of var 0..BIG: SHARES_SOLD_NONENR :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_START :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END :: is_defined_var;
+array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR :: is_defined_var;
+array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR :: is_defined_var;
+array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR :: is_defined_var;
+array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY :: is_defined_var;
 
 array[1..N] of var 0..BIG: COTIS_CELIAPP;
 array[1..N] of var 0..BIG: COTIS_CELI;
@@ -115,7 +120,7 @@ constraint forall(k in 2..N)(
 constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] <= DROITS_CELIAPP[k] /\ COTIS_CELIAPP[k] <= SALAIRES_FUTURS_IMPOT[k]
 );
-constraint CUMUL_CELIAPP[1] = COTIS_CELIAPP[1] * (1 + RENDEMENT);
+constraint CUMUL_CELIAPP[1] = CELIAPP_NOW + COTIS_CELIAPP[1] * (1 + RENDEMENT);
 constraint forall(k in 2..N)(
   CUMUL_CELIAPP[k] = (COTIS_CELIAPP[k] + CUMUL_CELIAPP[k-1]) * (1 + RENDEMENT)
 );
@@ -126,7 +131,7 @@ constraint forall(k in 2..N)(
 constraint forall(k in 1..N)(
   COTIS_CELI[k] <= DROITS_CELI[k]
 );
-constraint CUMUL_CELI[1] = COTIS_CELI[1] * (1 + RENDEMENT);
+constraint CUMUL_CELI[1] = CELI_NOW + COTIS_CELI[1] * (1 + RENDEMENT);
 constraint forall(k in 2..N)(
   CUMUL_CELI[k] = (COTIS_CELI[k] + CUMUL_CELI[k-1]) * (1 + RENDEMENT)
 );
@@ -154,7 +159,7 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     SHARES_SOLD_REER[k] * SHARE_PRICE[k] = SELL_REER[k]
 );
-constraint CUMUL_SHARES_REER_START[1] = SHARES_BOUGHT_REER[1];
+constraint CUMUL_SHARES_REER_START[1] = REER_NOW / share_price_theorical + SHARES_BOUGHT_REER[1];
 constraint forall(k in 2..N) (
     CUMUL_SHARES_REER_START[k] = SHARES_BOUGHT_REER[k] + CUMUL_SHARES_REER_END[k-1]
 );
@@ -185,7 +190,7 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     SHARES_SOLD_NONENR[k] * SHARE_PRICE[k] = SELL_NONENR[k]
 );
-constraint CUMUL_SHARES_NONENR_START[1] = SHARES_BOUGHT_NONENR[1];
+constraint CUMUL_SHARES_NONENR_START[1] = NONENR_NOW / share_price_theorical + SHARES_BOUGHT_NONENR[1];
 constraint forall(k in 2..N) (
     CUMUL_SHARES_NONENR_START[k] = SHARES_BOUGHT_NONENR[k] + CUMUL_SHARES_NONENR_END[k-1]
 );
@@ -219,39 +224,40 @@ constraint forall(k in 1..N)(
   COTIS_NONENR[k] <= COTIS_CELI[k] \/ COTIS_CELI[k] = DROITS_CELI[k]
 );
 
+
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
 
-%solve 
-%  ::seq_search([
-%  float_search([
-%    if i mod 2 == 1 then LIQUIDE[(i+1) div 2]
-%    else SELL_REER[i div 2] endif
-%    | i in 1..2*N+1
-%  ], 1000, input_order, indomain_min),
-%  float_search([
-%    if i mod 3 == 1 then COTIS_CELIAPP[(i+2) div 3]
-%    elseif i mod 3 == 2 then COTIS_CELI[(i+1) div 3]
-%    else COTIS_NONENR[i div 3] endif
-%    | i in 1..3*N
-%  ], 1000, input_order, indomain_max),
-%  float_search([RAP], 1000, input_order, indomain_max)
-%  ])
-%  maximize CASHDOWN;
-  
 solve 
   ::seq_search([
   float_search([
-    if i mod 5 == 1 then SELL_REER[(i+4) div 5]
-    elseif i mod 5 == 2 then COTIS_CELIAPP[(i+3) div 5]
-    elseif i mod 5 == 3 then COTIS_CELI[(i+2) div 5]
-    elseif i mod 5 == 4 then COTIS_REER[(i+1) div 5]
-    else COTIS_NONENR[i div 5] endif
-    | i in 1..5*N
+    if i mod 2 == 1 then LIQUIDE[(i+1) div 2]
+    else SELL_REER[i div 2] endif
+    | i in 1..2*N+1
+  ], 1000, input_order, indomain_min),
+  float_search([
+    if i mod 3 == 1 then COTIS_CELIAPP[(i+2) div 3]
+    elseif i mod 3 == 2 then COTIS_CELI[(i+1) div 3]
+    else COTIS_NONENR[i div 3] endif
+    | i in 1..3*N
   ], 1000, input_order, indomain_max),
-  float_search([RAP], 1000, input_order, indomain_min)
+  float_search([RAP], 1000, input_order, indomain_max)
   ])
   maximize CASHDOWN;
+  
+%solve 
+%  ::seq_search([
+%  float_search([
+%    if i mod 5 == 1 then SELL_REER[(i+4) div 5]
+%    elseif i mod 5 == 2 then COTIS_CELIAPP[(i+3) div 5]
+%    elseif i mod 5 == 3 then COTIS_CELI[(i+2) div 5]
+%    elseif i mod 5 == 4 then COTIS_REER[(i+1) div 5]
+%    else COTIS_NONENR[i div 5] endif
+%    | i in 1..5*N
+%  ], 1000, input_order, indomain_max),
+%  float_search([RAP], 1000, input_order, indomain_min)
+%  ])
+%  maximize CASHDOWN;
 
 %%% Afficher
 output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(CASHDOWN)) * 100)), "$ | ", "RAP = ", show(round(RAP)),"\n"];
