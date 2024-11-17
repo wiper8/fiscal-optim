@@ -36,19 +36,10 @@ array[1..N] of var -BIG..BIG: CUMUL_CELIAPP;
 array[1..N] of var -BIG..BIG: DROITS_CELIAPP;
 array[1..N] of var -BIG..BIG: CUMUL_CELI;
 array[1..N] of var -BIG..BIG: DROITS_CELI;
-array[1..N] of var 0..BIG: SHARES_BOUGHT_NONENR;
-array[1..N] of var 0..BIG: SHARES_SOLD_NONENR;
-array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_START;
-array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END;
-array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR;
-array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR;
-array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR;
 array[1..N, 1..N_PALIERS] of var -BIG..BIG: PALIERS_IMPOTS_TO_PAY;
 
 array[1..N] of var -BIG..BIG: COTIS_CELIAPP;
 array[1..N] of var -BIG..BIG: COTIS_CELI;
-array[1..N] of var 0..BIG: COTIS_NONENR;
-array[1..N] of var 0..BIG: SELL_NONENR;
 
 
 %%% Contraintes
@@ -57,14 +48,14 @@ array[1..N] of var 0..BIG: SELL_NONENR;
 %% contraintes pour fixer les variables déterministes
 constraint LIQUIDE[1] = LIQUIDE_NOW;
 constraint forall(k in 1..N) (
-  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_NONENR[k] + SELL_NONENR[k]
+  LIQUIDE[k + 1] = LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k]
 );
 constraint forall(k in 1..N) (
   LIQUIDE[k] + SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_NONENR[k] >= 0
 );
 
 constraint forall(k in 1..N) (
-  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] + GAIN_REALISED_NONENR[k] / 2% TODO retirer reer
+  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k]% TODO retirer reer
 );
 constraint forall(k in 1..N) (
     forall(j in 1..(N_PALIERS-1))(
@@ -160,6 +151,7 @@ solve
   float_search(SELL_NONENR, 1, input_order, indomain_max),
   float_search(SHARES_BOUGHT_NONENR, 0.01, input_order, indomain_min),
   float_search(SHARES_SOLD_NONENR, 0.01, input_order, indomain_min)
+
   ])
   maximize CASHDOWN;
 
@@ -189,4 +181,5 @@ output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), 
 %output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
 %output ["AVG_BOUGHT_SHAREPRICE_NONENR = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_NONENR[i])) | i in 1..N]), "\n"];
 output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
+
 
