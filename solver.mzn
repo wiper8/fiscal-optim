@@ -236,10 +236,33 @@ constraint forall(k in 1..N)(
 constraint forall(k in 1..N)(
   COTIS_NONENR[k] <= COTIS_CELI[k] \/ COTIS_CELI[k] = DROITS_CELI[k]
 );
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% on va dire : on ne peut pas acheter et vendre du NONENR la même année
+constraint forall(k in 1..N)(
+  SELL_NONENR[k] = 0 \/ COTIS_NONENR[k] = 0
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% on va dire : tant que ya dla place dans CELIAPP, on ne peut pas toucher au CELI et REER et NONENR
+constraint forall(k in 1..N)(
+  COTIS_CELIAPP[k] < DROITS_CELIAPP[k] -> COTIS_NONENR[k] = 0 /\ COTIS_CELI[k] = 0 /\ COTIS_REER[k] = 0
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% on va dire : tant que 2 salaires consécutifs sont dans la même bracket d'impôt, prioriser les déductions le plus tôt possible
+% ou quelque chose du genre, à repenser
+
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% cotiser le plus de CELI le plus tôt possible
+constraint forall(k in 2..N)(
+  RENDEMENT >= 0 /\ COTIS_CELI[k-1] < DROITS_CELI[k-1] /\ COTIS_CELI[k] < DROITS_CELI[k] /\ LIQUIDE[k-1] > 0 -> COTIS_CELI[k-1] >= COTIS_CELI[k]
+);
+%%%
 
 
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
+
+constraint forall(k in 3..N)(COTIS_REER[k] = 0);
+constraint forall(k in 2..N)(COTIS_NONENR[k] = 0);
 
 solve 
   ::seq_search([
@@ -284,10 +307,10 @@ output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"
 %output ["FOND_RETRAITE = ", join(" ", [show(round(FOND_RETRAITE[i])) | i in 1..N]), "\n"];
 %output ["NET = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k])) | k in 1..N]), "\n"];
 output ["COTIS_CELIAPP = ", join(" ", [show(round(COTIS_CELIAPP[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
+output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
 output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
-%output ["DROITS REER = ", join(" ", [show(round(DROITS_REER[i])) | i in 1..N]), "\n"];
+output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
+output ["DROITS REER = ", join(" ", [show(round(DROITS_REER[i])) | i in 1..N]), "\n"];
 %output ["FACTEUR_EQUIVALENCE = ", join(" ", [show(round(FACTEUR_EQUIVALENCE[i])) | i in 1..N]), "\n"];
 %output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
 %output ["CUMUL_CELIAPP = ", join(" ", [show(round(CUMUL_CELIAPP[i])) | i in 1..N]), "\n"];
