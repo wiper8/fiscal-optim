@@ -8,10 +8,12 @@ int: N_PALIERS;
 float: BIG = 10000000;
 float: PENNY = 0.01;
 float: share_price_theorical = 140;
+float: PLAFOND_CELI_NOW;
 float: PLAFOND_REER;
 float: PLAFOND_RAP;
 float: INFLATION;
 float: RENDEMENT;
+float: INFLATION_CELI;
 float: LIQUIDE_NOW;
 float: NONENR_NOW;
 float: CELI_NOW;
@@ -126,7 +128,7 @@ constraint forall(k in 2..N)(
 );
 constraint DROITS_CELI[1] = DROITS_CELI_RESTANTS;
 constraint forall(k in 2..N)(
-    DROITS_CELI[k] = DROITS_CELI[k-1] - COTIS_CELI[k-1] + 500 * round(7000 * (1 + INFLATION)^(k-1) / 500)
+    DROITS_CELI[k] = DROITS_CELI[k-1] - COTIS_CELI[k-1] + 500 * round(PLAFOND_CELI_NOW * (1 + INFLATION_CELI)^(k-1) / 500)
 );
 constraint forall(k in 1..N)(
   COTIS_CELI[k] <= DROITS_CELI[k]
