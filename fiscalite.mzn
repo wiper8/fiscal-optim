@@ -5,9 +5,6 @@ include "fiscalite_private.dzn";
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
 int: N;
 int: N_PALIERS;
-float: BIG = 10000000;
-float: PENNY = 0.01;
-float: share_price_theorical = 140;
 float: PLAFOND_REER;
 float: PLAFOND_RAP;
 float: INFLATION;
