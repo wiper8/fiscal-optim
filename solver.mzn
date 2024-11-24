@@ -198,7 +198,7 @@ constraint forall(k in 1..N)(
     GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
 );
 
-constraint RAP <= min(PLAFOND_RAP_NOW, CUMUL_VALUE_REER[N] * (1 + RENDEMENT) - SELL_REER[N]);
+constraint RAP <= min(PLAFOND_RAP_NOW, CUMUL_VALUE_REER[N] - SELL_REER[N]);
 
 %%% Bris de symmétries
 % on met cette contrainte pour forcer ces cas-là à investir en non enregistré
