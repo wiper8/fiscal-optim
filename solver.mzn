@@ -144,16 +144,16 @@ constraint forall(k in 2..N)(
 constraint forall(k in 1..N)(
   COTIS_CELI[k] <= DROITS_CELI[k]
 );
-constraint CUMUL_CELI[1] = CELI_NOW + COTIS_CELI[1] * (1 + RENDEMENT);
+constraint CUMUL_CELI[1] = (CELI_NOW + COTIS_CELI[1]) * (1 + RENDEMENT);
 constraint forall(k in 2..N)(
   CUMUL_CELI[k] = (COTIS_CELI[k] + CUMUL_CELI[k-1]) * (1 + RENDEMENT)
 );
 constraint forall(k in 1..N) (
-  FACTEUR_EQUIVALENCE[k] = max(0, 9 * (0.015 * min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) + 0.02 * max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1))) - 600)
+  FACTEUR_EQUIVALENCE[k] = max(0, 9 * (0.015 * min(SALAIRES_FUTURS_IMPOT[k], PLAFOND_SALAIRE_RRQ_NOW * (1 + INFLATION)^(k-1)) + 0.02 * max(0, SALAIRES_FUTURS_IMPOT[k] - PLAFOND_SALAIRE_RRQ_NOW * (1 + INFLATION)^(k-1))) - 600 * (1 + INFLATION)^(k-1))
 );
 constraint DROITS_REER[1] = DROITS_REER_RESTANTS;
 constraint forall(k in 2..N)(
-    DROITS_REER[k] = DROITS_REER[k-1] - COTIS_REER[k-1] + min(SALAIRES_FUTURS_IMPOT[k] * 0.18, PLAFOND_REER_NOW) - FACTEUR_EQUIVALENCE[k]
+    DROITS_REER[k] = DROITS_REER[k-1] - COTIS_REER[k-1] + min(SALAIRES_FUTURS_IMPOT[k] * 0.18, PLAFOND_REER_NOW * (1 + INFLATION)^(k-1)) - FACTEUR_EQUIVALENCE[k]
 );
 constraint forall(k in 1..N)(
   COTIS_REER[k] <= DROITS_REER[k] /\ COTIS_REER[k] <= SALAIRES_FUTURS_IMPOT[k]
