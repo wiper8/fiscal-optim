@@ -58,13 +58,7 @@ array[1..N] of var 0..BIG: DROITS_CELIAPP :: is_defined_var;
 array[1..N] of var 0..BIG: CUMUL_CELI :: is_defined_var;
 array[1..N] of var 0..BIG: DROITS_CELI :: is_defined_var;
 array[1..N] of var 0..BIG: DROITS_REER :: is_defined_var;
-array[1..N] of var 0..BIG: SHARES_BOUGHT_REER :: is_defined_var;
-array[1..N] of var 0..BIG: SHARES_SOLD_REER :: is_defined_var;
-array[1..N] of var 0..BIG: CUMUL_SHARES_REER_START :: is_defined_var;
-array[1..N] of var 0..BIG: CUMUL_SHARES_REER_END :: is_defined_var;
 array[1..N] of var 0..BIG: CUMUL_VALUE_REER :: is_defined_var;
-array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_REER :: is_defined_var;
-array[1..N] of var -BIG..BIG: GAIN_REALISED_REER :: is_defined_var;
 array[1..N] of var 0..BIG: FACTEUR_EQUIVALENCE :: is_defined_var;
 array[1..N] of var 0..BIG: SHARES_BOUGHT_NONENR :: is_defined_var;
 array[1..N] of var 0..BIG: SHARES_SOLD_NONENR :: is_defined_var;
@@ -96,7 +90,7 @@ constraint forall(k in 1..N) (
 );
 
 constraint forall(k in 1..N) (
-  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] - COTIS_REER[k] + SELL_REER[k] + GAIN_REALISED_REER[k] / 2 + GAIN_REALISED_NONENR[k] / 2
+  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] - COTIS_REER[k] + SELL_REER[k] + GAIN_REALISED_NONENR[k] / 2
 );
 constraint forall(k in 1..N) (
     forall(j in 1..(N_PALIERS-1))(
@@ -166,32 +160,9 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     SELL_REER[k] <= CUMUL_VALUE_REER[k] * (1 + RENDEMENT)
 );
-constraint forall(k in 1..N) (
-    SHARES_BOUGHT_REER[k] * SHARE_PRICE[k] = COTIS_REER[k]
-);
-constraint forall(k in 1..N) (
-    SHARES_SOLD_REER[k] * SHARE_PRICE[k] = SELL_REER[k]
-);
-constraint CUMUL_SHARES_REER_START[1] = REER_NOW / SHARE_PRICE_THEORICAL + SHARES_BOUGHT_REER[1];
-constraint forall(k in 2..N) (
-    CUMUL_SHARES_REER_START[k] = SHARES_BOUGHT_REER[k] + CUMUL_SHARES_REER_END[k-1]
-);
-constraint forall(k in 1..N) (
-    CUMUL_SHARES_REER_END[k] = CUMUL_SHARES_REER_START[k] - SHARES_SOLD_REER[k]
-);
-constraint forall(k in 1..N) (
-    CUMUL_VALUE_REER[k] = CUMUL_SHARES_REER_START[k] * SHARE_PRICE[k]
-);
-constraint AVG_BOUGHT_SHAREPRICE_REER[1] = SHARE_PRICE[1];
-constraint forall(k in 2..N) (
-    AVG_BOUGHT_SHAREPRICE_REER[k] * CUMUL_SHARES_REER_START[k] = (AVG_BOUGHT_SHAREPRICE_REER[k-1] * CUMUL_SHARES_REER_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_REER[k]) 
-);
-% pour éviter 0*x = 0*y
-constraint forall(k in 2..N) (
-  (AVG_BOUGHT_SHAREPRICE_REER[k-1] * CUMUL_SHARES_REER_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_REER[k]) <= PENNY -> CUMUL_SHARES_REER_START[k] = 0 /\ AVG_BOUGHT_SHAREPRICE_REER[k] = 0
-);
-constraint forall(k in 1..N)(
-    GAIN_REALISED_REER[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_REER[k]) * SHARES_SOLD_REER[k]
+constraint CUMUL_VALUE_REER[1] = (REER_NOW + COTIS_REER[1]) * (1 + RENDEMENT);
+constraint forall(k in 2..N)(
+  CUMUL_VALUE_REER[k] = (COTIS_REER[k] + CUMUL_VALUE_REER[k-1]) * (1 + RENDEMENT)
 );
 
 constraint forall(k in 1..N) (
