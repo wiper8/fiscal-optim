@@ -9,8 +9,18 @@ float: BIG;
 float: PENNY;
 float: SHARE_PRICE_THEORICAL;
 float: PLAFOND_CELI_NOW;
-float: PLAFOND_REER;
-float: PLAFOND_RAP;
+float: PLAFOND_REER_NOW;
+float: PLAFOND_RAP_NOW;
+float: PLAFOND_SALAIRE_RQAP_NOW;
+float: PLAFOND_SALAIRE_AE_NOW;
+float: PLAFOND_SALAIRE_RRQ_NOW;
+float: RATE_RQAP_NOW;
+float: RATE_AE_NOW;
+float: RATE_RRQ_LOW_NOW;
+float: RATE_RRQ_HIGH_NOW;
+float: PLAFOND_SALAIRE_FOND_RETRAITE_NOW;
+float: RATE_FOND_RETRAITE_LOW_NOW;
+float: RATE_FOND_RETRAITE_HIGH_NOW;
 float: INFLATION;
 float: RENDEMENT;
 float: INFLATION_IMPOT;
@@ -100,16 +110,16 @@ constraint forall(k in 1..N) (
     IMPOT[k] = sum(j in 1..N_PALIERS)(PALIERS_IMPOTS_TO_PAY[k, j])
 );
 constraint forall(k in 1..N) (
-    RQAP[k] = min(SALAIRES_FUTURS_IMPOT[k], 94000 * (1 + INFLATION)^(k-1)) * 0.00494
+    RQAP[k] = min(SALAIRES_FUTURS_IMPOT[k], PLAFOND_SALAIRE_RQAP_NOW * (1 + INFLATION)^(k-1)) * RATE_RQAP_NOW
 );
 constraint forall(k in 1..N) (
-    AE[k] = min(SALAIRES_FUTURS_IMPOT[k], 65700 * (1 + INFLATION)^(k-1)) * 0.0164
+    AE[k] = min(SALAIRES_FUTURS_IMPOT[k], PLAFOND_SALAIRE_AE_NOW * (1 + INFLATION)^(k-1)) * RATE_AE_NOW
 );
 constraint forall(k in 1..N) (
-    RRQ[k] = (min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) * 0.054 + max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.04)
+    RRQ[k] = (min(SALAIRES_FUTURS_IMPOT[k], PLAFOND_SALAIRE_RRQ_NOW * (1 + INFLATION)^(k-1)) * RATE_RRQ_LOW_NOW + max(0, SALAIRES_FUTURS_IMPOT[k] - PLAFOND_SALAIRE_RRQ_NOW * (1 + INFLATION)^(k-1)) * RATE_RRQ_HIGH_NOW)
 );
 constraint forall(k in 1..N) (
-    FOND_RETRAITE[k] = (min(SALAIRES_FUTURS_IMPOT[k], 68500 * (1 + INFLATION)^(k-1)) * 0.0705 + max(0, SALAIRES_FUTURS_IMPOT[k] - 68500 * (1 + INFLATION)^(k-1)) * 0.0855)
+    FOND_RETRAITE[k] = (min(SALAIRES_FUTURS_IMPOT[k], PLAFOND_SALAIRE_FOND_RETRAITE_NOW * (1 + INFLATION)^(k-1)) * RATE_FOND_RETRAITE_LOW_NOW + max(0, SALAIRES_FUTURS_IMPOT[k] - PLAFOND_SALAIRE_FOND_RETRAITE_NOW * (1 + INFLATION)^(k-1)) * RATE_FOND_RETRAITE_HIGH_NOW)
 );
 
 %% vraies contraintes libres
@@ -143,7 +153,7 @@ constraint forall(k in 1..N) (
 );
 constraint DROITS_REER[1] = DROITS_REER_RESTANTS;
 constraint forall(k in 2..N)(
-    DROITS_REER[k] = DROITS_REER[k-1] - COTIS_REER[k-1] + min(SALAIRES_FUTURS_IMPOT[k] * 0.18, PLAFOND_REER) - FACTEUR_EQUIVALENCE[k]
+    DROITS_REER[k] = DROITS_REER[k-1] - COTIS_REER[k-1] + min(SALAIRES_FUTURS_IMPOT[k] * 0.18, PLAFOND_REER_NOW) - FACTEUR_EQUIVALENCE[k]
 );
 constraint forall(k in 1..N)(
   COTIS_REER[k] <= DROITS_REER[k] /\ COTIS_REER[k] <= SALAIRES_FUTURS_IMPOT[k]
@@ -215,7 +225,7 @@ constraint forall(k in 1..N)(
     GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
 );
 
-constraint RAP <= min(PLAFOND_RAP, CUMUL_VALUE_REER[N] * (1 + RENDEMENT) - SELL_REER[N]);
+constraint RAP <= min(PLAFOND_RAP_NOW, CUMUL_VALUE_REER[N] * (1 + RENDEMENT) - SELL_REER[N]);
 
 %%% Bris de symmétries
 % on met cette contrainte pour forcer ces cas-là à investir en non enregistré
