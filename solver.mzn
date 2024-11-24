@@ -27,6 +27,7 @@ float: INFLATION_IMPOT;
 float: INFLATION_CELI;
 float: LIQUIDE_NOW;
 float: NONENR_NOW;
+float: NONENR_GAIN_NOW;
 float: CELI_NOW;
 float: CELIAPP_NOW;
 float: REER_NOW;
@@ -184,7 +185,8 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     CUMUL_VALUE_NONENR[k] = CUMUL_SHARES_NONENR_START[k] * SHARE_PRICE[k]
 );
-constraint AVG_BOUGHT_SHAREPRICE_NONENR[1] = SHARE_PRICE[1];
+constraint NONENR_NOW > PENNY -> AVG_BOUGHT_SHAREPRICE_NONENR[1] = (NONENR_NOW - NONENR_GAIN_NOW) * SHARE_PRICE[1] / NONENR_NOW;
+constraint NONENR_NOW <= PENNY -> AVG_BOUGHT_SHAREPRICE_NONENR[1] = SHARE_PRICE[1];
 constraint forall(k in 2..N) (
     AVG_BOUGHT_SHAREPRICE_NONENR[k] * CUMUL_SHARES_NONENR_START[k] = (AVG_BOUGHT_SHAREPRICE_NONENR[k-1] * CUMUL_SHARES_NONENR_END[k-1] + SHARE_PRICE[k] * SHARES_BOUGHT_NONENR[k]) 
 );
@@ -218,10 +220,8 @@ constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] < DROITS_CELIAPP[k] -> COTIS_NONENR[k] = 0 /\ COTIS_CELI[k] = 0 /\ COTIS_REER[k] = 0
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% on va dire : tant que 2 salaires consécutifs sont dans la même bracket d'impôt, prioriser les déductions le plus tôt possible
-% ou quelque chose du genre, à repenser
+% on va dire : 
 %%%
-
 
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
@@ -261,7 +261,7 @@ solve
 output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(CASHDOWN)) * 100)), "$ | ", "RAP = ", show(round(RAP)),"\n"];
 output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"];
 %output ["SALAIRES_FUTURS_IMPOT = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[i])) | i in 1..N]), "\n"];
-%output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i in 1..N]), "\n"];
+output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i in 1..N]), "\n"];
 %output ["IMPOT = ", join(" ", [show(round(IMPOT[i])) | i in 1..N]), "\n"];
 %output ["RQAP = ", join(" ", [show(round(RQAP[i])) | i in 1..N]), "\n"];
 %output ["AE = ", join(" ", [show(round(AE[i])) | i in 1..N]), "\n"];
@@ -269,9 +269,9 @@ output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"
 %output ["FOND_RETRAITE = ", join(" ", [show(round(FOND_RETRAITE[i])) | i in 1..N]), "\n"];
 %output ["NET = ", join(" ", [show(round(SALAIRES_FUTURS_IMPOT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k])) | k in 1..N]), "\n"];
 output ["COTIS_CELIAPP = ", join(" ", [show(round(COTIS_CELIAPP[i])) | i in 1..N]), "\n"];
-output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
+%output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
 output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\n"];
-output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
+%output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
 output ["DROITS REER = ", join(" ", [show(round(DROITS_REER[i])) | i in 1..N]), "\n"];
 %output ["FACTEUR_EQUIVALENCE = ", join(" ", [show(round(FACTEUR_EQUIVALENCE[i])) | i in 1..N]), "\n"];
 %output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
