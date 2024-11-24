@@ -249,20 +249,11 @@ constraint forall(k in 1..N)(
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
 % on va dire : tant que 2 salaires consécutifs sont dans la même bracket d'impôt, prioriser les déductions le plus tôt possible
 % ou quelque chose du genre, à repenser
-
-% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% cotiser le plus de CELI le plus tôt possible
-constraint forall(k in 2..N)(
-  RENDEMENT >= 0 /\ COTIS_CELI[k-1] < DROITS_CELI[k-1] /\ COTIS_CELI[k] < DROITS_CELI[k] /\ LIQUIDE[k-1] > 0 -> COTIS_CELI[k-1] >= COTIS_CELI[k]
-);
 %%%
 
 
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
-
-constraint forall(k in 3..N)(COTIS_REER[k] = 0);
-constraint forall(k in 2..N)(COTIS_NONENR[k] = 0);
 
 solve 
   ::seq_search([
