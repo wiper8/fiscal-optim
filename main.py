@@ -133,13 +133,38 @@ for i in range(N):
                   GAIN_REALISED_REER[i] / 2 + GAIN_REALISED_NONENR[i] / 2)
 
 ### TODO
+PALIERS_IMPOTS_min = [None] * N
+PALIERS_IMPOTS_min_bool = [None] * N
+PALIERS_IMPOTS_max = [None] * N
+PALIERS_IMPOTS_max_bool = [None] * N
 for i in range(N):
-    for j in range(N_PALIERS):
-        model.addCons(
-            PALIERS_IMPOTS_TO_PAY[i][j] ==
-            SALAIRE_IMPOSABLE[i] * PALIERS_IMPOTS_RATES[j]
+    for j in range(N_PALIERS-1):
+        PALIERS_IMPOTS_min[i] = [model.addVar(name=f"PALIERS_IMPOTS_min{i}_{j}", lb=0, ub=BIG) for j in range(N_PALIERS)]
+        PALIERS_IMPOTS_min_bool[i] = [model.addVar(name=f"PALIERS_IMPOTS_min_bool{i}_{j}", vtype="B") for j in range(N_PALIERS)]
+        PALIERS_IMPOTS_max[i] = [model.addVar(name=f"PALIERS_IMPOTS_max{i}_{j}", lb=0, ub=BIG) for j in
+                                 range(N_PALIERS)]
+        PALIERS_IMPOTS_max_bool[i] = [model.addVar(name=f"PALIERS_IMPOTS_max_bool{i}_{j}", vtype="B") for j in
+                                      range(N_PALIERS)]
+        model.addCons(PALIERS_IMPOTS_min[i][j] <= PALIERS_IMPOTS[j+1])
+        model.addCons(PALIERS_IMPOTS_min[i][j] <= SALAIRE_IMPOSABLE[i])
+        model.addCons(PALIERS_IMPOTS_min[i][j] >= PALIERS_IMPOTS[j+1] - BIG * (1-PALIERS_IMPOTS_min_bool[i][j]))
+        model.addCons(PALIERS_IMPOTS_min[i][j] >= SALAIRE_IMPOSABLE[i] - BIG * PALIERS_IMPOTS_min_bool[i][j])
+        model.addCons(SALAIRE_IMPOSABLE[i] <= PALIERS_IMPOTS[j+1] + BIG * PALIERS_IMPOTS_min_bool[i][j])
+        model.addCons(SALAIRE_IMPOSABLE[i] >= PALIERS_IMPOTS[j+1] + PENNY - BIG * (1 - PALIERS_IMPOTS_min_bool[i][j]))
 
-        )
+        model.addCons(PALIERS_IMPOTS_max[i][j] >= PALIERS_IMPOTS_min[i][j] - PALIERS_IMPOTS[j])
+        model.addCons(PALIERS_IMPOTS_max[i][j] >= 0)
+        model.addCons(PALIERS_IMPOTS_max[i][j] <= PALIERS_IMPOTS_min[i][j] - PALIERS_IMPOTS[j] + BIG * PALIERS_IMPOTS_max_bool[i][j])
+        model.addCons(PALIERS_IMPOTS_max[i][j] <= 0 + BIG * (1 - PALIERS_IMPOTS_max_bool[i][j]))
+        model.addCons(0 <= PALIERS_IMPOTS_min[i][j] - PALIERS_IMPOTS[j] + BIG * PALIERS_IMPOTS_max_bool[i][j])
+        model.addCons(0 >= PALIERS_IMPOTS_min[i][j] - PALIERS_IMPOTS[j] + PENNY - BIG * (1 - PALIERS_IMPOTS_max_bool[i][j]))
+
+for i in range(N):
+    for j in range(N_PALIERS-1):
+        model.addCons(PALIERS_IMPOTS_TO_PAY[i][j] == PALIERS_IMPOTS_max[i][j] * PALIERS_IMPOTS_RATES[j])
+for i in range(N):
+    model.addCons(PALIERS_IMPOTS_TO_PAY[i][N_PALIERS-1] == (SALAIRE_IMPOSABLE[i] - PALIERS_IMPOTS[N_PALIERS-1]) * PALIERS_IMPOTS_RATES[N_PALIERS-1])
+
 # for i in range(N):
 #     for j in range(N_PALIERS):
 #         model.addCons(
@@ -275,6 +300,15 @@ model.addCons(RAP <= CUMUL_VALUE_REER[N-1] * (1 + RENDEMENT) - SELL_REER[N-1])
     #model.addCons(COTIS_NONENR[i] <= COTIS_CELI[i] \/ COTIS_CELI[i] = DROITS_CELI[i])
 ### TODO
 
+### TODO
+# CONTRAINTES TEMPORAIRES
+for i in range(N):
+    model.addCons(COTIS_REER[i] == 0)
+    model.addCons(COTIS_CELIAPP[i] == 0)
+    model.addCons(COTIS_CELI[i] == 0)
+    model.addCons(COTIS_NONENR[i] == 0)
+### TODO
+
 # Objective
 model.addCons(CASHDOWN == LIQUIDE[N] - 10000 + CUMUL_CELIAPP[N-1] + CUMUL_CELI[N-1] + RAP)
 model.setObjective(CASHDOWN, sense="maximize")
@@ -287,6 +321,10 @@ print(f"Value of CASHDOWN: {model.getVal(CASHDOWN):.2f}")
 print(f"Value of LIQUIDE: {[f'{model.getVal(LIQUIDE[i]):.2f}' for i in range(N+1)]}")
 print(f"Value of SALAIRES_FUTURS_IMPOT: {[SALAIRES_FUTURS_IMPOT[i] for i in range(N)]}")
 print(f"Value of SALAIRE_IMPOSABLE: {[f'{model.getVal(SALAIRE_IMPOSABLE[i]):.2f}' for i in range(N)]}")
+print(f"Value of PALIERS_IMPOTS_TO_PAY: ")
+print("\n".join(
+    [f"{[f'{model.getVal(PALIERS_IMPOTS_TO_PAY[i][j]):.2f}' for i in range(N)]}" for j in range(N_PALIERS)]
+))
 print(f"Value of IMPOT: {[f'{model.getVal(IMPOT[i]):.2f}' for i in range(N)]}")
 print(f"Value of RQAP: {[f'{model.getVal(RQAP[i]):.2f}' for i in range(N)]}")
 print(f"Value of AE: {[f'{model.getVal(AE[i]):.2f}' for i in range(N)]}")
