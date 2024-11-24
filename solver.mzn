@@ -5,14 +5,15 @@ include "data_private.dzn";
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
 int: N;
 int: N_PALIERS;
-float: BIG = 10000000;
-float: PENNY = 0.01;
-float: share_price_theorical = 140;
+float: BIG;
+float: PENNY;
+float: SHARE_PRICE_THEORICAL;
 float: PLAFOND_CELI_NOW;
 float: PLAFOND_REER;
 float: PLAFOND_RAP;
 float: INFLATION;
 float: RENDEMENT;
+float: INFLATION_IMPOT;
 float: INFLATION_CELI;
 float: LIQUIDE_NOW;
 float: NONENR_NOW;
@@ -85,14 +86,14 @@ constraint forall(k in 1..N) (
 );
 
 constraint forall(k in 1..N) (
-  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] - COTIS_REER[k] + SELL_REER[k] + GAIN_REALISED_REER[k] / 2 + GAIN_REALISED_NONENR[k] / 2% TODO retirer reer
+  SALAIRE_IMPOSABLE[k] = SALAIRES_FUTURS_IMPOT[k] - COTIS_CELIAPP[k] - COTIS_REER[k] + SELL_REER[k] + GAIN_REALISED_REER[k] / 2 + GAIN_REALISED_NONENR[k] / 2
 );
 constraint forall(k in 1..N) (
     forall(j in 1..(N_PALIERS-1))(
-      PALIERS_IMPOTS_TO_PAY[k, j] = max(min(PALIERS_IMPOTS[j+1], SALAIRE_IMPOSABLE[k]) - PALIERS_IMPOTS[j], 0) * PALIERS_IMPOTS_RATES[j]
+      PALIERS_IMPOTS_TO_PAY[k, j] = max(min(PALIERS_IMPOTS[j+1] * (1 + INFLATION_IMPOT)^(k-1), SALAIRE_IMPOSABLE[k]) - PALIERS_IMPOTS[j] * (1 + INFLATION_IMPOT)^(k-1), 0) * PALIERS_IMPOTS_RATES[j]
 ));
 constraint forall(k in 1..N) (
-    PALIERS_IMPOTS_TO_PAY[k, N_PALIERS] = max(SALAIRE_IMPOSABLE[k] - PALIERS_IMPOTS[N_PALIERS], 0) * PALIERS_IMPOTS_RATES[N_PALIERS]
+    PALIERS_IMPOTS_TO_PAY[k, N_PALIERS] = max(SALAIRE_IMPOSABLE[k] - PALIERS_IMPOTS[N_PALIERS] * (1 + INFLATION_IMPOT)^(k-1), 0) * PALIERS_IMPOTS_RATES[N_PALIERS]
 );
 
 constraint forall(k in 1..N) (
@@ -149,7 +150,7 @@ constraint forall(k in 1..N)(
 );
 
 constraint forall(k in 1..N) (
-    SHARE_PRICE[k] = share_price_theorical * (1 + RENDEMENT)^(k-1)
+    SHARE_PRICE[k] = SHARE_PRICE_THEORICAL * (1 + RENDEMENT)^(k-1)
 );
 
 constraint forall(k in 1..N) (
@@ -161,7 +162,7 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     SHARES_SOLD_REER[k] * SHARE_PRICE[k] = SELL_REER[k]
 );
-constraint CUMUL_SHARES_REER_START[1] = REER_NOW / share_price_theorical + SHARES_BOUGHT_REER[1];
+constraint CUMUL_SHARES_REER_START[1] = REER_NOW / SHARE_PRICE_THEORICAL + SHARES_BOUGHT_REER[1];
 constraint forall(k in 2..N) (
     CUMUL_SHARES_REER_START[k] = SHARES_BOUGHT_REER[k] + CUMUL_SHARES_REER_END[k-1]
 );
@@ -192,7 +193,7 @@ constraint forall(k in 1..N) (
 constraint forall(k in 1..N) (
     SHARES_SOLD_NONENR[k] * SHARE_PRICE[k] = SELL_NONENR[k]
 );
-constraint CUMUL_SHARES_NONENR_START[1] = NONENR_NOW / share_price_theorical + SHARES_BOUGHT_NONENR[1];
+constraint CUMUL_SHARES_NONENR_START[1] = NONENR_NOW / SHARE_PRICE_THEORICAL + SHARES_BOUGHT_NONENR[1];
 constraint forall(k in 2..N) (
     CUMUL_SHARES_NONENR_START[k] = SHARES_BOUGHT_NONENR[k] + CUMUL_SHARES_NONENR_END[k-1]
 );
