@@ -1,5 +1,5 @@
-include "fiscalite.dzn";
-include "fiscalite_private.dzn";
+include "data_public.dzn";
+include "data_private.dzn";
 
 %%% Constantes
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
