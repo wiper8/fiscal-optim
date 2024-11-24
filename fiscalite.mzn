@@ -1,30 +1,3 @@
-include "fiscalite.dzn";
-include "fiscalite_private.dzn";
-
-%%% Constantes
-% LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
-int: N;
-int: N_PALIERS;
-float: PLAFOND_REER;
-float: PLAFOND_RAP;
-float: INFLATION;
-float: RENDEMENT;
-float: LIQUIDE_NOW;
-float: NONENR_NOW;
-float: CELI_NOW;
-float: CELIAPP_NOW;
-float: REER_NOW;
-float: DROITS_CELIAPP_RESTANTS;
-float: DROITS_CELI_RESTANTS;
-float: DROITS_REER_RESTANTS;
-int: ANNEES_CELIAPP_ACCUMULEES;
-array[1..N] of float: SALAIRES_FUTURS_IMPOT;
-array[1..N] of float: DEPENSES;
-array[1..N_PALIERS] of float: PALIERS_IMPOTS;
-array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
-
-%%% functions
-
 %%% Variables
 
 % variables fixées par data et contraintes

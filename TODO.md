@@ -1,5 +1,8 @@
-# TODO MiniZinc
-
+# TODO SCIP
+----------------------------
+PySCIPOpt
+contraintes min et max
+contraintes /\ et \/ et ->
 ----------------------------
 cotisation REER et effet sur l'impôt
 RAP

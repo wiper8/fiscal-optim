@@ -1,0 +1,10 @@
+Z = min(A, B)
+Z <= A
+Z <= B
+Z >= A - BIG * (1 - b)
+Z >= B - BIG * b
+
+
+
+Z = A->B
+not(A) \/ B
