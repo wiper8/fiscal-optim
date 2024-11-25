@@ -242,20 +242,7 @@ solve
   float_search([RAP], 1000, input_order, indomain_max)
   ])
   maximize CASHDOWN;
-  
-%solve 
-%  ::seq_search([
-%  float_search([
-%    if i mod 5 == 1 then SELL_REER[(i+4) div 5]
-%    elseif i mod 5 == 2 then COTIS_CELIAPP[(i+3) div 5]
-%    elseif i mod 5 == 3 then COTIS_CELI[(i+2) div 5]
-%    elseif i mod 5 == 4 then COTIS_REER[(i+1) div 5]
-%    else COTIS_NONENR[i div 5] endif
-%    | i in 1..5*N
-%  ], 1000, input_order, indomain_max),
-%  float_search([RAP], 1000, input_order, indomain_min)
-%  ])
-%  maximize CASHDOWN;
+
 
 %%% Afficher
 output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(CASHDOWN)) * 100)), "$ | ", "RAP = ", show(round(RAP)),"\n"];
@@ -277,14 +264,10 @@ output ["DROITS REER = ", join(" ", [show(round(DROITS_REER[i])) | i in 1..N]), 
 %output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
 %output ["CUMUL_CELIAPP = ", join(" ", [show(round(CUMUL_CELIAPP[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_CELI = ", join(" ", [show(round(CUMUL_CELI[i])) | i in 1..N]), "\n"];
-output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
-output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
 output ["COTIS_REER = ", join(" ", [show(round(COTIS_REER[i])) | i in 1..N]), "\n"];
 output ["SELL_REER = ", join(" ", [show(round(SELL_REER[i])) | i in 1..N]), "\n"];
-%output ["SHARES_BOUGHT_REER = ", join(" ", [show(round(SHARES_BOUGHT_REER[i])) | i in 1..N]), "\n"];
-%output ["SHARES_SOLD_REER = ", join(" ", [show(round(SHARES_SOLD_REER[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_SHARES_REER_START = ", join(" ", [show(round(CUMUL_SHARES_REER_START[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_SHARES_REER_END = ", join(" ", [show(round(CUMUL_SHARES_REER_END[i])) | i in 1..N]), "\n"];
+output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
+output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_VALUE_REER = ", join(" ", [show(round(CUMUL_VALUE_REER[i])) | i in 1..N]), "\n"];
 %output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
 %output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
