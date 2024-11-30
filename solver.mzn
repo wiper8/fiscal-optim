@@ -163,7 +163,7 @@ constraint forall(k in 1..N) (
 );
 constraint CUMUL_VALUE_REER[1] = (REER_NOW + COTIS_REER[1]) * (1 + RENDEMENT);
 constraint forall(k in 2..N)(
-  CUMUL_VALUE_REER[k] = (COTIS_REER[k] + CUMUL_VALUE_REER[k-1]) * (1 + RENDEMENT)
+  CUMUL_VALUE_REER[k] =  (COTIS_REER[k] + CUMUL_VALUE_REER[k-1] - SELL_REER[k-1]) * (1 + RENDEMENT)
 );
 
 constraint forall(k in 1..N) (
@@ -223,6 +223,7 @@ constraint forall(k in 1..N)(
 % on va dire : 
 %%%
 
+
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
 
@@ -268,8 +269,8 @@ output ["COTIS_REER = ", join(" ", [show(round(COTIS_REER[i])) | i in 1..N]), "\
 output ["SELL_REER = ", join(" ", [show(round(SELL_REER[i])) | i in 1..N]), "\n"];
 output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
 output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_VALUE_REER = ", join(" ", [show(round(CUMUL_VALUE_REER[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
+output ["CUMUL_VALUE_REER = ", join(" ", [show(round(CUMUL_VALUE_REER[i])) | i in 1..N]), "\n"];
+output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
 %output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
 %output ["AVG_BOUGHT_SHAREPRICE_REER = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_REER[i])) | i in 1..N]), "\n"];
 %output ["GAIN_REALISED_REER = ", join(" ", [show(round(GAIN_REALISED_REER[i])) | i in 1..N]), "\n"];
