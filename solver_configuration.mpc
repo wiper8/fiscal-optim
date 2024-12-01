@@ -1,0 +1,12 @@
+{
+    "--scip-branching/allfullstrong/priority": 100000,
+    "--scip-branching/preferbinary": "true",
+    "--scip-constraints/nonlinear/maxproprounds": 10,
+    "--scip-heuristics/undercover/freq": 10,
+    "--scip-nodeselection/hybridestim/memsavepriority": 500000000,
+    "--scip-nodeselection/hybridestim/stdpriority": 500000000,
+    "--scip-propagating/vbounds/usebdwidening": "false",
+    "intermediate-solutions": true,
+    "output-objective": true,
+    "solver": "org.minizinc.mip.scip@9.2.0.0"
+}
