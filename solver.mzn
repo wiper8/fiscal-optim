@@ -4,6 +4,7 @@ include "data_private.dzn";
 %%% Constantes
 % LA PREMIÈRE ANNÉE n=1 EST CELLE EN COURS AVANT JANVIER
 int: N;
+int: N_BUY_HOME;
 float: MOIS;
 int: N_PALIERS;
 float: BIG;
@@ -49,7 +50,8 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 
 % variables fixées par data et contraintes
 array[1..(N+1)] of var 0..BIG: LIQUIDE;
-var 0..BIG: CASHDOWN;
+var 0..BIG: CASH;
+var 0..BIG: CASH_PLUS_CELIAPP;
 array[1..N] of var 0..BIG: SHARE_PRICE :: is_defined_var;
 array[1..N] of var 0..BIG: ECONOMIES :: is_defined_var;
 array[1..N] of var -BIG..BIG: RETOUR_IMPOT :: is_defined_var;
@@ -84,7 +86,6 @@ array[1..N] of var 0..BIG: COTIS_NONENR;
 array[1..N] of var 0..BIG: SELL_NONENR;
 array[1..N] of var 0..BIG: COTIS_REER;
 array[1..N] of var 0..BIG: SELL_REER;
-var 0..BIG: RAP;
 
 %%% Contraintes
 
@@ -104,7 +105,7 @@ constraint forall(k in 1..N) (
 constraint RETOUR_IMPOT[1] = RETOUR_IMPOT_1_ESTIM;
 constraint forall(k in 2..N)(RETOUR_IMPOT[k] = IMPOT_PAYE[k-1] - IMPOT_DU[k-1]);
 
-constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) / (12 - (MOIS-1));
+constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) * (12 - (MOIS-1)) / 12;
 constraint forall(k in 2..N)(
   ECONOMIES[k] = SALAIRES_BRUT[k] - IMPOT_PAYE[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k]
 );
@@ -165,11 +166,12 @@ constraint forall(k in 2..N)(
     DROITS_CELIAPP[k] = DROITS_CELIAPP[k-1] - COTIS_CELIAPP[k-1] + if k <= (5+1-ANNEES_CELIAPP_ACCUMULEES) then 8000 else 0 endif
 );
 constraint forall(k in 1..N)(
-  COTIS_CELIAPP[k] <= DROITS_CELIAPP[k]
+  COTIS_CELIAPP[k] <= DROITS_CELIAPP[k] /\ (k >= N_BUY_HOME -> COTIS_CELIAPP[k] = 0)
 );
+
 constraint CUMUL_CELIAPP[1] = CELIAPP_NOW + COTIS_CELIAPP[1] * (1 + RENDEMENT)^((12 - (MOIS - 1))/12);
 constraint forall(k in 2..N)(
-  CUMUL_CELIAPP[k] = (COTIS_CELIAPP[k] + CUMUL_CELIAPP[k-1]) * (1 + RENDEMENT)
+  if k >= N_BUY_HOME then CUMUL_CELIAPP[k] = 0 else CUMUL_CELIAPP[k] = (COTIS_CELIAPP[k] + CUMUL_CELIAPP[k-1]) * (1 + RENDEMENT) endif  
 );
 constraint DROITS_CELI[1] = DROITS_CELI_RESTANTS;
 constraint forall(k in 2..N)(
@@ -238,8 +240,6 @@ constraint forall(k in 1..N)(
     GAIN_REALISED_NONENR[k] = (SHARE_PRICE[k] - AVG_BOUGHT_SHAREPRICE_NONENR[k]) * SHARES_SOLD_NONENR[k]
 );
 
-constraint RAP <= min(PLAFOND_RAP_NOW, CUMUL_VALUE_REER[N] - SELL_REER[N]);
-
 %%% Bris de symmétries
 % on met cette contrainte pour forcer ces cas-là à investir en non enregistré
 constraint forall(k in 1..N)(
@@ -284,11 +284,15 @@ constraint forall(k1 in 1..N-1)(
 );
 
 %% parfois, on pourrait vouloir préguider l'optimiseur sur la variable réponse
-%constraint CASHDOWN >= 0;
+%constraint CASH_PLUS_CELIAPP >= 0;
 %%%
 
+constraint forall(k in 1..N)(SELL_NONENR[k] = 0 /\ COTIS_NONENR[k] = 0 /\ SELL_REER[k] = 0);
+
 %%% variable à maximiser
-constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
+constraint CASH = round(100 * (CASH_PLUS_CELIAPP - CUMUL_CELIAPP[N_BUY_HOME-1])) / 100;
+constraint CASH_PLUS_CELIAPP = LIQUIDE[N+1] + CUMUL_CELIAPP[N_BUY_HOME-1] + CUMUL_CELI[N];
+
 
 solve 
   ::seq_search([
@@ -302,18 +306,17 @@ solve
     elseif i mod 3 == 2 then COTIS_CELI[(i+1) div 3]
     else COTIS_NONENR[i div 3] endif
     | i in 1..3*N
-  ], 1000, input_order, indomain_max),
-  float_search([RAP], 1000, input_order, indomain_max)
+  ], 1000, input_order, indomain_max)
   ])
-  maximize CASHDOWN;
+  maximize CASH_PLUS_CELIAPP;
 
 
 %%% Afficher
-output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(CASHDOWN)) * 100)), "$ | ", "RAP = ", show(round(RAP)),"\n"];
+output ["CASH = ", show(floor(CASH)), ".", show(floor((CASH - floor(CASH)) * 100)), "$", "\n"];
 output ["LIQUIDE =             ", join(" ", [format(LIQUIDE[i]) | i in 1..(N+1)]), "\n"];
 output ["SALAIRES_BRUT =       ", join(" ", [format(SALAIRES_BRUT[i]) | i in 1..N]), "\n"];
 output ["SALAIRE_IMPOSABLE =   ", join(" ", [format(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
-%output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
+output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
 output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N]), "\n"];
 %output ["IMPOT_PAYE =          ", join(" ", [format(IMPOT_PAYE[i]) | i in 1..N]), "\n"];
 %output ["IMPOT_DU =            ", join(" ", [format(IMPOT_DU[i]) | i in 1..N]), "\n"];
@@ -323,13 +326,13 @@ output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N
 %output ["FOND_RETRAITE =       ", join(" ", [format(FOND_RETRAITE[i]) | i in 1..N]), "\n"];
 %output ["NET =                 ", join(" ", [format(SALAIRES_BRUT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k]) | k in 1..N]), "\n"];
 output ["COTIS_CELIAPP =       ", join(" ", [format(COTIS_CELIAPP[i]) | i in 1..N]), "\n"];
-%output ["DROITS CELIAPP =      ", join(" ", [format(DROITS_CELIAPP[i]) | i in 1..N]), "\n"];
+output ["DROITS CELIAPP =      ", join(" ", [format(DROITS_CELIAPP[i]) | i in 1..N]), "\n"];
 output ["COTIS_CELI =          ", join(" ", [format(COTIS_CELI[i]) | i in 1..N]), "\n"];
 %output ["DROITS CELI =         ", join(" ", [format(DROITS_CELI[i]) | i in 1..N]), "\n"];
 %output ["DROITS REER =         ", join(" ", [format(DROITS_REER[i]) | i in 1..N]), "\n"];
 %output ["FACTEUR_EQUIVALENCE = ", join(" ", [format(FACTEUR_EQUIVALENCE[i]) | i in 1..N]), "\n"];
 %output [join(" ", [format(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
-%output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
+output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
 %output ["CUMUL_CELI =          ", join(" ", [format(CUMUL_CELI[i]) | i in 1..N]), "\n"];
 output ["COTIS_REER =          ", join(" ", [format(COTIS_REER[i]) | i in 1..N]), "\n"];
 output ["SELL_REER =           ", join(" ", [format(SELL_REER[i]) | i in 1..N]), "\n"];
