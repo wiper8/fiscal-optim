@@ -1,0 +1,10 @@
+{
+    "--scip-heuristics/undercover/freq": 10,
+    "--scip-nodeselection/hybridestim/memsavepriority": 500000,
+    "--scip-nodeselection/hybridestim/stdpriority": 500000,
+    "--scip-pricing/delvars": "true",
+    "--scip-pricing/delvarsroot": "true",
+    "intermediate-solutions": true,
+    "output-objective": true,
+    "solver": "org.minizinc.mip.scip@9.2.0.0"
+}
