@@ -345,7 +345,7 @@ output ["PALIER_MARGINAL =     ", join(" ", [format(PALIER_MARGINAL[i]) | i in 1
 
 
 function string: format(float: x) =
-    if x < 10 /\ x >= 0 then
+    if x < 10 /\ x > -1 then
     "      " ++ show(round(x))
     elseif x < 100 /\ x > -10 then
     "     " ++ show(round(x))
