@@ -104,7 +104,7 @@ constraint forall(k in 1..N) (
 constraint RETOUR_IMPOT[1] = RETOUR_IMPOT_1_ESTIM;
 constraint forall(k in 2..N)(RETOUR_IMPOT[k] = IMPOT_PAYE[k-1] - IMPOT_DU[k-1]);
 
-constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) / (12 - (MOIS-1));
+constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) * (12 - (MOIS-1)) / 12;
 constraint forall(k in 2..N)(
   ECONOMIES[k] = SALAIRES_BRUT[k] - IMPOT_PAYE[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k]
 );
