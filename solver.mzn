@@ -74,6 +74,7 @@ array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END :: is_defined_var;
 array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR :: is_defined_var;
 array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR :: is_defined_var;
 array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR :: is_defined_var;
+array[1..N] of var 0..N_PALIERS: PALIER_MARGINAL :: is_defined_var;
 array[1..N, 1..N_PALIERS] of var 0..BIG: PALIERS_IMPOTS_TO_PAY_PAYE :: is_defined_var;
 array[1..N, 1..N_PALIERS] of var 0..BIG: PALIERS_IMPOTS_TO_PAY_DU :: is_defined_var;
 
@@ -83,8 +84,6 @@ array[1..N] of var 0..BIG: COTIS_NONENR;
 array[1..N] of var 0..BIG: SELL_NONENR;
 array[1..N] of var 0..BIG: COTIS_REER;
 array[1..N] of var 0..BIG: SELL_REER;
-var 1..N: YEAR_START_SELLING_REER;
-var 1..N: YEAR_START_SELLING_NONENR;
 var 0..BIG: RAP;
 
 %%% Contraintes
@@ -127,6 +126,17 @@ constraint forall(k in 1..N) (
 );
 constraint forall(k in 1..N) (
     PALIERS_IMPOTS_TO_PAY_PAYE[k, N_PALIERS] = max(SALAIRES_BRUT[k] - PALIERS_IMPOTS[N_PALIERS] * (1 + INFLATION_IMPOT)^(k-1), 0) * PALIERS_IMPOTS_RATES[N_PALIERS]
+);
+
+constraint forall(k in 1..N)(
+  forall(j in 2..N_PALIERS)(
+    PALIERS_IMPOTS_TO_PAY_DU[k, j] = 0 -> PALIER_MARGINAL[k] < j
+  )
+);
+constraint forall(k in 1..N)(
+  forall(j in 2..N_PALIERS)(
+    PALIERS_IMPOTS_TO_PAY_DU[k, j] > 0 -> PALIER_MARGINAL[k] >= j
+  )
 );
 
 constraint forall(k in 1..N) (
@@ -250,25 +260,32 @@ constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] < DROITS_CELIAPP[k] -> COTIS_NONENR[k] = 0 /\ COTIS_CELI[k] = 0 /\ COTIS_REER[k] = 0
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% on va dire : pas le droit de vendre avant une certainne année
-constraint forall(k in 1..(YEAR_START_SELLING_REER-1))(
-  k >= 1 -> SELL_REER[k] = 0
-);
-constraint forall(k in YEAR_START_SELLING_REER..N)(
-  COTIS_REER[k] = 0
-);
-constraint forall(k in 1..(YEAR_START_SELLING_NONENR-1))(
-  k >= 1 -> SELL_NONENR[k] = 0
-);
-constraint forall(k in YEAR_START_SELLING_NONENR..N)(
-  COTIS_NONENR[k] = 0
+% on va dire : nonenr : gain tard est souvent meilleur même si plus haut taux d'impot
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> (((SELL_NONENR[k1] <= SELL_NONENR[k2] /\ COTIS_NONENR[k1] >= COTIS_NONENR[k2]) \/ SELL_NONENR[k1] = 0 \/ SELL_NONENR[k2] = 0 \/ COTIS_NONENR[k1] = 0 \/ COTIS_NONENR[k2] = 0) /\ ((SELL_REER[k1] <= SELL_REER[k2]) \/ SELL_REER[k1] = 0 \/ SELL_REER[k2] = 0 \/ COTIS_REER[k1] = DROITS_REER[k1] \/ COTIS_REER[k2] = DROITS_REER[k2]))
+  )
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% on va dire : on doit vendre de plus en plus
-constraint forall(k in 2..N)(SELL_REER[k-1] <= SELL_REER[k] /\ SELL_NONENR[k-1] <= SELL_NONENR[k]);
-constraint forall(k in 2..N)(COTIS_REER[k-1] >= COTIS_REER[k] /\ COTIS_NONENR[k-1] >= COTIS_NONENR[k]);
-%%%
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    (
+      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2] / 2) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1] / 2)
+    ) -> ((SELL_NONENR[k1] <= SELL_NONENR[k2] \/ SELL_NONENR[k2] = 0))
+  )
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    (
+      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2]) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1])
+    ) -> ((SELL_REER[k1] <= SELL_REER[k2] \/ SELL_REER[k2] = 0))
+  )
+);
 
+%% parfois, on pourrait vouloir préguider l'optimiseur sur la variable réponse
+%constraint CASHDOWN >= 0;
+%%%
 
 %%% variable à maximiser
 constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
@@ -293,37 +310,51 @@ solve
 
 %%% Afficher
 output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(CASHDOWN)) * 100)), "$ | ", "RAP = ", show(round(RAP)),"\n"];
-output ["LIQUIDE = ", join(" ", [show(round(LIQUIDE[i])) | i in 1..(N+1)]), "\n"];
-output ["SALAIRES_BRUT = ", join(" ", [show(round(SALAIRES_BRUT[i])) | i in 1..N]), "\n"];
-output ["SALAIRE_IMPOSABLE = ", join(" ", [show(round(SALAIRE_IMPOSABLE[i])) | i in 1..N]), "\n"];
-output ["ECONOMIES = ", join(" ", [show(round(ECONOMIES[i])) | i in 1..N]), "\n"];
-output ["RETOUR_IMPOT = ", join(" ", [show(round(RETOUR_IMPOT[i])) | i in 1..N]), "\n"];
-output ["IMPOT_PAYE = ", join(" ", [show(round(IMPOT_PAYE[i])) | i in 1..N]), "\n"];
-output ["IMPOT_DU = ", join(" ", [show(round(IMPOT_DU[i])) | i in 1..N]), "\n"];
-%output ["RQAP = ", join(" ", [show(round(RQAP[i])) | i in 1..N]), "\n"];
-%output ["AE = ", join(" ", [show(round(AE[i])) | i in 1..N]), "\n"];
-%output ["RRQ = ", join(" ", [show(round(RRQ[i])) | i in 1..N]), "\n"];
-%output ["FOND_RETRAITE = ", join(" ", [show(round(FOND_RETRAITE[i])) | i in 1..N]), "\n"];
-%output ["NET = ", join(" ", [show(round(SALAIRES_BRUT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k])) | k in 1..N]), "\n"];
-output ["COTIS_CELIAPP = ", join(" ", [show(round(COTIS_CELIAPP[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELIAPP = ", join(" ", [show(round(DROITS_CELIAPP[i])) | i in 1..N]), "\n"];
-output ["COTIS_CELI = ", join(" ", [show(round(COTIS_CELI[i])) | i in 1..N]), "\n"];
-%output ["DROITS CELI = ", join(" ", [show(round(DROITS_CELI[i])) | i in 1..N]), "\n"];
-output ["DROITS REER = ", join(" ", [show(round(DROITS_REER[i])) | i in 1..N]), "\n"];
-%output ["FACTEUR_EQUIVALENCE = ", join(" ", [show(round(FACTEUR_EQUIVALENCE[i])) | i in 1..N]), "\n"];
-%output [join(" ", [show(round(PALIERS_IMPOTS_TO_PAY[k, j])) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
-%output ["CUMUL_CELIAPP = ", join(" ", [show(round(CUMUL_CELIAPP[i])) | i in 1..N]), "\n"];
-%output ["CUMUL_CELI = ", join(" ", [show(round(CUMUL_CELI[i])) | i in 1..N]), "\n"];
-output ["COTIS_REER = ", join(" ", [show(round(COTIS_REER[i])) | i in 1..N]), "\n"];
-output ["SELL_REER = ", join(" ", [show(round(SELL_REER[i])) | i in 1..N]), "\n"];
-output ["COTIS_NONENR = ", join(" ", [show(round(COTIS_NONENR[i])) | i in 1..N]), "\n"];
-output ["SELL_NONENR = ", join(" ", [show(round(SELL_NONENR[i])) | i in 1..N]), "\n"];
-output ["CUMUL_VALUE_REER = ", join(" ", [show(round(CUMUL_VALUE_REER[i])) | i in 1..N]), "\n"];
-output ["CUMUL_VALUE_NONENR = ", join(" ", [show(round(CUMUL_VALUE_NONENR[i])) | i in 1..N]), "\n"];
-%output ["SHARE_PRICE = ", join(" ", [show(round(SHARE_PRICE[i])) | i in 1..N]), "\n"];
-%output ["AVG_BOUGHT_SHAREPRICE_REER = ", join(" ", [show(round(AVG_BOUGHT_SHAREPRICE_REER[i])) | i in 1..N]), "\n"];
-%output ["GAIN_REALISED_REER = ", join(" ", [show(round(GAIN_REALISED_REER[i])) | i in 1..N]), "\n"];
-output ["GAIN_REALISED_NONENR = ", join(" ", [show(round(GAIN_REALISED_NONENR[i])) | i in 1..N]), "\n"];
-output ["YEAR_START_SELLING_REER = ", show(YEAR_START_SELLING_REER), "\n"];
-output ["YEAR_START_SELLING_NONENR = ", show(YEAR_START_SELLING_NONENR), "\n"];
+output ["LIQUIDE =             ", join(" ", [format(LIQUIDE[i]) | i in 1..(N+1)]), "\n"];
+output ["SALAIRES_BRUT =       ", join(" ", [format(SALAIRES_BRUT[i]) | i in 1..N]), "\n"];
+output ["SALAIRE_IMPOSABLE =   ", join(" ", [format(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
+%output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
+output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N]), "\n"];
+%output ["IMPOT_PAYE =          ", join(" ", [format(IMPOT_PAYE[i]) | i in 1..N]), "\n"];
+%output ["IMPOT_DU =            ", join(" ", [format(IMPOT_DU[i]) | i in 1..N]), "\n"];
+%output ["RQAP =                ", join(" ", [format(RQAP[i]) | i in 1..N]), "\n"];
+%output ["AE =                  ", join(" ", [format(AE[i]) | i in 1..N]), "\n"];
+%output ["RRQ =                 ", join(" ", [format(RRQ[i]) | i in 1..N]), "\n"];
+%output ["FOND_RETRAITE =       ", join(" ", [format(FOND_RETRAITE[i]) | i in 1..N]), "\n"];
+%output ["NET =                 ", join(" ", [format(SALAIRES_BRUT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k]) | k in 1..N]), "\n"];
+output ["COTIS_CELIAPP =       ", join(" ", [format(COTIS_CELIAPP[i]) | i in 1..N]), "\n"];
+%output ["DROITS CELIAPP =      ", join(" ", [format(DROITS_CELIAPP[i]) | i in 1..N]), "\n"];
+output ["COTIS_CELI =          ", join(" ", [format(COTIS_CELI[i]) | i in 1..N]), "\n"];
+%output ["DROITS CELI =         ", join(" ", [format(DROITS_CELI[i]) | i in 1..N]), "\n"];
+%output ["DROITS REER =         ", join(" ", [format(DROITS_REER[i]) | i in 1..N]), "\n"];
+%output ["FACTEUR_EQUIVALENCE = ", join(" ", [format(FACTEUR_EQUIVALENCE[i]) | i in 1..N]), "\n"];
+%output [join(" ", [format(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
+%output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
+%output ["CUMUL_CELI =          ", join(" ", [format(CUMUL_CELI[i]) | i in 1..N]), "\n"];
+output ["COTIS_REER =          ", join(" ", [format(COTIS_REER[i]) | i in 1..N]), "\n"];
+output ["SELL_REER =           ", join(" ", [format(SELL_REER[i]) | i in 1..N]), "\n"];
+output ["COTIS_NONENR =        ", join(" ", [format(COTIS_NONENR[i]) | i in 1..N]), "\n"];
+output ["SELL_NONENR =         ", join(" ", [format(SELL_NONENR[i]) | i in 1..N]), "\n"];
+output ["CUMUL_VALUE_REER =    ", join(" ", [format(CUMUL_VALUE_REER[i]) | i in 1..N]), "\n"];
+output ["CUMUL_VALUE_NONENR =  ", join(" ", [format(CUMUL_VALUE_NONENR[i]) | i in 1..N]), "\n"];
+%output ["SHARE_PRICE =         ", join(" ", [format(SHARE_PRICE[i]) | i in 1..N]), "\n"];
+%output ["AVG_BOUGHT_SHAREPRICE_REER = ", join(" ", [format(AVG_BOUGHT_SHAREPRICE_REER[i]) | i in 1..N]), "\n"];
+%output ["GAIN_REALISED_REER =  ", join(" ", [format(GAIN_REALISED_REER[i]) | i in 1..N]), "\n"];
+output ["GAIN_REALISED_NONENR =", join(" ", [format(GAIN_REALISED_NONENR[i]) | i in 1..N]), "\n"];
+output ["PALIER_MARGINAL =     ", join(" ", [format(PALIER_MARGINAL[i]) | i in 1..N]), "\n"];
 
+
+function string: format(float: x) =
+    if x < 10 /\ x >= 0 then
+    "      " ++ show(round(x))
+    elseif x < 100 /\ x > -10 then
+    "     " ++ show(round(x))
+    elseif x < 1000 /\ x > -100 then
+    "    " ++ show(round(x))
+    elseif x < 10000 /\ x > -1000 then
+    "   " ++ show(round(x))
+    elseif x < 100000 /\ x > -10000 then
+    "  " ++ show(round(x))
+    elseif x < 1000000 /\ x > -100000 then
+    " " ++ show(round(x))
+    else show(round(x)) endif;
