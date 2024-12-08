@@ -52,6 +52,8 @@ array[1..N_PALIERS] of float: PALIERS_IMPOTS_RATES;
 array[1..(N+1)] of var 0..BIG: LIQUIDE;
 var 0..BIG: CASH;
 var 0..BIG: CASH_PLUS_CELIAPP;
+var 1..N: START_SELLING_NONENR;
+var 1..N: START_SELLING_REER;
 array[1..N] of var 0..BIG: SHARE_PRICE :: is_defined_var;
 array[1..N] of var 0..BIG: ECONOMIES :: is_defined_var;
 array[1..N] of var -BIG..BIG: RETOUR_IMPOT :: is_defined_var;
@@ -76,7 +78,8 @@ array[1..N] of var 0..BIG: CUMUL_SHARES_NONENR_END :: is_defined_var;
 array[1..N] of var 0..BIG: CUMUL_VALUE_NONENR :: is_defined_var;
 array[1..N] of var 0..BIG: AVG_BOUGHT_SHAREPRICE_NONENR :: is_defined_var;
 array[1..N] of var -BIG..BIG: GAIN_REALISED_NONENR :: is_defined_var;
-array[1..N] of var 0..N_PALIERS: PALIER_MARGINAL :: is_defined_var;
+array[1..N] of var int: PALIER_MARGINAL :: is_defined_var;
+constraint forall(k in 1..N)(PALIER_MARGINAL[k] >= 1 /\ PALIER_MARGINAL[k] <= N_PALIERS);
 array[1..N, 1..N_PALIERS] of var 0..BIG: PALIERS_IMPOTS_TO_PAY_PAYE :: is_defined_var;
 array[1..N, 1..N_PALIERS] of var 0..BIG: PALIERS_IMPOTS_TO_PAY_DU :: is_defined_var;
 
@@ -163,7 +166,7 @@ constraint forall(k in 1..N) (
 %% vraies contraintes libres
 constraint DROITS_CELIAPP[1] = DROITS_CELIAPP_RESTANTS;
 constraint forall(k in 2..N)(
-    DROITS_CELIAPP[k] = DROITS_CELIAPP[k-1] - COTIS_CELIAPP[k-1] + if k <= (5+1-ANNEES_CELIAPP_ACCUMULEES) then 8000 else 0 endif
+  DROITS_CELIAPP[k] = if k >= N_BUY_HOME then 0 else DROITS_CELIAPP[k-1] - COTIS_CELIAPP[k-1] + if k <= (5+1-ANNEES_CELIAPP_ACCUMULEES) then 8000 else 0 endif endif
 );
 constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] <= DROITS_CELIAPP[k] /\ (k >= N_BUY_HOME -> COTIS_CELIAPP[k] = 0)
@@ -260,38 +263,66 @@ constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] < DROITS_CELIAPP[k] -> COTIS_NONENR[k] = 0 /\ COTIS_CELI[k] = 0 /\ COTIS_REER[k] = 0
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% on va dire : nonenr : gain tard est souvent meilleur même si plus haut taux d'impot
+% nonenr : gain tard est souvent meilleur si même taux d'impot
 constraint forall(k1 in 1..N-1)(
   forall(k2 in k1+1..N)(
-    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> (((SELL_NONENR[k1] <= SELL_NONENR[k2] /\ COTIS_NONENR[k1] >= COTIS_NONENR[k2]) \/ SELL_NONENR[k1] = 0 \/ SELL_NONENR[k2] = 0 \/ COTIS_NONENR[k1] = 0 \/ COTIS_NONENR[k2] = 0) /\ ((SELL_REER[k1] <= SELL_REER[k2]) \/ SELL_REER[k1] = 0 \/ SELL_REER[k2] = 0 \/ COTIS_REER[k1] = DROITS_REER[k1] \/ COTIS_REER[k2] = DROITS_REER[k2]))
+    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> SELL_NONENR[k1] <= SELL_NONENR[k2] /\ SELL_REER[k1] <= SELL_REER[k2] /\ COTIS_REER[k1] >= COTIS_REER[k2]
+  )
+);
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] /\ %TODO!!! -> COTIS_REER[k1] >= COTIS_REER[k2]
   )
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
 constraint forall(k1 in 1..N-1)(
   forall(k2 in k1+1..N)(
-    (
-      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2] / 2) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1] / 2)
-    ) -> ((SELL_NONENR[k1] <= SELL_NONENR[k2] \/ SELL_NONENR[k2] = 0))
+    (1 + RENDEMENT)^(k2-k1) * (1 - PALIERS_IMPOTS_RATES[PALIER_MARGINAL[k2]] / 2) >= (1 - PALIERS_IMPOTS_RATES[PALIER_MARGINAL[k1]] / 2) -> SELL_NONENR[k1] = 0
   )
 );
+
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% pour REER, on peut trouver si on est mieux de vendre tôt ou tard
 constraint forall(k1 in 1..N-1)(
   forall(k2 in k1+1..N)(
-    (
-      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2]) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1])
-    ) -> ((SELL_REER[k1] <= SELL_REER[k2] \/ SELL_REER[k2] = 0))
+    (1 + RENDEMENT)^(k2-k1) * (1 - PALIERS_IMPOTS_RATES[PALIER_MARGINAL[k2]]) >= (1 - PALIERS_IMPOTS_RATES[PALIER_MARGINAL[k1]]) -> SELL_REER[k1] = 0
   )
 );
+
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% pour accélérer énormément les recherches
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    SELL_NONENR[k1] <= SELL_NONENR[k2]
+   )
+);
+constraint forall(k1 in 1..N-1)(
+  forall(k2 in k1+1..N)(
+    SELL_REER[k1] <= SELL_REER[k2]
+   )
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% si on a cotisé au max au CELIAPP et CELI, et qu'on est très loin de la fin, ca ne donne rien de vendre tout de suite du non-enregistré
+constraint forall(k in 1..N)(
+  COTIS_CELIAPP[k] = DROITS_CELIAPP[k] /\ COTIS_CELI[k] = DROITS_CELI[k] /\ log(1+RENDEMENT, 1/(1 - PALIERS_IMPOTS_RATES[N_PALIERS]/2)) < (N-k-1) -> SELL_NONENR[k] = 0
+);
+constraint forall(k in 1..N)(
+  COTIS_CELIAPP[k] = DROITS_CELIAPP[k] /\ COTIS_CELI[k] = DROITS_CELI[k] /\ log(1 + RENDEMENT, 1/(1 - PALIERS_IMPOTS_RATES[N_PALIERS])) < (N-k-1) -> SELL_REER[k] = 0
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+constraint forall(k in 1..N)(k < START_SELLING_NONENR -> SELL_NONENR[k] = 0);
+constraint forall(k in 1..N)(k >= START_SELLING_NONENR -> COTIS_NONENR[k] = 0);
+constraint forall(k in 1..N)(k < START_SELLING_REER -> SELL_REER[k] = 0);
+constraint forall(k in 1..N)(k >= START_SELLING_REER -> COTIS_REER[k] = 0);
 
 %% parfois, on pourrait vouloir préguider l'optimiseur sur la variable réponse
-%constraint CASH_PLUS_CELIAPP >= 0;
+%constraint CASH >= 0;
+
 %%%
 
-constraint forall(k in 1..N)(SELL_NONENR[k] = 0 /\ COTIS_NONENR[k] = 0 /\ SELL_REER[k] = 0);
-
 %%% variable à maximiser
-constraint CASH = round(100 * (CASH_PLUS_CELIAPP - CUMUL_CELIAPP[N_BUY_HOME-1])) / 100;
 constraint CASH_PLUS_CELIAPP = LIQUIDE[N+1] + CUMUL_CELIAPP[N_BUY_HOME-1] + CUMUL_CELI[N];
+constraint CASH = round(100 * (CASH_PLUS_CELIAPP - CUMUL_CELIAPP[N_BUY_HOME-1])) / 100;
 
 
 solve 
@@ -326,13 +357,13 @@ output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N
 %output ["FOND_RETRAITE =       ", join(" ", [format(FOND_RETRAITE[i]) | i in 1..N]), "\n"];
 %output ["NET =                 ", join(" ", [format(SALAIRES_BRUT[k] - IMPOT[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k]) | k in 1..N]), "\n"];
 output ["COTIS_CELIAPP =       ", join(" ", [format(COTIS_CELIAPP[i]) | i in 1..N]), "\n"];
-output ["DROITS CELIAPP =      ", join(" ", [format(DROITS_CELIAPP[i]) | i in 1..N]), "\n"];
+%output ["DROITS CELIAPP =      ", join(" ", [format(DROITS_CELIAPP[i]) | i in 1..N]), "\n"];
 output ["COTIS_CELI =          ", join(" ", [format(COTIS_CELI[i]) | i in 1..N]), "\n"];
 %output ["DROITS CELI =         ", join(" ", [format(DROITS_CELI[i]) | i in 1..N]), "\n"];
 %output ["DROITS REER =         ", join(" ", [format(DROITS_REER[i]) | i in 1..N]), "\n"];
 %output ["FACTEUR_EQUIVALENCE = ", join(" ", [format(FACTEUR_EQUIVALENCE[i]) | i in 1..N]), "\n"];
 %output [join(" ", [format(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
-output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
+%output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
 %output ["CUMUL_CELI =          ", join(" ", [format(CUMUL_CELI[i]) | i in 1..N]), "\n"];
 output ["COTIS_REER =          ", join(" ", [format(COTIS_REER[i]) | i in 1..N]), "\n"];
 output ["SELL_REER =           ", join(" ", [format(SELL_REER[i]) | i in 1..N]), "\n"];
@@ -343,8 +374,9 @@ output ["CUMUL_VALUE_NONENR =  ", join(" ", [format(CUMUL_VALUE_NONENR[i]) | i i
 %output ["SHARE_PRICE =         ", join(" ", [format(SHARE_PRICE[i]) | i in 1..N]), "\n"];
 %output ["AVG_BOUGHT_SHAREPRICE_REER = ", join(" ", [format(AVG_BOUGHT_SHAREPRICE_REER[i]) | i in 1..N]), "\n"];
 %output ["GAIN_REALISED_REER =  ", join(" ", [format(GAIN_REALISED_REER[i]) | i in 1..N]), "\n"];
-output ["GAIN_REALISED_NONENR =", join(" ", [format(GAIN_REALISED_NONENR[i]) | i in 1..N]), "\n"];
+%output ["GAIN_REALISED_NONENR =", join(" ", [format(GAIN_REALISED_NONENR[i]) | i in 1..N]), "\n"];
 output ["PALIER_MARGINAL =     ", join(" ", [format(PALIER_MARGINAL[i]) | i in 1..N]), "\n"];
+output ["START_SELLING = NONENR : ", show(START_SELLING_NONENR), ", REER : ", show(START_SELLING_REER), "\n"];
 
 
 function string: format(float: x) =
