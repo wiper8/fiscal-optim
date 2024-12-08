@@ -263,7 +263,7 @@ constraint forall(k in 1..N)(
 % on va dire : nonenr : gain tard est souvent meilleur même si plus haut taux d'impot
 constraint forall(k1 in 1..N-1)(
   forall(k2 in k1+1..N)(
-    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> (((SELL_NONENR[k1] <= SELL_NONENR[k2] /\ COTIS_NONENR[k1] >= COTIS_NONENR[k2]) \/ SELL_NONENR[k1] = 0 \/ SELL_NONENR[k2] = 0 \/ COTIS_NONENR[k1] = 0 \/ COTIS_NONENR[k2] = 0) /\ ((SELL_REER[k1] <= SELL_REER[k2]) \/ SELL_REER[k1] = 0 \/ SELL_REER[k2] = 0 \/ COTIS_REER[k1] = DROITS_REER[k1] \/ COTIS_REER[k2] = DROITS_REER[k2]))
+    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> SELL_NONENR[k1] <= SELL_NONENR[k2] /\ SELL_REER[k1] <= SELL_REER[k2] /\ COTIS_REER[k1] >= COTIS_REER[k2]
   )
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
