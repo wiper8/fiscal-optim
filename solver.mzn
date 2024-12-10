@@ -91,11 +91,13 @@ var 0..BIG: RAP;
 
 %% contraintes pour fixer les variables déterministes
 constraint LIQUIDE[1] = LIQUIDE_NOW;
-constraint LIQUIDE[2] = LIQUIDE[1] + ECONOMIES[1] - COTIS_CELIAPP[1] - COTIS_CELI[1] - COTIS_REER[1] - COTIS_NONENR[1] + SELL_REER[1] + SELL_NONENR[1] + if MOIS < 6 then RETOUR_IMPOT[1] else 0 endif;
-constraint forall(k in 2..N) (
-    LIQUIDE[k + 1] = LIQUIDE[k] + ECONOMIES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_REER[k] - COTIS_NONENR[k] + SELL_REER[k] + SELL_NONENR[k] + RETOUR_IMPOT[k]
+constraint LIQUIDE[2] = LIQUIDE[1] + ECONOMIES[1] - COTIS_CELIAPP[1] - COTIS_CELI[1] - COTIS_REER[1] - COTIS_NONENR[1] + SELL_REER[1] + SELL_NONENR[1];
+constraint forall(k in 2..N-1) (
+    LIQUIDE[k + 1] = LIQUIDE[k] + ECONOMIES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_REER[k] - COTIS_NONENR[k] + SELL_REER[k] + SELL_NONENR[k]
 );
-constraint forall(k in 1..N) (
+% ajouter le dernier paiement d'impôt sur le dernier liquide
+constraint LIQUIDE[N+1] = LIQUIDE[N] + ECONOMIES[N] - COTIS_CELIAPP[N] - COTIS_CELI[N] - COTIS_REER[N] - COTIS_NONENR[N] + SELL_REER[N] + SELL_NONENR[N] + IMPOT_PAYE[N] - IMPOT_DU[N];
+constraint forall(k in 1..N-1) (
   LIQUIDE[k] + ECONOMIES[k] - COTIS_CELIAPP[k] - COTIS_CELI[k] - COTIS_REER[k] - COTIS_NONENR[k] >= 0
 );
 
@@ -104,9 +106,9 @@ constraint forall(k in 1..N) (
 constraint RETOUR_IMPOT[1] = RETOUR_IMPOT_1_ESTIM;
 constraint forall(k in 2..N)(RETOUR_IMPOT[k] = IMPOT_PAYE[k-1] - IMPOT_DU[k-1]);
 
-constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) * (12 - (MOIS-1)) / 12;
+constraint ECONOMIES[1] = (SALAIRES_BRUT[1] - IMPOT_PAYE[1] - RQAP[1] - AE[1] - RRQ[1] - FOND_RETRAITE[1] - DEPENSES[1]) * (12 - (MOIS-1)) / 12 + if MOIS < 6 then RETOUR_IMPOT[1] else 0 endif;
 constraint forall(k in 2..N)(
-  ECONOMIES[k] = SALAIRES_BRUT[k] - IMPOT_PAYE[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k]
+  ECONOMIES[k] = SALAIRES_BRUT[k] - IMPOT_PAYE[k] - RQAP[k] - AE[k] - RRQ[k] - FOND_RETRAITE[k] - DEPENSES[k] + RETOUR_IMPOT[k]
 );
 
 constraint forall(k in 1..N) (
@@ -242,12 +244,18 @@ constraint RAP <= min(PLAFOND_RAP_NOW, CUMUL_VALUE_REER[N] - SELL_REER[N]);
 
 %%% Bris de symmétries
 % on met cette contrainte pour forcer ces cas-là à investir en non enregistré
-constraint forall(k in 1..N)(
-  SELL_REER[k] = 0 \/ COTIS_REER[k] = 0
-);
 % on priorise CELI au NONENR
 constraint forall(k in 1..N)(
-  COTIS_NONENR[k] <= COTIS_CELI[k] \/ COTIS_CELI[k] = DROITS_CELI[k]
+  COTIS_CELI[k] < DROITS_CELI[k] -> COTIS_NONENR[k] = 0
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+% si ya dla place dans le celi, on devrait investir dedans après le celiapp et ne pas attendre
+constraint forall(k in 1..N)(
+  COTIS_CELI[k] < DROITS_CELI[k] /\ COTIS_CELIAPP[k] = DROITS_CELIAPP[k] -> COTIS_CELI[k] = DROITS_CELI[k]
+);
+% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
+constraint forall(k in 1..N)(
+  SELL_REER[k] = 0 \/ COTIS_REER[k] = 0
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
 % on va dire : on ne peut pas acheter et vendre du NONENR la même année
@@ -260,52 +268,26 @@ constraint forall(k in 1..N)(
   COTIS_CELIAPP[k] < DROITS_CELIAPP[k] -> COTIS_NONENR[k] = 0 /\ COTIS_CELI[k] = 0 /\ COTIS_REER[k] = 0
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-% on va dire : nonenr : gain tard est souvent meilleur même si plus haut taux d'impot
+% on va dire : nonenr : gain tard est souvent meilleur si même taux
 constraint forall(k1 in 1..N-1)(
   forall(k2 in k1+1..N)(
-    PALIER_MARGINAL[k1] = PALIER_MARGINAL[k2] -> SELL_NONENR[k1] <= SELL_NONENR[k2] /\ SELL_REER[k1] <= SELL_REER[k2] /\ COTIS_REER[k1] >= COTIS_REER[k2]
+    PALIER_MARGINAL[k1] >= PALIER_MARGINAL[k2] /\ RENDEMENT >= 0 -> SELL_NONENR[k1] = 0 /\ SELL_REER[k1] = 0
   )
 );
 % CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-constraint forall(k1 in 1..N-1)(
-  forall(k2 in k1+1..N)(
-    (
-      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2] / 2) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1] / 2)
-    ) -> ((SELL_NONENR[k1] <= SELL_NONENR[k2] \/ SELL_NONENR[k2] = 0))
-  )
-);
-% CONTRAINTE LIMITANT LA SOLUTION OPTIMALE
-constraint forall(k1 in 1..N-1)(
-  forall(k2 in k1+1..N)(
-    (
-      ((1 + RENDEMENT)^k2 - 1) * (1 - PALIERS_IMPOTS_RATES[k2]) >= ((1 + RENDEMENT)^k1 - 1) * (1 - PALIERS_IMPOTS_RATES[k1])
-    ) -> ((SELL_REER[k1] <= SELL_REER[k2] \/ SELL_REER[k2] = 0))
-  )
-);
+% si le liquide est = 0, il doit toujours être à 0 auparavant (quand on commence à décaisser, on peut liquide>0)
+%constraint forall(k in 3..N)(
+%  LIQUIDE[k] < PENNY -> LIQUIDE[k-1] < PENNY
+%);
 
 %% parfois, on pourrait vouloir préguider l'optimiseur sur la variable réponse
 %constraint CASHDOWN >= 0;
 %%%
 
 %%% variable à maximiser
-constraint CASHDOWN = round(100 * (LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP)) / 100;
+constraint CASHDOWN = LIQUIDE[N+1] - 10000 + CUMUL_CELIAPP[N] + CUMUL_CELI[N] + RAP;
 
-solve 
-  ::seq_search([
-  float_search([
-    if i mod 2 == 1 then LIQUIDE[(i+1) div 2]
-    else SELL_REER[i div 2] endif
-    | i in 1..2*N+1
-  ], 1000, input_order, indomain_min),
-  float_search([
-    if i mod 3 == 1 then COTIS_CELIAPP[(i+2) div 3]
-    elseif i mod 3 == 2 then COTIS_CELI[(i+1) div 3]
-    else COTIS_NONENR[i div 3] endif
-    | i in 1..3*N
-  ], 1000, input_order, indomain_max),
-  float_search([RAP], 1000, input_order, indomain_max)
-  ])
-  maximize CASHDOWN;
+solve maximize CASHDOWN;
 
 
 %%% Afficher
@@ -313,7 +295,7 @@ output ["CASHDOWN = ", show(floor(CASHDOWN)), ".", show(floor((CASHDOWN - floor(
 output ["LIQUIDE =             ", join(" ", [format(LIQUIDE[i]) | i in 1..(N+1)]), "\n"];
 output ["SALAIRES_BRUT =       ", join(" ", [format(SALAIRES_BRUT[i]) | i in 1..N]), "\n"];
 output ["SALAIRE_IMPOSABLE =   ", join(" ", [format(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
-%output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
+output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
 output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N]), "\n"];
 %output ["IMPOT_PAYE =          ", join(" ", [format(IMPOT_PAYE[i]) | i in 1..N]), "\n"];
 %output ["IMPOT_DU =            ", join(" ", [format(IMPOT_DU[i]) | i in 1..N]), "\n"];
