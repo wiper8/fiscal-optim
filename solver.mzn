@@ -297,8 +297,8 @@ output ["SALAIRES_BRUT =       ", join(" ", [format(SALAIRES_BRUT[i]) | i in 1..
 output ["SALAIRE_IMPOSABLE =   ", join(" ", [format(SALAIRE_IMPOSABLE[i]) | i in 1..N]), "\n"];
 output ["ECONOMIES =           ", join(" ", [format(ECONOMIES[i]) | i in 1..N]), "\n"];
 output ["RETOUR_IMPOT =        ", join(" ", [format(RETOUR_IMPOT[i]) | i in 1..N]), "\n"];
-%output ["IMPOT_PAYE =          ", join(" ", [format(IMPOT_PAYE[i]) | i in 1..N]), "\n"];
-%output ["IMPOT_DU =            ", join(" ", [format(IMPOT_DU[i]) | i in 1..N]), "\n"];
+output ["IMPOT_PAYE =          ", join(" ", [format(IMPOT_PAYE[i]) | i in 1..N]), "\n"];
+output ["IMPOT_DU =            ", join(" ", [format(IMPOT_DU[i]) | i in 1..N]), "\n"];
 %output ["RQAP =                ", join(" ", [format(RQAP[i]) | i in 1..N]), "\n"];
 %output ["AE =                  ", join(" ", [format(AE[i]) | i in 1..N]), "\n"];
 %output ["RRQ =                 ", join(" ", [format(RRQ[i]) | i in 1..N]), "\n"];
@@ -310,7 +310,8 @@ output ["COTIS_CELI =          ", join(" ", [format(COTIS_CELI[i]) | i in 1..N])
 %output ["DROITS CELI =         ", join(" ", [format(DROITS_CELI[i]) | i in 1..N]), "\n"];
 %output ["DROITS REER =         ", join(" ", [format(DROITS_REER[i]) | i in 1..N]), "\n"];
 %output ["FACTEUR_EQUIVALENCE = ", join(" ", [format(FACTEUR_EQUIVALENCE[i]) | i in 1..N]), "\n"];
-%output [join(" ", [format(PALIERS_IMPOTS_TO_PAY[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];array[1..N] of var 0..BIG: COTIS_NONENR;
+%output [join(" ", [format(PALIERS_IMPOTS_TO_PAY_PAYE[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];
+%output [join(" ", [format(PALIERS_IMPOTS_TO_PAY_DU[k, j]) | k in 1..N]) ++ "\n" | j in 1..N_PALIERS];
 %output ["CUMUL_CELIAPP =       ", join(" ", [format(CUMUL_CELIAPP[i]) | i in 1..N]), "\n"];
 %output ["CUMUL_CELI =          ", join(" ", [format(CUMUL_CELI[i]) | i in 1..N]), "\n"];
 output ["COTIS_REER =          ", join(" ", [format(COTIS_REER[i]) | i in 1..N]), "\n"];
