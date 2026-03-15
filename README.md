@@ -21,6 +21,6 @@ The Excel file serves as a solution validator. The workflow proposed is:
 You need R installed on your machine.
 
 The workflow proposed is:
-1. Copy `R/data/fiscalite_private_template.R` and rename it as `R/data/fiscalite_private.R`
+1. Copy `R/data/fiscal_template.R` and rename it as `R/data/fiscal_private.R`
 2. Put a strategy in the `R/main.R` file.
 3. Run the `R/main.R` file.
