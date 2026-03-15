@@ -11,9 +11,12 @@ if (file.exists(private_filename)) {
 
 source("R/src/try_strategy.R")
 
-actifs_hist <- try_stategy(START_AGE, actifs, revenus, depenses, strategy)
+actifs_hist <- try_stategy(actifs, revenus, depenses, strategy)
 
 ggplot() +
   geom_hline(aes(yintercept = 0)) +
+  geom_line(aes(x = START_AGE:MAX_AGE, y = apply(actifs_hist, 1, sum)), color = "black") +
   geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "cash"]), color = "#00DD00") +
+  geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "nonenr_capital"]), color = "#0000bb") +
+  geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
   xlab("Âge") + ylab("Actifs")
