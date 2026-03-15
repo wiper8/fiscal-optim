@@ -5,4 +5,6 @@ rendement_brut <- 1.07
 RENDEMENT <- rendement_brut / inflation
 START_AGE <- 20
 
-actifs <- list()
+actifs <- list(
+  cash = 400000
+)
