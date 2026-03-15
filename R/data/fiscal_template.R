@@ -21,3 +21,7 @@ depenses <- data.frame(
   age = START_AGE:MAX_AGE,
   depenses = 40000
 )
+
+# strategy of withdrawals
+strategy <- matrix()
+
