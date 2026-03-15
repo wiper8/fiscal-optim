@@ -7,7 +7,9 @@ START_AGE <- 20 # en date du 1er janvier
 
 # en date du 1er janvier
 actifs <- list(
-  cash = 400000
+  cash = 400000,
+  nonenr_capital = 100000,
+  nonenr_gain = 200000
 )
 
 # en date du 1er janvier
@@ -23,5 +25,19 @@ depenses <- data.frame(
 )
 
 # strategy of withdrawals
-strategy <- matrix()
+strategy <- matrix(
+  NA,
+  nrow = 1,
+  ncol = 2,
+  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR"))
+)
+strategy[1, "COTIS_NONENR"] <- 0
+strategy[1, "SELL_NONENR"] <- 0
 
+strategy <- matrix(
+  strategy,
+  nrow = MAX_AGE - START_AGE + 1,
+  ncol = ncol(strategy),
+  byrow = TRUE,
+  dimnames = dimnames(strategy)
+)
