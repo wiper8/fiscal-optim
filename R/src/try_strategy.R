@@ -1,4 +1,5 @@
 source("R/src/manage_nonenr.R")
+source("R/src/get_revenu_disponible.R")
 
 try_stategy <- function(actifs, revenus, depenses, strategy) {
   actifs_history <- matrix(
@@ -14,7 +15,12 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     
     new_nonenr <- manage_nonenr(nonenr_capital, nonenr_gain, strategy[i, ], share_price = RENDEMENT^(i - 1))
     
-    revenu_disponible <- revenus$revenu_emploi[i] + new_nonenr$capital_vendu + new_nonenr$gain_en_capital_vendu
+    revenu_disponible <- get_revenu_disponible(
+      revenus$revenu_emploi[i],
+      new_nonenr$capital_vendu,
+      new_nonenr$gain_en_capital_vendu
+    )
+    
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i]
     
     if (remaining_cash < 0) {
