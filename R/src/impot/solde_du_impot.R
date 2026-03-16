@@ -1,4 +1,4 @@
-source("R/src/impot/annexe3.R")
+source("R/src/impot/annexe_3.R")
 source("R/src/impot/grille_l30000.R")
 source("R/src/impot/grille_l30100.R")
 source("R/src/impot/grille_l34990.R")
@@ -14,7 +14,7 @@ TABLE_IMPOT <- matrix(
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable) {
   # revenu total
   l10100 <- revenu_emploi
-  l12700 <- annexe3(gain_capital_imposable)
+  l12700 <- annexe_3(gain_capital_imposable)
   l15000 <- l10100 + l12700
   
   # revenu net
