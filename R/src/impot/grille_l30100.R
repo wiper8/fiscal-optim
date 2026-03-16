@@ -1,4 +1,4 @@
 grille_l30100 <- function(age, l23600) {
-  if (age < 65) return(0)
-  max(0, 9028 - 0.15 * max(0, l23600 - 45522))
+  (age < 65) * 0 +
+    (age >= 65) * pmax(0, 9028 - 0.15 * pmax(0, l23600 - 45522))
 }
