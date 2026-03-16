@@ -18,7 +18,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     revenu_disponible <- get_revenu_disponible(
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
-      new_nonenr$gain_en_capital_vendu
+      new_nonenr$gain_en_capital_vendu,
+      age = START_AGE + i - 1
     )
     
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i]
