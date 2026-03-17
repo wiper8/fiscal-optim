@@ -1,4 +1,5 @@
 source("R/src/impot/annexe_3.R")
+source("R/src/impot/grille_l23500.R")
 source("R/src/impot/grille_l30000.R")
 source("R/src/impot/grille_l30100.R")
 source("R/src/impot/grille_l34990.R")
@@ -11,15 +12,17 @@ TABLE_IMPOT <- matrix(
   nrow = 2, byrow = TRUE
 )
 
-solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable) {
+solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_psv) {
   # revenu total
   l10100 <- revenu_emploi
   l12700 <- annexe_3(gain_capital_imposable)
-  l15000 <- l10100 + l12700
+  l11300 <- pension_psv
+  l15000 <- l10100 + l11300 + l12700
   
   # revenu net
   l23400 <- l15000
-  l23600 <- pmax(0, l23400)
+  l23500 <- l42200 <- grille_l23500(l11300, l23400)
+  l23600 <- pmax(0, l23400 - l23500)
 
   # revenu imposable
   l26000 <- pmax(0, l23600)
@@ -51,11 +54,11 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable) {
   # remboursement ou solde dû
   # impot provincial (autres que QC) donc 0 car c'est revenu québec qui le recoit, pas le fédéral
   l42800 <- 0
-  l43500 <- l42000 + l42800 # Total à payer
+  l43500 <- l42000 + l42200 + l42800 # Total à payer
   
   l43850 <- 0
   l44000 <- 0.165 * l42900
   l48200 <- l43850 + l44000
   l48500 <- l43500 - l48200
-  l48500
+  list(l48500 = l48500, l23500 = l23500)
 }

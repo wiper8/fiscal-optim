@@ -1,4 +1,5 @@
 library(ggplot2)
+library(scales)
 
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
@@ -13,11 +14,17 @@ source("R/src/try_strategy.R")
 
 actifs_hist <- try_stategy(actifs, revenus, depenses, strategy)
 
+key_moments <- c(START_AGE, revenus$age[head(which(revenus$revenu_emploi == 0), 1)], 65, 75, MAX_AGE)
+
 ggplot() +
+  theme_bw() +
+  scale_y_continuous(labels = label_dollar()) +
   geom_hline(aes(yintercept = 0)) +
   geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = apply(actifs_hist, 1, sum)), color = "black", linewidth=1) +
   geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "cash"]), color = "#00DD00") +
   geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "nonenr_capital"]), color = "#0000bb") +
   geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
   geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "celi"]), color = "#bbbb00") +
+  geom_segment(aes(x = key_moments, xend = key_moments,
+                   y = 0, yend = max(actifs_hist) * 0.1), linetype = "dashed", alpha = 0.4) +
   xlab("Âge") + ylab("Actifs")
