@@ -2,7 +2,7 @@ source("R/src/impot/qc/grille_201.R")
 source("R/src/impot/qc/grille_401.R")
 source("R/src/impot/qc/annexe_g.R")
 
-impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv, ...) {
+impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv, psv_clawback, ...) {
   # revenu total
   l101 <- revenu_emploi
   l114 <- pension_psv
@@ -12,6 +12,7 @@ impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv,
   # revenu net
   l201 <- grille_201(l101)
   
+  l250 <- psv_clawback
   l254 <- l201
   l256 <- l199 - l254
   l275 <- pmax(0, l256)

@@ -16,11 +16,11 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_p
   # revenu total
   l10100 <- revenu_emploi
   l12700 <- annexe_3(gain_capital_imposable)
-  l11300 <- pension_psv
+  l11300 <<- pension_psv
   l15000 <- l10100 + l11300 + l12700
   
   # revenu net
-  l23400 <- l15000
+  l23400 <<- l15000
   l23500 <- l42200 <- grille_l23500(l11300, l23400)
   l23600 <- pmax(0, l23400 - l23500)
 
@@ -60,5 +60,5 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_p
   l44000 <- 0.165 * l42900
   l48200 <- l43850 + l44000
   l48500 <- l43500 - l48200
-  l48500
+  list(l48500 = l48500, l23500 = l23500)
 }
