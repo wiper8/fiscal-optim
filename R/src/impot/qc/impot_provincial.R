@@ -5,7 +5,7 @@ source("R/src/impot/qc/annexe_g.R")
 impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv, ...) {
   # revenu total
   l101 <- revenu_emploi
-  l114 <- pension_psv - grille_l23500(pension_psv, l199)
+  l114 <- pension_psv
   l139 <- annexe_g(gain_capital_imposable)
   l199 <- l101 + l114 + l139
   
