@@ -13,7 +13,7 @@ impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv,
   l201 <- grille_201(l101)
   
   l250 <- psv_clawback
-  l254 <- l201
+  l254 <- l201 + l250
   l256 <- l199 - l254
   l275 <- pmax(0, l256)
 
@@ -29,6 +29,8 @@ impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv,
   # impôts et cotisations
   l401 <- grille_401(l299)
   l413 <- l401 - l399
+  l430 <- l413
+  l432 <- pmax(0, l430)
   l450 <- l413
   
   # remboursement ou solde à payer
