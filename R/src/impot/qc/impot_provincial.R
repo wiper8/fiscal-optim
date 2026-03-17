@@ -2,7 +2,7 @@ source("R/src/impot/qc/grille_201.R")
 source("R/src/impot/qc/grille_401.R")
 source("R/src/impot/qc/annexe_g.R")
 
-impot_provincial <- function(revenu_emploi, gain_capital_imposable, ...) {
+impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv, ...) {
   # revenu total
   l101 <- revenu_emploi
   l139 <- annexe_g(gain_capital_imposable)
