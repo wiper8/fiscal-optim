@@ -25,4 +25,4 @@ The workflow proposed is:
 2. Run the `R/main.R` file.
 
 ### Tax facts ignored
-- claiming some deduction for *previous years*
+- claiming some deduction for *previous years* (like capital gains losses)
