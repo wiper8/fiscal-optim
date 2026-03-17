@@ -3,13 +3,18 @@ inflation <- 1.0275
 ipc <- 1.02
 rendement_brut <- 1.07
 RENDEMENT <- rendement_brut / inflation
-START_AGE <- 20 # en date du 1er janvier
+START_AGE <- 50 # en date du 1er janvier
 
 # en date du 1er janvier
 actifs <- list(
-  cash = 400000,
+  cash = 500000,
   nonenr_capital = 100000,
-  nonenr_gain = 200000
+  nonenr_gain = 200000,
+  celi = list(
+    yearly = 7000,
+    remaining = 4500, # droits de cotisation
+    current_value = 48000
+  )
 )
 
 # en date du 1er janvier
@@ -28,11 +33,12 @@ depenses <- data.frame(
 strategy <- matrix(
   NA,
   nrow = 1,
-  ncol = 2,
-  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR"))
+  ncol = 3,
+  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI"))
 )
 strategy[1, "COTIS_NONENR"] <- 0
-strategy[1, "SELL_NONENR"] <- 0
+strategy[1, "SELL_NONENR"] <- 13500
+strategy[1, "NET_COTIS_CELI"] <- -2175
 
 strategy <- matrix(
   strategy,

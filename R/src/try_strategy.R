@@ -2,19 +2,29 @@ source("R/src/manage_nonenr.R")
 source("R/src/get_revenu_disponible.R")
 
 try_stategy <- function(actifs, revenus, depenses, strategy) {
+  actifs_names <- c("nonenr_capital", "nonenr_gain", "cash", "celi")
   actifs_history <- matrix(
-    c(actifs$nonenr_capital, actifs$nonenr_gain, actifs$cash),
+    c(actifs$nonenr_capital, actifs$nonenr_gain, actifs$cash, actifs$celi$current_value),
     nrow = 1,
-    dimnames = list(NULL, c("nonenr_capital", "nonenr_gain", "cash"))
+    dimnames = list(NULL, actifs_names)
   )
   
-  for (i in seq_len(MAX_AGE - START_AGE)) {
-    
-    nonenr_capital <- tail(actifs_history[, "nonenr_capital"], 1)
-    nonenr_gain <- tail(actifs_history[, "nonenr_gain"], 1)
-    
-    new_nonenr <- manage_nonenr(nonenr_capital, nonenr_gain, strategy[i, ], share_price = RENDEMENT^(i - 1))
-    
+  for (i in seq_len(MAX_AGE - START_AGE + 1)) {
+    # changer la part de capital et de gain selon les achats et ventes
+    new_nonenr <- manage_nonenr(
+      tail(actifs_history[, "nonenr_capital"], 1),
+      tail(actifs_history[, "nonenr_gain"], 1),
+      strategy[i, ],
+      share_price = RENDEMENT^(i - 1)
+    )
+
+    # celi
+    actifs$celi$remaining <- actifs$celi$remaining + actifs$celi$yearly - strategy[i, "NET_COTIS_CELI"]
+    if (actifs$celi$remaining < 0) message("attention, droits de cotisations au celi dépassés")
+    actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
+
+
+    # revenu après impôts
     revenu_disponible <- get_revenu_disponible(
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
@@ -22,26 +32,29 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       age = START_AGE + i - 1
     )
     
-    remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i]
+    remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
+      strategy[i, "NET_COTIS_CELI"] - strategy[i, "COTIS_NONENR"] + strategy[i, "SELL_NONENR"]
     
-    if (remaining_cash < 0) {
-      message(paste0("argent insuffisant à i=", i))
-    }
+    if (remaining_cash < 0) message(paste0("argent insuffisant à i=", i))
     
     # update les actifs
     new_actifs <- c(
-      "nonenr_capital" = nonenr_capital - new_nonenr$capital_vendu,
-      "nonenr_gain" = nonenr_gain - new_nonenr$gain_en_capital_vendu,
-      "cash" = remaining_cash
+      "nonenr_capital" = new_nonenr$new_actifs$nonenr_capital,
+      "nonenr_gain" = new_nonenr$new_actifs$nonenr_gain,
+      "cash" = remaining_cash,
+      "celi" = actifs$celi$current_value
     )
-    names(new_actifs) <- c("nonenr_capital", "nonenr_gain", "cash")
+    names(new_actifs) <- actifs_names
 
     # appliquer du rendement
+    actifs$celi$current_value <- actifs$celi$current_value * RENDEMENT
     new_actifs <- c(
       new_actifs["nonenr_capital"],
       (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * RENDEMENT - new_actifs["nonenr_capital"],
-      remaining_cash
+      remaining_cash,
+      new_actifs["celi"] * RENDEMENT
     )
+    names(new_actifs) <- actifs_names
 
     actifs_history <- rbind(
       actifs_history,
