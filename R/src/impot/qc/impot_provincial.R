@@ -31,7 +31,7 @@ impot_provincial <- function(revenu_emploi, gain_capital_imposable, pension_psv,
   l413 <- l401 - l399
   l430 <- l413
   l432 <- pmax(0, l430)
-  l450 <- l413
+  l450 <- l432
   
   # remboursement ou solde à payer
   l468 <- 0
