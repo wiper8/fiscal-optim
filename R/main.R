@@ -15,8 +15,9 @@ actifs_hist <- try_stategy(actifs, revenus, depenses, strategy)
 
 ggplot() +
   geom_hline(aes(yintercept = 0)) +
-  geom_line(aes(x = START_AGE:MAX_AGE, y = apply(actifs_hist, 1, sum)), color = "black") +
-  geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "cash"]), color = "#00DD00") +
-  geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "nonenr_capital"]), color = "#0000bb") +
-  geom_line(aes(x = START_AGE:MAX_AGE, y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
+  geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = apply(actifs_hist, 1, sum)), color = "black", linewidth=1) +
+  geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "cash"]), color = "#00DD00") +
+  geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "nonenr_capital"]), color = "#0000bb") +
+  geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
+  geom_line(aes(x = START_AGE:(MAX_AGE + 1), y = actifs_hist[, "celi"]), color = "#bbbb00") +
   xlab("Âge") + ylab("Actifs")
