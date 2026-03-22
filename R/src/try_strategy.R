@@ -15,8 +15,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
       tail(actifs_history[, "nonenr_gain"], 1),
-      strategy[i, ],
-      share_price = RENDEMENT^(i - 1)
+      strategy[i, "COTIS_NONENR"],
+      strategy[i, "SELL_NONENR"]
     )
 
     # celi
