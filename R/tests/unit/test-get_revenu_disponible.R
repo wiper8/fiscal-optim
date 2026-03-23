@@ -7,27 +7,25 @@ fake_impot_provincial <- mock(7, 7)
 stub(get_revenu_disponible, "solde_du_impot", fake_solde_du_impot)
 stub(get_revenu_disponible, "impot_provincial", fake_impot_provincial)
 
-stopifnot(
-  all.equal(
-    get_revenu_disponible(
-      revenu_emploi = 10,
-      nonenr_capital_vendu = 100,
-      nonenr_gain_vendu = 1000,
-      pension_psv = 10000
-    ),
-    11102
-  )
+expect_equal(
+  get_revenu_disponible(
+    revenu_emploi = 10,
+    nonenr_capital_vendu = 100,
+    nonenr_gain_vendu = 1000,
+    pension_psv = 10000
+  ),
+  11102
 )
 
 # test que le revenu peut être négatif si on doit de l'impôt
-stopifnot(
-  all.equal(
-    get_revenu_disponible(
-      revenu_emploi = 10,
-      nonenr_capital_vendu = 100,
-      nonenr_gain_vendu = 1000,
-      pension_psv = 10000
-    ),
-    -988897
-  )
+expect_equal(
+  get_revenu_disponible(
+    revenu_emploi = 10,
+    nonenr_capital_vendu = 100,
+    nonenr_gain_vendu = 1000,
+    pension_psv = 10000
+  ),
+  -988897
 )
+
+TRUE

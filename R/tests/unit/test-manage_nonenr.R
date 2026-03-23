@@ -64,3 +64,5 @@ expect_equal(
 expect_error(
   manage_nonenr(nonenr_capital = 1, nonenr_gain = 3, cotis = 2, sell = 6.01)
 )
+
+TRUE

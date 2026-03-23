@@ -11,9 +11,9 @@ actifs <- list(
   nonenr_capital = 100000,
   nonenr_gain = 200000,
   celi = list(
-    yearly = 7000,
-    remaining = 4500, # droits de cotisation
-    current_value = 48000
+    contrib_yearly = 7000, # droits de cotisation supplémentaires par an
+    contrib_lim = 4500, # droits de cotisation
+    current_value = 48000 # valeur présente du celi (capital + gain)
   )
 )
 

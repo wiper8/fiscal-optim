@@ -8,13 +8,18 @@ TABLE_IMPOT <- matrix(
 
 grille_l30000 <- function(l23600) {
   # conditions
+  cond1 <- l23600 <= TABLE_IMPOT[2, 4]
+  cond2 <- l23600 >= TABLE_IMPOT[2, 5]
+
   l1 <- 14538
   l2 <- 1591
-  if (l23600 <= TABLE_IMPOT[2, 4]) return(l1 + l2)
-  if (l23600 >= TABLE_IMPOT[2, 5]) return(l1)
-  
-  l1 + l2 * pmin(
+
+  res <- l1 + l2 * pmin(
     1,
     pmax(0, TABLE_IMPOT[2, 5] - l23600) / (TABLE_IMPOT[2, 5] - TABLE_IMPOT[2, 4])
   )
+
+  cond1 * (l1 + l2) +
+    cond2 * l1 +
+    (!cond1 & !cond2) * res
 }

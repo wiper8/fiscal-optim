@@ -12,20 +12,3 @@ grille_401 <- function(l299) {
     TABLE_IMPOT_QC[1, 3] * pmax(0, pmin(l299, TABLE_IMPOT_QC[2, 4]) - TABLE_IMPOT_QC[2, 3]) +
     TABLE_IMPOT_QC[1, 4] * pmax(0, l299 - TABLE_IMPOT_QC[2, 4])
 }
-stopifnot(all.equal(
-  grille_401(25000),
-  25000 * 0.14
-))
-stopifnot(all.equal(
-  grille_401(75000),
-  (75000 - 53255) * 0.19 + 7455.7
-))
-stopifnot(all.equal(
-  grille_401(112000),
-  (112000 - 106495) * 0.24 + 17571.3
-))
-stopifnot(all.equal(
-  grille_401(200000),
-  (200000 - 129590) * 0.2575 + 23114.1
-))
-

@@ -1,9 +1,9 @@
-source("R/src/impot/annexe_3.R")
-source("R/src/impot/get_l77.R")
-source("R/src/impot/grille_l23500.R")
-source("R/src/impot/grille_l30000.R")
-source("R/src/impot/grille_l30100.R")
-source("R/src/impot/grille_l34990.R")
+source("R/src/impot/fed/annexe_3.R")
+source("R/src/impot/fed/get_l77.R")
+source("R/src/impot/fed/grille_l23500.R")
+source("R/src/impot/fed/grille_l30000.R")
+source("R/src/impot/fed/grille_l30100.R")
+source("R/src/impot/fed/grille_l34990.R")
 
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_psv) {
   # revenu total
@@ -14,7 +14,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_p
   
   # revenu net
   l23400 <- l15000
-  l23500 <- l42200 <- grille_l23500(l11300, l23400)
+  l23500 <- l42200 <- grille_l23500(l11300, l23400) # remboursement des prestations de programmes sociaux
   l23600 <- pmax(0, l23400 - l23500)
 
   # revenu imposable
