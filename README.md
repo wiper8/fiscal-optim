@@ -24,5 +24,8 @@ The workflow proposed is:
 1. Copy `R/data/fiscal_template.R` and rename it as `R/data/fiscal_private.R`
 2. Run the `R/main.R` file.
 
+### Running tests
+`source("R/run-tests.R")`
+
 ### Tax facts ignored
 - claiming some deduction for *previous years* (like capital gains losses)
