@@ -15,13 +15,13 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
       tail(actifs_history[, "nonenr_gain"], 1),
-      strategy[i, ],
-      share_price = RENDEMENT^(i - 1)
+      strategy[i, "COTIS_NONENR"],
+      strategy[i, "SELL_NONENR"]
     )
 
     # celi
-    actifs$celi$remaining <- actifs$celi$remaining + actifs$celi$yearly - strategy[i, "NET_COTIS_CELI"]
-    if (actifs$celi$remaining < 0) message("attention, droits de cotisations au celi dépassés")
+    actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
+    if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
 
@@ -37,7 +37,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
       strategy[i, "NET_COTIS_CELI"] - strategy[i, "COTIS_NONENR"] + strategy[i, "SELL_NONENR"]
     
-    if (remaining_cash < 0) message(paste0("argent insuffisant à i=", i))
+    if (remaining_cash < 0) stop(paste0("argent insuffisant à i=", i))
     
     # update les actifs
     new_actifs <- c(

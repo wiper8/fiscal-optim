@@ -1,16 +1,9 @@
-source("R/src/impot/annexe_3.R")
-source("R/src/impot/grille_l23500.R")
-source("R/src/impot/grille_l30000.R")
-source("R/src/impot/grille_l30100.R")
-source("R/src/impot/grille_l34990.R")
-
-TABLE_IMPOT <- matrix(
-  c(
-    0.145, 0.205, 0.26, 0.29, 0.33,
-    0, 57375, 114750, 177882, 253414
-  ),
-  nrow = 2, byrow = TRUE
-)
+source("R/src/impot/fed/annexe_3.R")
+source("R/src/impot/fed/get_l77.R")
+source("R/src/impot/fed/grille_l23500.R")
+source("R/src/impot/fed/grille_l30000.R")
+source("R/src/impot/fed/grille_l30100.R")
+source("R/src/impot/fed/grille_l34990.R")
 
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_psv) {
   # revenu total
@@ -21,18 +14,14 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_p
   
   # revenu net
   l23400 <- l15000
-  l23500 <- l42200 <- grille_l23500(l11300, l23400)
+  l23500 <- l42200 <- grille_l23500(l11300, l23400) # remboursement des prestations de programmes sociaux
   l23600 <- pmax(0, l23400 - l23500)
 
   # revenu imposable
   l26000 <- pmax(0, l23600)
   
   # impot federal
-  l77 <- TABLE_IMPOT[1, 1] * pmin(l26000, TABLE_IMPOT[2, 2]) +
-    TABLE_IMPOT[1, 2] * pmax(0, pmin(l26000, TABLE_IMPOT[2, 3]) - TABLE_IMPOT[2, 2]) +
-    TABLE_IMPOT[1, 3] * pmax(0, pmin(l26000, TABLE_IMPOT[2, 4]) - TABLE_IMPOT[2, 3]) +
-    TABLE_IMPOT[1, 4] * pmax(0, pmin(l26000, TABLE_IMPOT[2, 5]) - TABLE_IMPOT[2, 4]) +
-    TABLE_IMPOT[1, 5] * pmax(0, l26000 - TABLE_IMPOT[2, 5])
+  l77 <- get_l77(l26000)
 
   # crédits d'impot non rembousables
   l30000 <- grille_l30000(l23600) # montant personnel de base
@@ -42,7 +31,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_p
   l31260 <- min(1471, l10100)
   l33500 <- l30000 + l30100 + l31260
   
-  l118 <- TABLE_IMPOT[1, 1]
+  l118 <- 0.145
   l33800 <- l33500 * l118
   l34990 <- grille_l34990(l33800)
   l35000 <- l33800 + l34990

@@ -1,22 +1,24 @@
-manage_nonenr <- function(nonenr_capital, nonenr_gain, strategy, share_price) {
+manage_nonenr <- function(nonenr_capital, nonenr_gain, cotis, sell) {
+  if (any(sell > (nonenr_capital + nonenr_gain + cotis))) stop("Fonds insuffisants de non enregistré")
+  useless_share_price <- 100 # présent juste pour aider à interpréter les calculs
+  
   nonenr_total <- nonenr_capital + nonenr_gain
   
-  shares_31dec <- nonenr_total / share_price
+  shares_31dec <- nonenr_total / useless_share_price
   avg_cost_basis <- nonenr_capital / shares_31dec
   
   # jan 1: buying
-  shares_bought <- strategy["COTIS_NONENR"] / share_price
-  nonenr_capital <- nonenr_capital + strategy["COTIS_NONENR"]
+  shares_bought <- cotis / useless_share_price
+  nonenr_capital <- nonenr_capital + cotis
   shares_1jan <- shares_bought + shares_31dec
   avg_cost_basis <- ifelse(shares_1jan == 0, 0, nonenr_capital / shares_1jan)
   
   # jan 2: selling
-  shares_sold <- strategy["SELL_NONENR"] / share_price
-  realised_gain <- (share_price - avg_cost_basis) * shares_sold
+  shares_sold <- sell / useless_share_price
+  realised_gain <- (useless_share_price - avg_cost_basis) * shares_sold
   nonenr_gain <- nonenr_gain - realised_gain
   capital_vendu <- avg_cost_basis * shares_sold
   nonenr_capital <- nonenr_capital - capital_vendu
-  if (nonenr_capital < 0) message("Fonds insuffisants de capital de non enregistré")
   shares_2jan <- shares_31dec - shares_sold
   avg_cost_basis <- nonenr_capital / shares_2jan
   
