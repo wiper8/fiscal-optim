@@ -1,6 +1,7 @@
 source("R/src/impot/fed/solde_du_impot.R")
 source("R/src/impot/qc/impot_provincial.R")
 
+# revenu total après avoir payé l'impôt
 get_revenu_disponible <- function(
     revenu_emploi = 0,
     nonenr_capital_vendu = 0,

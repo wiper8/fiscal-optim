@@ -1,3 +1,4 @@
+# gains en capital
 annexe_g <- function(gain) {
   # section B
   l10 <- gain # gains ou pertes d'actions

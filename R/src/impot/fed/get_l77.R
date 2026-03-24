@@ -1,3 +1,4 @@
+# impôt
 TABLE_IMPOT <- matrix(
   c(
     0.145, 0.205, 0.26, 0.29, 0.33,

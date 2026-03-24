@@ -6,6 +6,7 @@ TABLE_IMPOT <- matrix(
   nrow = 2, byrow = TRUE
 )
 
+# montant personnel de base (souvent considéré comme le premier bracket d'impôt)
 grille_l30000 <- function(l23600) {
   # conditions
   cond1 <- l23600 <= TABLE_IMPOT[2, 4]
