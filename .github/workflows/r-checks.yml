@@ -50,7 +50,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          install.packages(c('mockery', 'testthat', 'ggplot2', 'scales'))
+          install.packages(c('mockery', 'testthat', 'ggplot2'))
         shell: Rscript {0}
       
       - name: Run tests
