@@ -2,6 +2,7 @@ source("R/src/get_prest_psv.R")
 source("R/src/manage_nonenr.R")
 source("R/src/get_revenu_disponible.R")
 
+# tenter une strategie de décaissement et tester si l'argent est suffisant
 try_stategy <- function(actifs, revenus, depenses, strategy) {
   actifs_names <- c("nonenr_capital", "nonenr_gain", "cash", "celi")
   actifs_history <- matrix(
@@ -10,6 +11,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     dimnames = list(NULL, actifs_names)
   )
   
+  # itérer à chaque année, au 1er janvier.
   for (i in seq_len(MAX_AGE - START_AGE + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
     new_nonenr <- manage_nonenr(
@@ -19,7 +21,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       strategy[i, "SELL_NONENR"]
     )
 
-    # celi
+    # celi : contribution, retraits, nouveaux droits
     actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
     if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]

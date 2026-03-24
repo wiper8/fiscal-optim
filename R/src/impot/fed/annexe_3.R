@@ -1,3 +1,4 @@
+# gain en capital
 annexe_3 <- function(gains_T3) {
   # partie 4
   l17600 <- gains_T3

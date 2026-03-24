@@ -1,3 +1,4 @@
+# impôt provincial
 TABLE_IMPOT_QC <- matrix(
   c(
     0.14, 0.19, 0.24, 0.2575,
