@@ -12,7 +12,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
   )
   
   # itérer à chaque année, au 1er janvier.
-  for (i in seq_len(MAX_AGE - START_AGE + 1)) {
+  for (i in seq_len(max_age - start_age + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
@@ -32,8 +32,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
       new_nonenr$gain_en_capital_vendu,
-      pension_psv = get_prest_psv(START_AGE + i - 1),
-      age = START_AGE + i - 1
+      pension_psv = get_prest_psv(start_age + i - 1),
+      age = start_age + i - 1
     )
     
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
@@ -51,12 +51,12 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     names(new_actifs) <- actifs_names
 
     # appliquer du rendement
-    actifs$celi$current_value <- actifs$celi$current_value * RENDEMENT
+    actifs$celi$current_value <- actifs$celi$current_value * rendement
     new_actifs <- c(
       new_actifs["nonenr_capital"],
-      (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * RENDEMENT - new_actifs["nonenr_capital"],
+      (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * rendement - new_actifs["nonenr_capital"],
       remaining_cash,
-      new_actifs["celi"] * RENDEMENT
+      new_actifs["celi"] * rendement
     )
     names(new_actifs) <- actifs_names
 

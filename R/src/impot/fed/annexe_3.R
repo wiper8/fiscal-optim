@@ -1,7 +1,7 @@
 # gain en capital
-annexe_3 <- function(gains_T3) {
+annexe_3 <- function(gains_t3) {
   # partie 4
-  l17600 <- gains_T3
+  l17600 <- gains_t3
   l19700 <- l17600 # total gain ou perte en capital
 
   # partie 5
