@@ -10,7 +10,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     nrow = 1,
     dimnames = list(NULL, actifs_names)
   )
-  
+
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
@@ -35,12 +35,12 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       pension_psv = get_prest_psv(start_age + i - 1),
       age = start_age + i - 1
     )
-    
+
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
       strategy[i, "NET_COTIS_CELI"] - strategy[i, "COTIS_NONENR"] + strategy[i, "SELL_NONENR"]
-    
+
     if (remaining_cash < 0) stop(paste0("argent insuffisant à i=", i))
-    
+
     # update les actifs
     new_actifs <- c(
       "nonenr_capital" = new_nonenr$new_actifs$nonenr_capital,
