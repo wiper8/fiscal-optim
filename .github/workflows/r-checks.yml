@@ -77,6 +77,4 @@ jobs:
             printf "%s\n" "$TODO_LINES" | while read line; do
               echo "::warning::$line"
             done
-          else
-            echo "::notice::✓ No TODO items found!"
           fi
