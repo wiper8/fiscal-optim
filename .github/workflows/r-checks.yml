@@ -73,10 +73,10 @@ jobs:
 
           if [ -n "$TODO_LINES" ]; then
             TODO_COUNT=$(echo "$TODO_LINES" | wc -l)
-            echo "::notice::Found $TODO_COUNT TODO items"
             echo "$TODO_LINES" | while read line; do
               echo "::warning::$line"
             done
+            echo "::notice::Found $TODO_COUNT TODO items"
           else
             echo "::notice::✓ No TODO items found!"
           fi
