@@ -1,9 +1,9 @@
-MAX_AGE <- 100 # en date du 1er janvier
+max_age <- 100 # en date du 1er janvier
 inflation <- 1.0275
 ipc <- 1.02
 rendement_brut <- 1.07
-RENDEMENT <- rendement_brut / inflation
-START_AGE <- 50 # en date du 1er janvier
+rendement <- rendement_brut / inflation
+start_age <- 50 # en date du 1er janvier
 
 # en date du 1er janvier
 actifs <- list(
@@ -19,13 +19,13 @@ actifs <- list(
 
 # en date du 1er janvier
 revenus <- data.frame(
-  age = START_AGE:MAX_AGE,
+  age = start_age:max_age,
   revenu_emploi = 0
 )
 
 # en date du 1er janvier
 depenses <- data.frame(
-  age = START_AGE:MAX_AGE,
+  age = start_age:max_age,
   depenses = 40000
 )
 
@@ -42,7 +42,7 @@ strategy[1, "NET_COTIS_CELI"] <- -2175
 
 strategy <- matrix(
   strategy,
-  nrow = MAX_AGE - START_AGE + 1,
+  nrow = max_age - start_age + 1,
   ncol = ncol(strategy),
   byrow = TRUE,
   dimnames = dimnames(strategy)
