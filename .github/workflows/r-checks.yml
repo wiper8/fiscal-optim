@@ -69,4 +69,4 @@ jobs:
       - name: Report TODO items
         id: todos
         run: |
-          TODO_LINES=$(grep -r "TODOasd" . --exclude-dir=".git" --exclude-dir=".github" 2>/dev/null)
+          TODO_LINES=$(grep -r "TODOasd" . --exclude-dir=".git" --exclude-dir=".github" 2>/dev/null || true)
