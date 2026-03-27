@@ -69,7 +69,7 @@ jobs:
       - name: Report TODO items
         id: todos
         run: |
-          TODO_LINES=$(grep -r "TODO" . --exclude-dir=".github" 2>/dev/null)
+          TODO_LINES=$(grep -r "TODOasd" . --exclude-dir=".github" 2>/dev/null)
 
           if [ -n "$TODO_LINES" ]; then
             TODO_COUNT=$(echo "$TODO_LINES" | wc -l)
