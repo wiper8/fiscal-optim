@@ -69,10 +69,10 @@ jobs:
       - name: Report TODO items
         id: todos
         run: |
-          TODO_LINES=$(grep -r "TODOdsa" . --exclude-dir=".github" 2>/dev/null)
-          TODO_COUNT=$(echo "$TODO_LINES" | grep -c . || echo 0)
-          
+          TODO_LINES=$(grep -r "TODO" . --exclude-dir=".github" 2>/dev/null)
+
           if [ -n "$TODO_LINES" ]; then
+            TODO_COUNT=$(echo "$TODO_LINES" | wc -l)
             echo "::notice::Found $TODO_COUNT TODO items"
             echo "$TODO_LINES" | while read line; do
               echo "::warning::$line"
