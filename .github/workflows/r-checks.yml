@@ -70,11 +70,3 @@ jobs:
         id: todos
         run: |
           TODO_LINES=$(grep -r "TODOasd" . --exclude-dir=".git" --exclude-dir=".github" 2>/dev/null)
-
-          if [ -n "$TODO_LINES" ]; then
-            TODO_COUNT=$(printf "%s\n" "$TODO_LINES" | wc -l)
-            echo "::notice::Found $TODO_COUNT TODO items"
-            printf "%s\n" "$TODO_LINES" | while read line; do
-              echo "::warning::$line"
-            done
-          fi
