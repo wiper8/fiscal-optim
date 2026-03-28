@@ -62,7 +62,7 @@ jobs:
   todos:
     runs-on: ubuntu-latest
     name: Report TODOs
-    needs: lint
+    needs: test
     steps:
       - uses: actions/checkout@v4
       
