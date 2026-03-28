@@ -1,3 +1,4 @@
+source("R/src/get_rente.R")
 source("R/src/get_prest_psv.R")
 source("R/src/manage_nonenr.R")
 source("R/src/get_revenu_disponible.R")
@@ -36,6 +37,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       new_nonenr$gain_en_capital_vendu,
       dividendes_recus,
       interet_recu,
+      rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years),
       pension_psv = get_prest_psv(start_age + i - 1),
       age = start_age + i - 1
     )

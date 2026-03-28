@@ -3,19 +3,21 @@ source("R/src/impot/qc/grille_401.R")
 source("R/src/impot/qc/annexe_g.R")
 
 impot_provincial <- function(
-  revenu_emploi, gain_capital_imposable, dividends, interests, pension_psv, psv_clawback,
+  revenu_emploi, gain_capital_imposable, dividends, interests, rente_emploi, cotis_rente, pension_psv, psv_clawback,
   ...
 ) {
   # revenu total
   l101 <- revenu_emploi
   l114 <- pension_psv
+  l122 <- rente_emploi
   l128 <- dividends
   l130 <- interests
   l139 <- annexe_g(gain_capital_imposable)
-  l199 <- l101 + l114 + l128 + l130 + l139 # revenu total
+  l199 <- l101 + l114 + l122 + l128 + l130 + l139 # revenu total
 
   # revenu net
   l201 <- grille_201(l101) # déduction pour travailleur
+  l205 <- cotis_rente # déduction pour régime de pension agréé (RPA)
 
   l250 <- psv_clawback
   l254 <- l201 + l250 # total des déductions

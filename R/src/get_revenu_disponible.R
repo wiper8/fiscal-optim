@@ -1,3 +1,4 @@
+source("R/src/cotis_rente.R")
 source("R/src/impot/fed/solde_du_impot.R")
 source("R/src/impot/qc/impot_provincial.R")
 
@@ -8,13 +9,19 @@ get_revenu_disponible <- function(
   nonenr_gain_vendu = 0,
   dividends = 0,
   interests = 0,
+  rente_emploi = 0,
   pension_psv = 0,
   ...
 ) {
 
-  solde_impot_fed <- solde_du_impot(revenu_emploi, nonenr_gain_vendu, dividends, interests, pension_psv, ...)
+  cotis_rente <- cotis_rente(revenu_emploi)
+
+  solde_impot_fed <- solde_du_impot(
+    # TODO inclure dans les 2 formules de solde d'impot les revenus de rentes d'emploi et les cotisation de rente
+    revenu_emploi, nonenr_gain_vendu, dividends, interests, rente_emploi, cotis_rente, pension_psv, ...
+  )
   solde_impot_prov <- impot_provincial(
-    revenu_emploi, nonenr_gain_vendu, dividends, interests, pension_psv, solde_impot_fed$l23500,
+    revenu_emploi, nonenr_gain_vendu, dividends, interests, rente_emploi, cotis_rente, pension_psv, solde_impot_fed$l23500,
     ...
   )
 
@@ -23,6 +30,8 @@ get_revenu_disponible <- function(
     nonenr_gain_vendu +
     dividends +
     interests +
+    rente_emploi -
+    cotis_rente +
     pension_psv -
     solde_impot_fed$l48500 -
     solde_impot_prov

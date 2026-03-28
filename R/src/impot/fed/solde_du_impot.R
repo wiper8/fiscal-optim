@@ -7,17 +7,21 @@ source("R/src/impot/fed/grille_l30000.R")
 source("R/src/impot/fed/grille_l30100.R")
 source("R/src/impot/fed/grille_l34990.R")
 
-solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends, interests, pension_psv) {
+solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends, interests,
+                           rente_emploi, cotis_rente, pension_psv) {
   # revenu total
   l10100 <- revenu_emploi
   l11300 <- pension_psv
+  l11500 <- rente_emploi
   l12000 <- grille_l12000(dividends)
   l12100 <- grille_l12100(interests)
   l12700 <- annexe_3(gain_capital_imposable)
-  l15000 <- l10100 + l11300 + l12000 + l12100 + l12700
+  l15000 <- l10100 + l11300 + l11500 + l12000 + l12100 + l12700
 
   # revenu net
-  l23400 <- l15000 # revenu net avant rajustements
+  l20700 <- cotis_rente # déduction régime de pension agréés (RPA)
+  l23300 <- l20700
+  l23400 <- l15000 - l23300 # revenu net avant rajustements
   l23500 <- l42200 <- grille_l23500(l11300, l23400) # remboursement des prestations de programmes sociaux
   l23600 <- pmax(0, l23400 - l23500) # revenu net
 
@@ -33,6 +37,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends
 
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
+  # TODO l31400 montant pour revenu de pension
   l33500 <- l30000 + l30100 + l31260
 
   l118 <- 0.145
