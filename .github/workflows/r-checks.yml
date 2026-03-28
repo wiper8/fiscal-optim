@@ -7,10 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
-  # Job 1: Lint Check
+  # Job 2: Run Tests
+  test:
+    runs-on: ubuntu-latest
+    name: Run Tests
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3'
+      
+      - name: Install dependencies
+        run: |
+          install.packages(c('mockery', 'testthat', 'ggplot2'))
+        shell: Rscript {0}
+      
+      - name: Run tests
+        run: |
+          source("R/run-tests.R")
+        shell: Rscript {0}
+
+  # Job 2: Lint Check
   lint:
     runs-on: ubuntu-latest
     name: Lint Check
+    needs: test
     steps:
       - uses: actions/checkout@v4
       
@@ -33,29 +56,6 @@ jobs:
           } else {
             cat("✓ No linting issues found!\n")
           }
-        shell: Rscript {0}
-
-  # Job 2: Run Tests
-  test:
-    runs-on: ubuntu-latest
-    name: Run Tests
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.3'
-      
-      - name: Install dependencies
-        run: |
-          install.packages(c('mockery', 'testthat', 'ggplot2'))
-        shell: Rscript {0}
-      
-      - name: Run tests
-        run: |
-          source("R/run-tests.R")
         shell: Rscript {0}
 
   # Job 3: Extract & Report TODOs
