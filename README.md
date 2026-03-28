@@ -29,3 +29,6 @@ The workflow proposed is:
 
 ### Tax facts ignored
 - claiming some deduction for *previous years* (like capital gains losses)
+
+## Courbes de Lafferière (CQFF)
+https://cqff.com/courbes-cqff/
