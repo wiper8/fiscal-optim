@@ -13,5 +13,4 @@ data_filename <- if (file.exists(private_filename)) {
   template_filename
 }
 
-debugonce(optim_flat_expenses)
-optim_flat_expenses(data_filename, inflation)
+optim_flat_expenses(data_filename, inflation, eps = 100)

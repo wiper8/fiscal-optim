@@ -29,24 +29,24 @@ optim_flat_expenses <- function(data_filepath, inflation_over_ipc, eps = 0.01) {
     # try to live while spending `depenses` schedule
     bounds <- tryCatch({
       try_strategy(actifs, revenus, depenses, strategy)
-      message("success")
       # if success, increment lower bound
       c(yearly_expenses, bounds[2])
     },
     error = function(e) { # too high
-      message("failed")
       if (is.na(bounds[2])) return(c(bounds[1], yearly_expenses))
       c(bounds[1], min(bounds[2], yearly_expenses))
     })
-    message("finally")
-    # next value to try
+
+    ## finally
     old_yearly_expenses <- yearly_expenses
-    if (is.na(bounds[2])) {
-      yearly_expenses <<- (yearly_expenses + eps) * 2
-      yearly_expenses <- (yearly_expenses + eps) * 2
+    # next value to try
+    yearly_expenses <- if (is.na(bounds[2])) {
+      (yearly_expenses + eps) * 2
     } else {
-      yearly_expenses <<- mean(bounds)
+      mean(bounds)
     }
+
+    # stop condition
     if (abs(old_yearly_expenses - yearly_expenses) < eps) break
   }
   old_yearly_expenses
