@@ -20,7 +20,7 @@ impot_provincial <- function(
   l205 <- cotis_rente # déduction pour régime de pension agréé (RPA)
 
   l250 <- psv_clawback
-  l254 <- l201 + l250 # total des déductions
+  l254 <- l201 + l205 + l250 # total des déductions
   l275 <- pmax(0, l199 - l254) # revenu net
 
   # revenu imposable
