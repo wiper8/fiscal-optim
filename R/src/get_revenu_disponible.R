@@ -11,7 +11,7 @@ get_revenu_disponible <- function(
   pension_psv = 0,
   ...
 ) {
-  
+
   solde_impot_fed <- solde_du_impot(revenu_emploi, nonenr_gain_vendu, dividends, interests, pension_psv, ...)
   solde_impot_prov <- impot_provincial(
     revenu_emploi, nonenr_gain_vendu, dividends, interests, pension_psv, solde_impot_fed$l23500,

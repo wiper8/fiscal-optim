@@ -59,7 +59,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     new_actifs <- c(
       new_actifs["nonenr_capital"],
       (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * rendement - new_actifs["nonenr_capital"],
-      remaining_cash * rendement_cash / ipc, 
+      remaining_cash * rendement_cash / ipc,
       new_actifs["celi"] * rendement
     )
     names(new_actifs) <- actifs_names
