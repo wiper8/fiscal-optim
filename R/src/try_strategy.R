@@ -26,12 +26,16 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
+    dividendes_recus <- (new_nonenr$new_actifs$nonenr_capital + new_nonenr$new_actifs$nonenr_gain) * dividend_yield
+    interet_recu <- tail(actifs_history[, "cash"], 1) * (rendement_cash - 1)
 
     # revenu après impôts
     revenu_disponible <- get_revenu_disponible(
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
       new_nonenr$gain_en_capital_vendu,
+      dividendes_recus,
+      interet_recu,
       pension_psv = get_prest_psv(start_age + i - 1),
       age = start_age + i - 1
     )
@@ -55,7 +59,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     new_actifs <- c(
       new_actifs["nonenr_capital"],
       (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * rendement - new_actifs["nonenr_capital"],
-      remaining_cash,
+      remaining_cash * rendement_cash / ipc,
       new_actifs["celi"] * rendement
     )
     names(new_actifs) <- actifs_names

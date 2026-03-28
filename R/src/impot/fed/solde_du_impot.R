@@ -1,16 +1,20 @@
 source("R/src/impot/fed/annexe_3.R")
 source("R/src/impot/fed/get_l77.R")
+source("R/src/impot/fed/grille_l12000.R")
+source("R/src/impot/fed/grille_l12100.R")
 source("R/src/impot/fed/grille_l23500.R")
 source("R/src/impot/fed/grille_l30000.R")
 source("R/src/impot/fed/grille_l30100.R")
 source("R/src/impot/fed/grille_l34990.R")
 
-solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, pension_psv) {
+solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends, interests, pension_psv) {
   # revenu total
   l10100 <- revenu_emploi
-  l12700 <- annexe_3(gain_capital_imposable)
   l11300 <- pension_psv
-  l15000 <- l10100 + l11300 + l12700
+  l12000 <- grille_l12000(dividends)
+  l12100 <- grille_l12100(interests)
+  l12700 <- annexe_3(gain_capital_imposable)
+  l15000 <- l10100 + l11300 + l12000 + l12100 + l12700
 
   # revenu net
   l23400 <- l15000 # revenu net avant rajustements

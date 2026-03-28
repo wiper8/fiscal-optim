@@ -26,5 +26,5 @@ ggplot() +
   geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
   geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "celi"]), color = "#bbbb00") +
   geom_segment(aes(x = key_moments, xend = key_moments,
-                   y = 0, yend = max(actifs_hist) * 0.1), linetype = "dashed", alpha = 0.4) +
+                   y = 0, yend = max(actifs_hist)), linetype = "dashed", alpha = 0.4) +
   xlab("Âge") + ylab("Actifs")
