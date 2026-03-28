@@ -1,8 +1,10 @@
 max_age <- 100 # en date du 1er janvier
 inflation <- 1.0275
 ipc <- 1.02
-rendement_brut <- 1.07
+rendement_brut <- 1.07 # capital gain (excludes dividends)
+dividend_yield <- 0.01 # yearly
 rendement <- rendement_brut / inflation
+rendement_cash <- 1.0055
 start_age <- 50 # en date du 1er janvier
 
 # en date du 1er janvier

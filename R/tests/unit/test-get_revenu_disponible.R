@@ -12,9 +12,11 @@ expect_equal(
     revenu_emploi = 10,
     nonenr_capital_vendu = 100,
     nonenr_gain_vendu = 1000,
+    dividends = 25,
+    interests = 50,
     pension_psv = 10000
   ),
-  11102
+  11177
 )
 
 # test que le revenu peut être négatif si on doit de l'impôt
@@ -23,9 +25,12 @@ expect_equal(
     revenu_emploi = 10,
     nonenr_capital_vendu = 100,
     nonenr_gain_vendu = 1000,
-    pension_psv = 10000
+    dividends = 25,
+    interests = 50,
+    pension_psv = 10000,
+    age = 60
   ),
-  -988897
+  -988822
 )
 
 TRUE
