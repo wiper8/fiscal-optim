@@ -12,42 +12,42 @@ optim_flat_expenses <- function(data_filepath, inflation_over_ipc, eps = 0.01) {
   
   # bounds on the yearly_expenses amount
   # upper will be set after first failure
-  lower <- 0
-  upper <- NA
-  
+  bounds <- c(0, NA)
+
   repeat {
-    tryCatch({
-      message(c("[", round(lower, 2), ", ", round(upper, 2), "]"))
-      # reinitiate assets
-      source(data_filepath)
-      
-      # set expenses level
-      depenses <- data.frame(
-        age = start_age:max_age,
-        depenses = yearly_expenses * (inflation_over_ipc / ipc)^(0:(max_age - start_age))
-      )
-      
-      # try to live while spending `depenses` schedule
+    
+    message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
+    # reinitiate assets
+    source(data_filepath)
+    
+    # set expenses level
+    depenses <- data.frame(
+      age = start_age:max_age,
+      depenses = yearly_expenses * (inflation_over_ipc / ipc)^(0:(max_age - start_age))
+    )
+    
+    # try to live while spending `depenses` schedule
+    bounds <- tryCatch({
       try_strategy(actifs, revenus, depenses, strategy)
       message("success")
       # if success, increment lower bound
-      lower <- yearly_expenses
+      c(yearly_expenses, bounds[2])
     },
     error = function(e) { # too high
       message("failed")
-      if (is.na(upper)) upper <- yearly_expenses
-      upper <- min(upper, yearly_expenses)
-    }, finally = {
-      message("finally")
-      # next value to try
-      old_yearly_expenses <- yearly_expenses
-      if (is.na(upper)) {
-        yearly_expenses <- (yearly_expenses + eps) * 2
-      } else {
-        yearly_expenses <- (lower + upper) / 2
-      }
-      if (abs(old_yearly_expenses - yearly_expenses) < eps) break 
+      if (is.na(bounds[2])) return(c(bounds[1], yearly_expenses))
+      c(bounds[1], min(bounds[2], yearly_expenses))
     })
+    message("finally")
+    # next value to try
+    old_yearly_expenses <- yearly_expenses
+    if (is.na(bounds[2])) {
+      yearly_expenses <<- (yearly_expenses + eps) * 2
+      yearly_expenses <- (yearly_expenses + eps) * 2
+    } else {
+      yearly_expenses <<- mean(bounds)
+    }
+    if (abs(old_yearly_expenses - yearly_expenses) < eps) break
   }
   old_yearly_expenses
 }
