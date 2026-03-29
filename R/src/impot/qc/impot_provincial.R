@@ -3,7 +3,7 @@ source("R/src/impot/qc/grille_401.R")
 source("R/src/impot/qc/annexe_g.R")
 
 impot_provincial <- function(
-  revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests, rente_emploi, cotis_rente,
+    revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests, rente_emploi, cotis_rente,
   pension_psv, psv_clawback,
   ...
 ) {
