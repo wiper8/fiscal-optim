@@ -1,6 +1,7 @@
 source("R/src/get_rente.R")
 source("R/src/get_prest_psv.R")
 source("R/src/manage_nonenr.R")
+source("R/src/get_cotis_rrq.R")
 source("R/src/get_droits_reer.R")
 source("R/src/get_revenu_disponible.R")
 
@@ -12,7 +13,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     nrow = 1,
     dimnames = list(NULL, actifs_names)
   )
-
+  
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
@@ -22,12 +23,12 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       strategy[i, "COTIS_NONENR"],
       strategy[i, "SELL_NONENR"]
     )
-
+    
     # celi : contribution, retraits, nouveaux droits
     actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
     if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
-
+    
     # reer
     # trop de cotisation
     if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) stop(
@@ -38,7 +39,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     if (-strategy[i, "NET_COTIS_REER"] < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) stop(
       "Retraits du REER insuffisants car FERR"
     )
-
+    
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],
@@ -49,10 +50,10 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       get_droits_reer(revenus$revenu_emploi[i], ipc = ipc) # TODO arrêter les droits après FERR?
     actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
     actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
-
+    
     dividendes_recus <- (new_nonenr$new_actifs$nonenr_capital + new_nonenr$new_actifs$nonenr_gain) * dividend_yield
     interet_recu <- tail(actifs_history[, "cash"], 1) * (rendement_cash - 1)
-
+    
     # revenu après impôts
     revenu_disponible <- get_revenu_disponible(
       revenus$revenu_emploi[i],
@@ -64,6 +65,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
+      prestation_rrq = get_prest_rrq(), # TODO fonction + tests
+      cotis_rrq = get_cotis_rrq(start_age + i - 1, revenus$revenu_emploi[i]),
       age = start_age + i - 1
     )
 
@@ -81,7 +84,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       "celi" = actifs$celi$current_value
     )
     names(new_actifs) <- actifs_names
-
+    
     # appliquer du rendement
     actifs$celi$current_value <- actifs$celi$current_value * rendement
     new_actifs <- c(
