@@ -23,8 +23,8 @@ actifs <- list(
   reer = list(
     contrib_rate = 0.18,
     plafond = 32490,
-    droits_cotis_inutilises = 6000, # droits de cotisation inutilisés
-    cotis_versees_non_deduites = 0,
+    droits_cotis_inutilises = 6000,
+    cotis_versees_non_deduites = 0, # reports de déductions pour cotisations déjà versées
     current_value = 50000 # valeur présente du REER (capital + gain)
   )
 )

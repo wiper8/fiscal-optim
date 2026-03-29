@@ -19,7 +19,7 @@ impot_provincial <- function(
   # revenu net
   l201 <- grille_201(l101) # déduction pour travailleur
   l205 <- cotis_rente # déduction pour régime de pension agréé (RPA)
-  l214 <- l20800
+  l214 <- l20800 # déduction reer
 
   l250 <- psv_clawback
   l254 <- l201 + l205 + l214 + l250 # total des déductions
