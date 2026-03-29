@@ -4,7 +4,7 @@ get_cotis_rrq <- function(age, revenu_emploi) {
   c <- 9900 * (age < 73)
   d <- 81200 * (age < 73)
   e <- 3500 * (age < 73)
-  
+
   salaire_plafond <- pmin(d, revenu_emploi)
   cotisable_supp <- pmax(0, salaire_plafond - b)
   cotisable_brut <- salaire_plafond - cotisable_supp

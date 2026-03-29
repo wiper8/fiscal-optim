@@ -7,7 +7,7 @@ annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
   c <- 9900 * (age < 73)
   d <- 81200 * (age < 73)
   e <- 3500 * (age < 73)
-  
+
   ### partie 2
   l50329 <- revenu_emploi
   l2 <- pmin(d, l50329)
@@ -15,7 +15,7 @@ annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
   l5 <- l2 - l4
   l7 <- pmax(0, l5 - e)
   l8 <- t4_17
-  l9 <- 0.84375 * l8 # 0.84375 = 0.054 / (0.054 + 0.01)
+  l9 <- 0.84375 * l8 # 0.84375 provient de 0.054 / (0.054 + 0.01)
   l10 <- l8 - l9
   l11 <- 0.054 * l7
   l12 <- 0.01 * l7
@@ -31,7 +31,7 @@ annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
   l22 <- 0.04 * l4
   l23 <- l21 - l22
   l24 <- l20 + l23
-  
+
   ## partie 2b
   # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi
   l35 <- l29 <- l15

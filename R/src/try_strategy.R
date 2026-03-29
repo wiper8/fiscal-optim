@@ -39,7 +39,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     if (-strategy[i, "NET_COTIS_REER"] < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) stop(
       "Retraits du REER insuffisants car FERR"
     )
-    
+
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],
@@ -53,7 +53,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     
     dividendes_recus <- (new_nonenr$new_actifs$nonenr_capital + new_nonenr$new_actifs$nonenr_gain) * dividend_yield
     interet_recu <- tail(actifs_history[, "cash"], 1) * (rendement_cash - 1)
-    
+
     # revenu après impôts
     revenu_disponible <- get_revenu_disponible(
       revenus$revenu_emploi[i],
@@ -68,7 +68,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       prestation_rrq = get_prest_rrq(), # TODO fonction + tests
       age = start_age + i - 1
     )
-    
+
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
       strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"] +
       strategy[i, "SELL_NONENR"]
