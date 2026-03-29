@@ -53,7 +53,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       l20800 = tmp_reer$l20800,
       dividendes_recus,
       interet_recu,
-      rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years),
+      rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
       age = start_age + i - 1
     )
