@@ -19,6 +19,13 @@ actifs <- list(
     contrib_yearly = 7000, # droits de cotisation supplémentaires par an
     contrib_lim = 4500, # droits de cotisation
     current_value = 48000 # valeur présente du celi (capital + gain)
+  ),
+  reer = list(
+    contrib_rate = 0.18,
+    plafond = 32490,
+    droits_cotis_inutilises = 6000, # droits de cotisation inutilisés
+    cotis_versees_non_deduites = 0,
+    current_value = 50000 # valeur présente du REER (capital + gain)
   )
 )
 
@@ -38,12 +45,14 @@ depenses <- data.frame(
 strategy <- matrix(
   NA,
   nrow = 1,
-  ncol = 3,
-  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI"))
+  ncol = 5,
+  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
 )
 strategy[1, "COTIS_NONENR"] <- 0
 strategy[1, "SELL_NONENR"] <- 13500
 strategy[1, "NET_COTIS_CELI"] <- -2175
+strategy[1, "NET_COTIS_REER"] <- -1900
+strategy[1, "DEDUCE_REER"] <- 0
 
 strategy <- matrix(
   strategy,

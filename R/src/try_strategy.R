@@ -27,6 +27,18 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
+    # reer
+    tmp_reer <- annexe_7(
+      actifs$reer$cotis_versees_non_deduites,
+      strategy[i, "NET_COTIS_REER"],
+      strategy[i, "DEDUCE_REER"],
+      actifs$reer$droits_cotis_inutilises
+    )
+    actifs$reer$droits_cotis_inutilises <- actifs$reer$droits_cotis_inutilises - max(0, strategy[i, "NET_COTIS_REER"]) +
+      get_droits_reer(revenus$revenu_emploi[i]) # TODO arrêter les droits après FERR?
+    actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
+    actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
+
     dividendes_recus <- (new_nonenr$new_actifs$nonenr_capital + new_nonenr$new_actifs$nonenr_gain) * dividend_yield
     interet_recu <- tail(actifs_history[, "cash"], 1) * (rendement_cash - 1)
 
@@ -35,6 +47,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
       new_nonenr$gain_en_capital_vendu,
+      max(0, -strategy[i, "NET_COTIS_REER"]),
+      l20800 = tmp_reer$l20800,
       dividendes_recus,
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years),
