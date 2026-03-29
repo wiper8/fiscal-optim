@@ -6,7 +6,7 @@ annexe_7 <- function(cotisations_inutilisees_versees_dispo_a_deduire,
   # partie A
   # cotisation REER
   l1 <- cotisations_inutilisees_versees_dispo_a_deduire
-  l24500 <- l2 <- cotisations_versees_reer
+  l24500 <- l2 <- pmax(0, cotisations_versees_reer)
 
   l5 <- l1 + l24500
   

@@ -28,6 +28,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
     # reer
+    if (strategy[i, "DEDUCE_REER"] > min(actifs$reer$droits_cotis_inutilises, actifs$reer$cotis_versees_non_deduites +
+                                         strategy[i, "NET_COTIS_REER"]))
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],

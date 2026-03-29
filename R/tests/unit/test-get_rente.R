@@ -30,11 +30,12 @@ expect_equal(
             15),
   18652.5
 )
+# on atteint le maximum
 expect_equal(
   get_rente(65,
-            200000,
+            220000,
             45),
-  163957.5
+  169050.1
 )
 
 TRUE
