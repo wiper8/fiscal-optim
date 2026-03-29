@@ -1,6 +1,6 @@
 # RRQ
 annexe_u <- function(revenu_emploi, l98, l98_2) {
-  # 98_1 est le revenu d'emploi admis. au RRQ, 98 est les costisations versées au RRQ base, 98_2 est les cotis au supp 
+  # 98_1 est le revenu d'emploi admis. au RRQ, 98 est les costisations versées au RRQ base, 98_2 est les cotis au supp
   # TODO suppose que les intrants sont conformes aux cotisations selon revenu_emploi
   # TODO vérifier
   l18_5 <- l98_1 <- revenu_emploi
