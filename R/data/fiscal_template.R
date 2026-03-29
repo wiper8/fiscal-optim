@@ -6,6 +6,9 @@ dividend_yield <- 0.01 # yearly
 rendement <- rendement_brut / inflation
 rendement_cash <- 1.0055
 start_age <- 50 # en date du 1er janvier
+passed_work_years <- 25 # nombre d'années cotisées de travail avec salaire au régime de rente employeur
+cotis_rente_yield1 <- 0.05 # under MGA
+cotis_rente_yield2 <- 0.06 # over MGA
 
 # en date du 1er janvier
 actifs <- list(
