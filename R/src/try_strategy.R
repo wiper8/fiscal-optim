@@ -1,6 +1,7 @@
 source("R/src/get_rente.R")
 source("R/src/get_prest_psv.R")
 source("R/src/manage_nonenr.R")
+source("R/src/get_cotis_rrq.R")
 source("R/src/get_droits_reer.R")
 source("R/src/get_revenu_disponible.R")
 
@@ -64,6 +65,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
+      prestation_rrq = get_prest_rrq(), # TODO fonction + tests
       age = start_age + i - 1
     )
 
