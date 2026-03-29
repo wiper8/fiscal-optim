@@ -5,6 +5,7 @@ source("R/src/impot/fed/grille_l12100.R")
 source("R/src/impot/fed/grille_l23500.R")
 source("R/src/impot/fed/grille_l30000.R")
 source("R/src/impot/fed/grille_l30100.R")
+source("R/src/impot/fed/grille_l31400.R")
 source("R/src/impot/fed/grille_l34990.R")
 
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends, interests,
@@ -37,8 +38,8 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends
 
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
-  # TODO l31400 montant pour revenu de pension
-  l33500 <- l30000 + l30100 + l31260
+  l31400 <- grille_l31400(l11500, l12900 = 0, age) # montant pour revenu de pension
+  l33500 <- l30000 + l30100 + l31260 + l31400
 
   l118 <- 0.145
   l33800 <- l33500 * l118
