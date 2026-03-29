@@ -21,10 +21,10 @@ annexe_7 <- function(cotisations_inutilisees_versees_dispo_a_deduire,
   l18 <- deduction_reer
   stopifnot(l18 <= l17)
   l20800 <- l20 <- pmin(l10, l18)
-
+  
   # partie D
   # cotisations inutilisées versées à un REER disponibles à reporter
   cotis_inutil_vers_disp_deduc <- l10 - l20
-
+  
   list(l20800 = l20800, l24500 = l24500, cotis_inutil_vers_disp_deduc = cotis_inutil_vers_disp_deduc)
 }

@@ -28,8 +28,11 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
     # reer
-    if (strategy[i, "DEDUCE_REER"] > min(actifs$reer$droits_cotis_inutilises, actifs$reer$cotis_versees_non_deduites +
-                                         strategy[i, "NET_COTIS_REER"]))
+    # trop de cotisation
+    if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) stop(
+      "attention, droits de cotisations au reer dépassés"
+    )
+
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],
@@ -37,7 +40,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       actifs$reer$droits_cotis_inutilises
     )
     actifs$reer$droits_cotis_inutilises <- actifs$reer$droits_cotis_inutilises - max(0, strategy[i, "NET_COTIS_REER"]) +
-      get_droits_reer(revenus$revenu_emploi[i]) # TODO arrêter les droits après FERR?
+      get_droits_reer(revenus$revenu_emploi[i], ipc = ipc) # TODO arrêter les droits après FERR?
     actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
     actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
 
@@ -59,7 +62,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     )
 
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
-      strategy[i, "NET_COTIS_CELI"] - strategy[i, "COTIS_NONENR"] + strategy[i, "SELL_NONENR"]
+      strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"] +
+      strategy[i, "SELL_NONENR"]
 
     if (remaining_cash < 0) stop(paste0("argent insuffisant à i=", i))
 

@@ -60,5 +60,5 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l44000 <- 0.165 * l42900
   l48200 <- l43850 + l44000 # total des crédits
   l48500 <- l43500 - l48200 # solde dû
-  list(l48500 = l48500, l23500 = l23500, cotis_inutilisees_reer = tmp_reer$cotis_inutilisees_reer)
+  list(l48500 = l48500, l23500 = l23500)
 }
