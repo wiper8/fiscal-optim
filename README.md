@@ -32,3 +32,8 @@ The workflow proposed is:
 
 ## Courbes de Lafferière (CQFF)
 https://cqff.com/courbes-cqff/
+
+### lint
+To contribute to R files, code must be linted.
+
+`lintr::lint_dir("R")`
