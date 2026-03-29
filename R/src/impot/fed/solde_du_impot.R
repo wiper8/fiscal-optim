@@ -42,12 +42,12 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l30000 <- grille_l30000(l23600) # montant personnel de base
   l30100 <- grille_l30100(age, l23600) # montant pour l'âge
   l30800 <- tmp_annexe_8$l30800 # cotisation de base RRQ
-  
+
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
   l31400 <- grille_l31400(l11500, l12900 = 0, age) # montant pour revenu de pension
   l33500 <- l30000 + l30100 + l30800 + l31260 + l31400
-  
+
   l118 <- 0.145
   l33800 <- l33500 * l118
   l34990 <- grille_l34990(l33800) # crédit d'impôt compensatoire
