@@ -33,6 +33,11 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
     if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) stop(
       "attention, droits de cotisations au reer dépassés"
     )
+    # car FERR
+    if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) stop("Pas le droit de cotiser au REER, car FERR")
+    if (-strategy[i, "NET_COTIS_REER"] < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) stop(
+      "Retraits du REER insuffisants car FERR"
+    )
 
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,

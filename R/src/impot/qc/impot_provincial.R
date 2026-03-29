@@ -10,7 +10,7 @@ impot_provincial <- function(
   # revenu total
   l101 <- revenu_emploi
   l114 <- pension_psv
-  l122 <- rente_emploi + revenus_reer
+  l122 <- rente_emploi + revenus_reer # le FERR irait ici, mais pour simplifier, je le laisse dans le revenus_reer
   l128 <- dividends
   l130 <- interests
   l139 <- annexe_g(gain_capital_imposable)
