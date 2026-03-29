@@ -13,7 +13,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   # revenu total
   l10100 <- revenu_emploi
   l11300 <- pension_psv
-  l11500 <- rente_emploi
+  l11500 <- rente_emploi # le FERR irait ici, mais pour simplifier, je le laisse dans le REER ligne 12900
   l12000 <- grille_l12000(dividends)
   l12100 <- grille_l12100(interests)
   l12700 <- annexe_3(gain_capital_imposable)

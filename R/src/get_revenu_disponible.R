@@ -14,9 +14,9 @@ get_revenu_disponible <- function(
   pension_psv = 0,
   ...
 ) {
-
+  
   cotis_rente <- cotis_rente(revenu_emploi)
-
+  
   solde_impot_fed <- solde_du_impot(
     revenu_emploi, nonenr_gain_vendu, revenus_reer, dividends, interests, rente_emploi, cotis_rente, pension_psv, ...
   )
