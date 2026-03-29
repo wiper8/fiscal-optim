@@ -1,11 +1,11 @@
 # REER
-annexe_7 <- function(cotisations_inutilisees_versees_dispo_a_deduire,
+annexe_7 <- function(cotis_inutil_vers_dispo_deduc,
                      cotisations_versees_reer,
                      deduction_reer,
                      max_deductible_reer) {
   # partie A
   # cotisation REER
-  l1 <- cotisations_inutilisees_versees_dispo_a_deduire
+  l1 <- cotis_inutil_vers_dispo_deduc
   l24500 <- l2 <- pmax(0, cotisations_versees_reer)
 
   l5 <- l1 + l24500
