@@ -25,8 +25,9 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l20700 <- cotis_rente # déduction régime de pension agréés (RPA)
   
   l20800 <- l20800 # déduction reer demandée (en argument)
-  l22215 <- annexe_8() # TODO
-  l23300 <- l20700 + l20800
+  tmp_annexe_8 <- annexe_8(age, revenu_emploi, cotis_rrq$box17, cotis_rrq$box17A)
+  l22215 <- tmp_annexe_8$l22215
+  l23300 <- l20700 + l20800 + l22215
   l23400 <- l15000 - l23300 # revenu net avant rajustements
   l23500 <- l42200 <- grille_l23500(l11300, l23400) # remboursement des prestations de programmes sociaux
   l23600 <- pmax(0, l23400 - l23500) # revenu net
@@ -40,11 +41,12 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   # crédits d'impot non rembousables
   l30000 <- grille_l30000(l23600) # montant personnel de base
   l30100 <- grille_l30100(age, l23600) # montant pour l'âge
+  l30800 <- tmp_annexe_8$l30800 # cotisation de base RRQ
   
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
   l31400 <- grille_l31400(l11500, l12900 = 0, age) # montant pour revenu de pension
-  l33500 <- l30000 + l30100 + l31260 + l31400
+  l33500 <- l30000 + l30100 + l30800 + l31260 + l31400
   
   l118 <- 0.145
   l33800 <- l33500 * l118

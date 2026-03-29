@@ -33,5 +33,11 @@ annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
   l24 <- l20 + l23
   
   ## partie 2b
-  list(l30800 = 0, l22215 = 0)
+  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi
+  l35 <- l29 <- l15
+  # suite
+  l42 <- l36 <- l18
+  l46 <- l43 <- l22
+  l47 <- l42 + l46
+  list(l30800 = l35, l22215 = l47)
 }

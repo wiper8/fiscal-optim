@@ -13,23 +13,22 @@ get_revenu_disponible <- function(
   rente_emploi = 0,
   pension_psv = 0,
   prestation_rrq = 0,
-  cotis_rrq = 0,
   ...
 ) {
-  
+
   cotis_rente <- cotis_rente(revenu_emploi)
-  
-  # TODO
+  cotis_rrq <- get_cotis_rrq(revenu_emploi, ...)
+
   solde_impot_fed <- solde_du_impot(
     revenu_emploi, nonenr_gain_vendu, revenus_reer, dividends, interests, rente_emploi, cotis_rente, pension_psv,
     prestation_rrq, cotis_rrq, ...
   )
-  # TODO
+
   solde_impot_prov <- impot_provincial(
     revenu_emploi, nonenr_gain_vendu, revenus_reer, dividends, interests, rente_emploi, cotis_rente, pension_psv,
     prestation_rrq, cotis_rrq, solde_impot_fed$l23500, ...
   )
-  
+
   revenu_emploi +
     nonenr_capital_vendu +
     nonenr_gain_vendu +

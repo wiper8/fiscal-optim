@@ -66,10 +66,9 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
       prestation_rrq = get_prest_rrq(), # TODO fonction + tests
-      cotis_rrq = get_cotis_rrq(start_age + i - 1, revenus$revenu_emploi[i]),
       age = start_age + i - 1
     )
-
+    
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
       strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"] +
       strategy[i, "SELL_NONENR"]
