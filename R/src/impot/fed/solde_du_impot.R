@@ -1,4 +1,5 @@
 source("R/src/impot/fed/annexe_3.R")
+source("R/src/impot/fed/annexe_8.R")
 source("R/src/impot/fed/get_l77.R")
 source("R/src/impot/fed/grille_l12000.R")
 source("R/src/impot/fed/grille_l12100.R")
@@ -25,7 +26,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l20700 <- cotis_rente # déduction régime de pension agréés (RPA)
 
   l20800 <- l20800 # déduction reer demandée (en argument)
-  tmp_annexe_8 <- annexe_8(age, revenu_emploi, cotis_rrq$box17, cotis_rrq$box17A)
+  tmp_annexe_8 <- annexe_8(age, revenu_emploi)
   l22215 <- tmp_annexe_8$l22215
   l23300 <- l20700 + l20800 + l22215
   l23400 <- l15000 - l23300 # revenu net avant rajustements

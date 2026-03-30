@@ -1,6 +1,8 @@
+source("R/src/get_cotis_rrq.R")
+
 # RRQ
 # TODO possible entre 60 et 70 ans de choisir de cesser de cotiser au RRQ
-annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
+annexe_8 <- function(age, revenu_emploi) {
   ### partie 1
   # A simplifié vu que je considère tout en date du 1er janvier, le nombre de mois est toujours 0 ou 12
   b <- 71300 * (age < 73)
@@ -9,6 +11,10 @@ annexe_8 <- function(age, revenu_emploi, t4_17, t4_17a) {
   e <- 3500 * (age < 73)
 
   ### partie 2
+  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi
+  tmp_cotis_rrq <- get_cotis_rrq(age, revenu_emploi)
+  t4_17 <- tmp_cotis_rrq$box17
+  t4_17a <- tmp_cotis_rrq$box17A
   l50329 <- revenu_emploi
   l2 <- pmin(d, l50329)
   l4 <- pmax(0, l2 - b)

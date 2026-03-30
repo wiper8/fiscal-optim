@@ -2,11 +2,14 @@ source("R/src/get_rente.R")
 source("R/src/get_prest_psv.R")
 source("R/src/manage_nonenr.R")
 source("R/src/get_cotis_rrq.R")
+source("R/src/get_prest_rrq.R")
 source("R/src/get_droits_reer.R")
+source("R/src/retrait_min_ferr.R")
+source("R/src/impot/fed/annexe_7.R")
 source("R/src/get_revenu_disponible.R")
 
 # tenter une strategie de décaissement et tester si l'argent est suffisant
-try_stategy <- function(actifs, revenus, depenses, strategy) {
+try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
   actifs_names <- c("nonenr_capital", "nonenr_gain", "cash", "celi")
   actifs_history <- matrix(
     c(actifs$nonenr_capital, actifs$nonenr_gain, actifs$cash, actifs$celi$current_value),
@@ -47,7 +50,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       actifs$reer$droits_cotis_inutilises
     )
     actifs$reer$droits_cotis_inutilises <- actifs$reer$droits_cotis_inutilises - max(0, strategy[i, "NET_COTIS_REER"]) +
-      get_droits_reer(revenus$revenu_emploi[i], ipc = ipc) # TODO arrêter les droits après FERR?
+      get_droits_reer(revenus$revenu_emploi[i], age = start_age + i - 1, ipc = ipc)
     actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
     actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
 
@@ -65,7 +68,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy) {
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
-      prestation_rrq = get_prest_rrq(), # TODO fonction + tests
+      prestation_rrq = get_prest_rrq(c(passed_revenus$revenu_emploi, revenus$revenu_emploi), start_age, ipc),
       age = start_age + i - 1
     )
 

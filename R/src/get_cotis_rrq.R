@@ -1,5 +1,5 @@
 # cotisations retenues par l'employeur
-get_cotis_rrq <- function(age, revenu_emploi) {
+get_cotis_rrq <- function(age, revenu_emploi, ...) {
   b <- 71300 * (age < 73)
   c <- 9900 * (age < 73)
   d <- 81200 * (age < 73)
