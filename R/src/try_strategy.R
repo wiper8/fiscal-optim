@@ -68,7 +68,14 @@ try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),
       pension_psv = get_prest_psv(start_age + i - 1),
-      prestation_rrq = get_prest_rrq(c(passed_revenus$revenu_emploi, revenus$revenu_emploi), start_age, ipc),
+      prestation_rrq = get_prest_rrq(
+        c(
+          passed_revenus$revenu_emploi[18 <= passed_revenus$age & passed_revenus$age < 65],
+          revenus$revenu_emploi[18 <= revenus$age & revenus$age < 65]
+        ),
+        start_age,
+        ipc
+      ),
       age = start_age + i - 1
     )
 

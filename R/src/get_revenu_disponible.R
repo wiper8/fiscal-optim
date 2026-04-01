@@ -38,7 +38,7 @@ get_revenu_disponible <- function(
     cotis_rente +
     pension_psv +
     prestation_rrq -
-    cotis_rrq -
+    cotis_rrq$box17 - cotis_rrq$box17A -
     solde_impot_fed$l48500 -
     solde_impot_prov
 }
