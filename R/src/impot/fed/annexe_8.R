@@ -11,7 +11,8 @@ annexe_8 <- function(age, revenu_emploi) {
   e <- 3500 * (age < 73)
 
   ### partie 2
-  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi
+  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi (que l'employeur)
+  # met déjà le nombre parfait de cotisations en déductions sur le salaire
   tmp_cotis_rrq <- get_cotis_rrq(age, revenu_emploi)
   t4_17 <- tmp_cotis_rrq$box17
   t4_17a <- tmp_cotis_rrq$box17A
@@ -39,7 +40,8 @@ annexe_8 <- function(age, revenu_emploi) {
   l24 <- l20 + l23
 
   ## partie 2b
-  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi
+  # TODO suppose que les intrants t4_17 et t4_17a sont conformes aux cotisations selon revenu_emploi (que l'employeur)
+  # met déjà le nombre parfait de cotisations en déductions sur le salaire
   l35 <- l29 <- l15
   # suite
   l42 <- l36 <- l18

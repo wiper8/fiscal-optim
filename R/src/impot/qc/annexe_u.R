@@ -2,7 +2,8 @@
 source("R/src/get_cotis_rrq.R")
 
 annexe_u <- function(revenu_emploi) {
-  # TODO suppose que les intrants sont conformes aux cotisations selon revenu_emploi
+  # TODO ceci suppose que les intrants sont conformes aux cotisations selon revenu_emploi (que l'employeur met déjà)
+  # les déductions parfaites pour le RRQ
   tmp <- get_cotis_rrq(age = 30, revenu_emploi) # TODO approximation à cause de l'âge < 73 ans
   l98 <- tmp$box17
   l98_2 <- tmp$box17A

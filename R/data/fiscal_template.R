@@ -29,6 +29,7 @@ actifs <- list(
   )
 )
 
+# revenu d'emploi seulement
 passed_revenus <- data.frame(
   age = 18:(start_age - 1),
   revenu_emploi = 60000

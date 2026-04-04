@@ -1,7 +1,5 @@
 source("R/src/impot/fed/annexe_8.R")
 
-# TODO
-
 expect_equal(
   annexe_8(35, c(0, 3000, 5000, 60000, 75000, 85000, 500000)),
   list(
