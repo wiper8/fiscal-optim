@@ -12,17 +12,26 @@ get_revenu_disponible <- function(
   interests = 0,
   rente_emploi = 0,
   pension_psv = 0,
+  prestation_rrq = 0,
   ...
 ) {
 
   cotis_rente <- cotis_rente(revenu_emploi)
+  cotis_rrq <- get_cotis_rrq(revenu_emploi, ...)
 
   solde_impot_fed <- solde_du_impot(
-    revenu_emploi, nonenr_gain_vendu, revenus_reer, dividends, interests, rente_emploi, cotis_rente, pension_psv, ...
+    revenu_emploi = revenu_emploi, gain_capital_imposable = nonenr_gain_vendu, revenus_reer = revenus_reer,
+    dividends = dividends, interests = interests, rente_emploi = rente_emploi, cotis_rente = cotis_rente,
+    pension_psv = pension_psv, prestation_rrq = prestation_rrq, cotis_rrq = cotis_rrq,
+    ...
   )
+
   solde_impot_prov <- impot_provincial(
-    revenu_emploi, nonenr_gain_vendu, revenus_reer, dividends, interests, rente_emploi, cotis_rente, pension_psv,
-    solde_impot_fed$l23500, ...
+    revenu_emploi = revenu_emploi, gain_capital_imposable = nonenr_gain_vendu, revenus_reer = revenus_reer,
+    dividends = dividends, interests = interests, rente_emploi = rente_emploi, cotis_rente = cotis_rente,
+    pension_psv = pension_psv, prestation_rrq = prestation_rrq, cotis_rrq = cotis_rrq,
+    psv_clawback = solde_impot_fed$l23500,
+    ...
   )
 
   revenu_emploi +
@@ -32,7 +41,9 @@ get_revenu_disponible <- function(
     interests +
     rente_emploi -
     cotis_rente +
-    pension_psv -
+    pension_psv +
+    prestation_rrq -
+    cotis_rrq$box17 - cotis_rrq$box17A -
     solde_impot_fed$l48500 -
     solde_impot_prov
 }

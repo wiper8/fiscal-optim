@@ -16,7 +16,8 @@ expect_equal(
     nonenr_gain_vendu = 1000,
     dividends = 25,
     interests = 50,
-    pension_psv = 10000
+    pension_psv = 10000,
+    age = 60
   ),
   11175
 )

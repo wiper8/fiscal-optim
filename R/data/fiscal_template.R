@@ -29,6 +29,12 @@ actifs <- list(
   )
 )
 
+# revenu d'emploi seulement
+passed_revenus <- data.frame(
+  age = 18:(start_age - 1),
+  revenu_emploi = 60000
+)
+
 # en date du 1er janvier
 revenus <- data.frame(
   age = start_age:max_age,
