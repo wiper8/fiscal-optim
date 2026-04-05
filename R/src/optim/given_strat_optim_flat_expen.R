@@ -2,7 +2,7 @@ source("R/src/try_strategy.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-optim_flat_expenses <- function(data_filepath, inflation_over_ipc, eps = 0.01) {
+given_strat_optim_flat_expen <- function(data_filepath, inflation_over_ipc, eps = 0.01) {
 
   # in today's dollars
   # estimation of propabe yearly_expenses, very simplified
