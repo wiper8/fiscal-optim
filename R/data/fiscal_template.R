@@ -67,4 +67,3 @@ strategy <- matrix(
   byrow = TRUE,
   dimnames = dimnames(strategy)
 )
-

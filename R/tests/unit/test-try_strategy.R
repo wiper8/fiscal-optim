@@ -225,7 +225,7 @@ expect_equal(
     ),
     passed_revenus = NULL
   )[2, 3],
-  # (cash + salaire - impotestim&RRQ&rente - depenses + dividendes_interest) * rendement_cash
+  # nolint (cash + salaire - impotestim&RRQ&rente - depenses + dividendes_interest) * rendement_cash
   (20000 + revenus$revenu_emploi - (6000 + 8000 + 4000 + 3500) - depenses$depenses +
      (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
   tolerance = 500,
