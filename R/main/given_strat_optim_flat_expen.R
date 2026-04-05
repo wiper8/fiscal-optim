@@ -1,7 +1,7 @@
 library(ggplot2)
 library(scales)
 
-source("R/src/optim/optim_flat_expenses.R")
+source("R/src/optim/given_strat_optim_flat_expen.R")
 
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
@@ -13,4 +13,4 @@ data_filename <- if (file.exists(private_filename)) {
   template_filename
 }
 
-optim_flat_expenses(data_filename, inflation, eps = 100)
+given_strat_optim_flat_expen(data_filename, inflation, eps = 100)
