@@ -1,5 +1,6 @@
 library(ggplot2)
 library(scales)
+source("R/src/optim/maximise_expenses.R")
 
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
@@ -10,9 +11,7 @@ if (file.exists(private_filename)) {
   source(template_filename)
 }
 
-source("R/src/try_strategy.R")
-
-actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+actifs_hist <- maximise_expenses(actifs, revenus, passed_revenus)
 
 key_moments <- c(start_age, revenus$age[head(which(revenus$revenu_emploi == 0), 1)], 65, 75, max_age)
 
