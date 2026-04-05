@@ -2,8 +2,6 @@ library(ggplot2)
 library(scales)
 source("R/src/try_strategy.R")
 
-source("R/src/try_strategy.R")
-
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
 
