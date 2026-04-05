@@ -25,10 +25,15 @@ The workflow proposed is:
 2. Run one of the `R/main/*.R` file.
 
 ### Running tests
-`source("R/run-tests.R")`
+`source("R/tests/run-tests.R")`
 
 ### Tax facts ignored
 - claiming some deduction for *previous years* (like capital gains losses)
 
 ## Courbes de Lafferière (CQFF)
 https://cqff.com/courbes-cqff/
+
+### lint
+To contribute to R files, code must be linted.
+
+`lintr::lint_dir("R")`

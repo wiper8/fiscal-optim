@@ -1,23 +1,35 @@
 source("R/src/impot/fed/annexe_3.R")
+source("R/src/impot/fed/annexe_8.R")
 source("R/src/impot/fed/get_l77.R")
 source("R/src/impot/fed/grille_l12000.R")
 source("R/src/impot/fed/grille_l12100.R")
 source("R/src/impot/fed/grille_l23500.R")
 source("R/src/impot/fed/grille_l30000.R")
 source("R/src/impot/fed/grille_l30100.R")
+source("R/src/impot/fed/grille_l31400.R")
 source("R/src/impot/fed/grille_l34990.R")
 
-solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends, interests, pension_psv) {
+solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests,
+                           rente_emploi, cotis_rente, pension_psv, prestation_rrq, cotis_ae, cotis_rqap) {
   # revenu total
   l10100 <- revenu_emploi
   l11300 <- pension_psv
+  l11400 <- prestation_rrq
+  l11500 <- rente_emploi # le FERR irait ici, mais pour simplifier, je le laisse dans le REER ligne 12900
   l12000 <- grille_l12000(dividends)
   l12100 <- grille_l12100(interests)
   l12700 <- annexe_3(gain_capital_imposable)
-  l15000 <- l10100 + l11300 + l12000 + l12100 + l12700
+  l12900 <- revenus_reer
+  l15000 <- l10100 + l11300 + l11400 + l11500 + l12000 + l12100 + l12700 + l12900
 
   # revenu net
-  l23400 <- l15000 # revenu net avant rajustements
+  l20700 <- cotis_rente # déduction régime de pension agréés (RPA)
+
+  l20800 <- l20800 # déduction reer demandée (en argument)
+  tmp_annexe_8 <- annexe_8(age, revenu_emploi) # déduction cotis supp RRQ
+  l22215 <- tmp_annexe_8$l22215
+  l23300 <- l20700 + l20800 + l22215
+  l23400 <- l15000 - l23300 # revenu net avant rajustements
   l23500 <- l42200 <- grille_l23500(l11300, l23400) # remboursement des prestations de programmes sociaux
   l23600 <- pmax(0, l23400 - l23500) # revenu net
 
@@ -30,10 +42,14 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, dividends
   # crédits d'impot non rembousables
   l30000 <- grille_l30000(l23600) # montant personnel de base
   l30100 <- grille_l30100(age, l23600) # montant pour l'âge
+  l30800 <- tmp_annexe_8$l30800 # cotisation de base RRQ
+  l31200 <- pmin(860.67, cotis_ae)
+  l31205 <- pmin(484.12, cotis_rqap)
 
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
-  l33500 <- l30000 + l30100 + l31260
+  l31400 <- grille_l31400(l11500, l12900 = 0, age) # montant pour revenu de pension
+  l33500 <- l30000 + l30100 + l30800 + l31200 + l31205 + l31260 + l31400
 
   l118 <- 0.145
   l33800 <- l33500 * l118
