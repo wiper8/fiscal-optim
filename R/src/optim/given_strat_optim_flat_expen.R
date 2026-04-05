@@ -28,7 +28,7 @@ given_strat_optim_flat_expen <- function(data_filepath, inflation_over_ipc, eps 
 
     # try to live while spending `depenses` schedule
     bounds <- tryCatch({
-      try_strategy(actifs, revenus, depenses, strategy)
+      try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
       # if success, increment lower bound
       c(yearly_expenses, bounds[2])
     },
