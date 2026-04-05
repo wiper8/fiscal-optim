@@ -2,11 +2,12 @@ source("R/src/try_strategy.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-given_strat_optim_flat_expen <- function(data_filepath, inflation_over_ipc, eps = 0.01) {
+given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation_over_ipc, eps = 0.01) {
 
   # in today's dollars
   # estimation of propabe yearly_expenses, very simplified
   source(data_filepath)
+  strategy <- real_strategy
   yearly_expenses <- actifs$cash + actifs$nonenr_capital + actifs$nonenr_gain + actifs$celi$current_value
   yearly_expenses <- yearly_expenses * (rendement_brut / ipc - 1)
 
@@ -19,6 +20,7 @@ given_strat_optim_flat_expen <- function(data_filepath, inflation_over_ipc, eps 
     message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
     # reinitiate assets
     source(data_filepath)
+    strategy <- real_strategy
 
     # set expenses level
     depenses <- data.frame(
