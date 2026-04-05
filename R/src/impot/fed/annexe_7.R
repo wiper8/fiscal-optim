@@ -3,6 +3,10 @@ annexe_7 <- function(cotis_inutil_vers_dispo_deduc,
                      cotisations_versees_reer,
                      deduction_reer,
                      max_deductible_reer) {
+  stopifnot(cotis_inutil_vers_dispo_deduc >= 0)
+  stopifnot(deduction_reer >= 0)
+  stopifnot(max_deductible_reer >= 0)
+
   # partie A
   # cotisation REER
   l1 <- cotis_inutil_vers_dispo_deduc
