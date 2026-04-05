@@ -20,6 +20,13 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
+    dispo_nonenr <- sum(c(
+      strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
+    ))
+    if (strategy[i, "SELL_NONENR"] > dispo_nonenr) {
+      warning("attention, retraits trop importants dans le NONENR")
+      strategy[i, "SELL_NONENR"] <- dispo_nonenr
+    }
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
       tail(actifs_history[, "nonenr_gain"], 1),
@@ -28,6 +35,10 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
 
     # celi : contribution, retraits, nouveaux droits
+    if (-strategy[i, "NET_COTIS_CELI"] > actifs$celi$current_value) {
+      warning("attention, retraits trop importants dans le CELI")
+      strategy[i, "NET_COTIS_CELI"] <- -actifs$celi$current_value
+    }
     actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
     if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
@@ -41,11 +52,13 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) stop("Pas le droit de cotiser au REER, car FERR")
     if (-min(0, strategy[i, "NET_COTIS_REER"]) < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) {
       strategy[i, "NET_COTIS_REER"] <- -retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value
-      warning(
-        "Retraits du REER insuffisants car FERR. Retrait forcé"
-      )
+      warning("Retraits du REER insuffisants car FERR. Retrait forcé")
     }
 
+    if (-strategy[i, "NET_COTIS_REER"] > actifs$reer$current_value) {
+      warning("attention, retraits trop importants dans le REER.")
+      strategy[i, "NET_COTIS_REER"] <- -actifs$reer$current_value
+    }
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],

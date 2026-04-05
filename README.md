@@ -22,7 +22,7 @@ You need R installed on your machine.
 
 The workflow proposed is:
 1. Copy `R/data/fiscal_template.R` and rename it as `R/data/fiscal_private.R`
-2. Run the `R/main.R` file.
+2. Run one of the `R/main/*.R` file.
 
 ### Running tests
 `source("R/tests/run-tests.R")`
