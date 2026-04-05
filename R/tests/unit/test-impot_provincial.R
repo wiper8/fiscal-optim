@@ -1,7 +1,5 @@
 source("R/src/impot/qc/impot_provincial.R")
 
-# TODO
-
 # rien de spécial
 expect_equal(
   impot_provincial(
