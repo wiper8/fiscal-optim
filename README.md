@@ -22,7 +22,7 @@ You need R installed on your machine.
 
 The workflow proposed is:
 1. Copy `R/data/fiscal_template.R` and rename it as `R/data/fiscal_private.R`
-2. Run one of the `R/main*.R` file.
+2. Run one of the `R/main/*.R` file.
 
 ### Running tests
 `source("R/tests/run-tests.R")`
@@ -37,3 +37,8 @@ https://cqff.com/courbes-cqff/
 To contribute to R files, code must be linted.
 
 `lintr::lint_dir("R")`
+
+## Setting up git hooks (optional)
+After cloning the repository, run:
+```bash
+bash .github/hooks/setup-hooks.sh
