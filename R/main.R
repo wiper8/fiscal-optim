@@ -9,7 +9,7 @@ if (file.exists(private_filename)) {
 } else {
   source(template_filename)
 }
- 
+
 source("R/src/try_strategy.R")
 
 actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
