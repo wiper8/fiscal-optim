@@ -20,13 +20,12 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
     # changer la part de capital et de gain selon les achats et ventes
-    if (strategy[i, "SELL_NONENR"] > sum(c(
+    dispo_nonenr <- sum(c(
       strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
-    ))) {
+    ))
+    if (strategy[i, "SELL_NONENR"] > dispo_nonenr) {
       warning("attention, retraits trop importants dans le NONENR")
-      strategy[i, "SELL_NONENR"] <- sum(c(
-        strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
-      ))
+      strategy[i, "SELL_NONENR"] <- dispo_nonenr
     }
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
