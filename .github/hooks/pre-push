@@ -16,6 +16,7 @@ if [ -n "$TODO_LINES" ]; then
 else
     echo "No TODO items found!"
 fi
+echo ""
 
 echo "Pre-push : running lintr"
 
