@@ -201,12 +201,16 @@ expect_equal(
 
 # cash
 actifs$cash <- 20000
-fake_cotis_rente <- mock(4000, 4000)
+fake_get_cotis_rente <- mock(4000, 4000)
+fake_get_cotis_ae <- mock(250, 250)
+fake_get_cotis_rqap <- mock(750, 750)
 fake_get_cotis_rrq <- mock(list(box17 = 2000, box17A = 1500), list(box17 = 2000, box17A = 1500))
 fake_solde_du_impot <- mock(list(l48500 = 6000, l23500 = 0), list(l48500 = 6000, l23500 = 0))
 fake_impot_provincial <- mock(8000, 8000)
 
-stub(get_revenu_disponible, "cotis_rente", fake_cotis_rente)
+stub(get_revenu_disponible, "get_cotis_rente", fake_get_cotis_rente)
+stub(get_revenu_disponible, "get_cotis_ae", fake_get_cotis_ae)
+stub(get_revenu_disponible, "get_cotis_rqap", fake_get_cotis_rqap)
 stub(get_revenu_disponible, "get_cotis_rrq", fake_get_cotis_rrq)
 stub(get_revenu_disponible, "solde_du_impot", fake_solde_du_impot)
 stub(get_revenu_disponible, "impot_provincial", fake_impot_provincial)
@@ -223,8 +227,8 @@ expect_equal(
     ),
     passed_revenus = NULL
   )[2, 3],
-  # nolint (cash + salaire - impotestim&RRQ&rente - depenses + dividendes_interest) * rendement_cash
-  (20000 + revenus$revenu_emploi - (6000 + 8000 + 4000 + 3500) - depenses$depenses +
+  # nolint (cash + salaire - impotestim&AE&RQAP&RRQ&rente - depenses + dividendes_interest) * rendement_cash
+  (20000 + revenus$revenu_emploi - (6000 + 8000 + 250 + 750 + 4000 + 3500) - depenses$depenses +
      (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
   tolerance = 500,
   scale = 1
@@ -243,9 +247,10 @@ expect_equal(
     ),
     passed_revenus = NULL
   )[2, 3],
-  # nolint (cash + nonenr - celi + reer + salaire - impotestim&RRQ&rente - depenses + dividendes_interest) * rendement_cash
-  (20000 + (7500 - 10000) - 4000 + 10000 + revenus$revenu_emploi - (15093 + 3616 + 3000) - depenses$depenses +
-     (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
+  # nolint (cash + nonenr - celi + reer + salaire - impotestim&AE&RQAP&RRQ&rente - depenses + dividendes_interest) *
+  #   rendement_cash
+  (20000 + (7500 - 10000) - 4000 + 10000 + revenus$revenu_emploi - (6000 + 8000 + 250 + 750 + 4000 + 3500) -
+     depenses$depenses + (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
   tolerance = 500,
   scale = 1
 )

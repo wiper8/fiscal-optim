@@ -5,7 +5,7 @@ source("R/src/impot/qc/annexe_u.R")
 
 impot_provincial <- function(
   revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests, rente_emploi, cotis_rente,
-  pension_psv, prestation_rrq, cotis_rrq, psv_clawback,
+  pension_psv, prestation_rrq, cotis_rrq, cotis_rqap, psv_clawback,
   ...
 ) {
   # revenu total
@@ -22,7 +22,7 @@ impot_provincial <- function(
   l201 <- grille_201(l101) # déduction pour travailleur
   l205 <- cotis_rente # déduction pour régime de pension agréé (RPA)
   l214 <- l20800 # déduction reer
-  l248 <- annexe_u(revenu_emploi)
+  l248 <- annexe_u(revenu_emploi) # TODO RQAP
   l250 <- psv_clawback
   l254 <- l201 + l205 + l214 + l248 + l250 # total des déductions
   l275 <- pmax(0, l199 - l254) # revenu net
@@ -44,7 +44,9 @@ impot_provincial <- function(
   l450 <- l432 # impôt et cotisations
 
   # remboursement ou solde à payer
-  l468 <- 0 # impôt, cotisations et retenues à la source déjà payées
+  l457 <- (l101 < 2000) * cotis_rqap # RQAP payé en trop
+  l465 <- l457 # impôt payé et autres crédits
+  l468 <- l465 # impôt, cotisations et retenues à la source déjà payées
   l475 <- l470 <- l450 - l468
   l475 # solde à payer
 }
