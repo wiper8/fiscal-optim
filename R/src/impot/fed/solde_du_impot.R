@@ -10,7 +10,7 @@ source("R/src/impot/fed/grille_l31400.R")
 source("R/src/impot/fed/grille_l34990.R")
 
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests,
-                           rente_emploi, cotis_rente, pension_psv, prestation_rrq) {
+                           rente_emploi, cotis_rente, pension_psv, prestation_rrq, cotis_ae, cotis_rqap) {
   # revenu total
   l10100 <- revenu_emploi
   l11300 <- pension_psv
@@ -43,11 +43,13 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l30000 <- grille_l30000(l23600) # montant personnel de base
   l30100 <- grille_l30100(age, l23600) # montant pour l'âge
   l30800 <- tmp_annexe_8$l30800 # cotisation de base RRQ
+  l31200 <- pmin(860.67, cotis_ae)
+  l31205 <- pmin(484.12, cotis_rqap)
 
   # montant canadien pour emploi
   l31260 <- min(1471, l10100)
   l31400 <- grille_l31400(l11500, l12900 = 0, age) # montant pour revenu de pension
-  l33500 <- l30000 + l30100 + l30800 + l31260 + l31400
+  l33500 <- l30000 + l30100 + l30800 + l31200 + l31205 + l31260 + l31400
 
   l118 <- 0.145
   l33800 <- l33500 * l118
