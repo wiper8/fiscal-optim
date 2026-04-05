@@ -9,10 +9,10 @@ source("R/src/impot/fed/annexe_7.R")
 source("R/src/get_revenu_disponible.R")
 
 # tenter une strategie de décaissement et tester si l'argent est suffisant
-try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
-  actifs_names <- c("nonenr_capital", "nonenr_gain", "cash", "celi")
+try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
+  actifs_names <- c("nonenr_capital", "nonenr_gain", "cash", "celi", "reer")
   actifs_history <- matrix(
-    c(actifs$nonenr_capital, actifs$nonenr_gain, actifs$cash, actifs$celi$current_value),
+    c(actifs$nonenr_capital, actifs$nonenr_gain, actifs$cash, actifs$celi$current_value, actifs$reer$current_value),
     nrow = 1,
     dimnames = list(NULL, actifs_names)
   )
@@ -39,9 +39,12 @@ try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
     # car FERR
     if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) stop("Pas le droit de cotiser au REER, car FERR")
-    if (-strategy[i, "NET_COTIS_REER"] < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) stop(
-      "Retraits du REER insuffisants car FERR"
-    )
+    if (-min(0, strategy[i, "NET_COTIS_REER"]) < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) {
+      strategy[i, "NET_COTIS_REER"] <- -retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value
+      warning(
+        "Retraits du REER insuffisants car FERR. Retrait forcé"
+      )
+    }
 
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
@@ -80,8 +83,7 @@ try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
 
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
-      strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"] +
-      strategy[i, "SELL_NONENR"]
+      strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"]
 
     if (remaining_cash < 0) stop(paste0("argent insuffisant à i=", i))
 
@@ -90,17 +92,21 @@ try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       "nonenr_capital" = new_nonenr$new_actifs$nonenr_capital,
       "nonenr_gain" = new_nonenr$new_actifs$nonenr_gain,
       "cash" = remaining_cash,
-      "celi" = actifs$celi$current_value
+      "celi" = actifs$celi$current_value,
+      "reer" = actifs$reer$current_value
     )
     names(new_actifs) <- actifs_names
 
     # appliquer du rendement
-    actifs$celi$current_value <- actifs$celi$current_value * rendement
+    actifs$celi$current_value <- actifs$celi$current_value * (rendement + dividend_yield)
+    actifs$reer$current_value <- actifs$reer$current_value * (rendement + dividend_yield)
+
     new_actifs <- c(
       new_actifs["nonenr_capital"],
       (new_actifs["nonenr_gain"] + new_actifs["nonenr_capital"]) * rendement - new_actifs["nonenr_capital"],
       remaining_cash * rendement_cash / ipc,
-      new_actifs["celi"] * rendement
+      new_actifs["celi"] * (rendement + dividend_yield),
+      new_actifs["reer"] * (rendement + dividend_yield)
     )
     names(new_actifs) <- actifs_names
 
