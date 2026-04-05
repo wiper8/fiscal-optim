@@ -1,5 +1,6 @@
 # maximiser une quantitée d'argent flat dans le temps en optimisant une stratégie de cotisations/retraits fiscaux
 maximise_expenses <- function(actifs, revenus, passed_revenus) {
+  # TODO
   to_optim <- function(depenses_and_flat_strategy) {
     strategy <- matrix(
       depenses_and_flat_strategy[-1],
