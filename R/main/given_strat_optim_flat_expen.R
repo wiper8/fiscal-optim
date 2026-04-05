@@ -1,6 +1,3 @@
-library(ggplot2)
-library(scales)
-
 source("R/src/optim/given_strat_optim_flat_expen.R")
 
 private_filename <- "R/data/fiscal_private.R"

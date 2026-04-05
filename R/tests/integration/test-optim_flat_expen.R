@@ -1,8 +1,9 @@
-template_filename <- "R/data/fiscal_template.R"
-
-source(template_filename)
 source("R/src/optim/maximise_expenses.R")
 
-actifs_hist <- maximise_expenses(actifs, revenus, passed_revenus)
+template_filename <- "R/data/fiscal_template.R"
+source(template_filename)
+
+maximise_expenses(start_age, max_age, data_filepath = template_filename, inflation_over_ipc = 1.02, eps = 100,
+                  verbose = FALSE)
 
 TRUE

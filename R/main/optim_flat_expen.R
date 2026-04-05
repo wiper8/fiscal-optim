@@ -1,30 +1,22 @@
-library(ggplot2)
-library(scales)
+source("R/src/plot_actifs_hist.R")
 source("R/src/optim/maximise_expenses.R")
 
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
 
-if (file.exists(private_filename)) {
-  source(private_filename)
+data_filepath <- if (file.exists(private_filename)) {
+  private_filename
 } else {
-  source(template_filename)
+  template_filename
 }
 
-actifs_hist <- maximise_expenses(actifs, revenus, passed_revenus)
+source(data_filepath)
+
+tmp <- maximise_expenses(start_age, max_age, data_filepath = data_filepath, inflation_over_ipc = inflation, eps = 100,
+                         verbose = FALSE)
+
+actifs_hist <- try_strategy(actifs, revenus, tmp$depenses, tmp$strategy, passed_revenus)
 
 key_moments <- c(start_age, revenus$age[head(which(revenus$revenu_emploi == 0), 1)], 65, 75, max_age)
 
-ggplot() +
-  theme_bw() +
-  scale_y_continuous(labels = label_dollar()) +
-  geom_hline(aes(yintercept = 0)) +
-  geom_line(aes(x = start_age:(max_age + 1), y = apply(actifs_hist, 1, sum)), color = "black", linewidth = 1) +
-  geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "cash"]), color = "#00DD00") +
-  geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "nonenr_capital"]), color = "#0000bb") +
-  geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "nonenr_gain"]), color = "#bb0000") +
-  geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "celi"]), color = "#bbbb00") +
-  geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "reer"]), color = "#00bbbb") +
-  geom_segment(aes(x = key_moments, xend = key_moments,
-                   y = 0, yend = max(actifs_hist)), linetype = "dashed", alpha = 0.4) +
-  xlab("Âge") + ylab("Actifs")
+plot_actifs_hist(actifs_hist, key_moments)

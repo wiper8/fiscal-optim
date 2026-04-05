@@ -1,5 +1,3 @@
-library(ggplot2)
-library(scales)
 source("R/src/try_strategy.R")
 source("R/src/plot_actifs_hist.R")
 

@@ -23,6 +23,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     dispo_nonenr <- sum(c(
       strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
     ))
+    if (length(strategy[i, "SELL_NONENR"] > dispo_nonenr) <= 0) browser()
     if (strategy[i, "SELL_NONENR"] > dispo_nonenr) {
       warning("attention, retraits trop importants dans le NONENR")
       strategy[i, "SELL_NONENR"] <- dispo_nonenr
@@ -49,7 +50,10 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       "attention, droits de cotisations au reer dépassés"
     )
     # car FERR
-    if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) stop("Pas le droit de cotiser au REER, car FERR")
+    if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) {
+      strategy[i, "NET_COTIS_REER"] <- 0
+      warning("Pas le droit de cotiser au REER, car FERR. Limité à 0.")
+    }
     if (-min(0, strategy[i, "NET_COTIS_REER"]) < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) {
       strategy[i, "NET_COTIS_REER"] <- -retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value
       warning("Retraits du REER insuffisants car FERR. Retrait forcé")

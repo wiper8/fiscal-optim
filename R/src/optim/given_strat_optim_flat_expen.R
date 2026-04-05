@@ -2,7 +2,7 @@ source("R/src/try_strategy.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation_over_ipc, eps = 0.01) {
+given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation_over_ipc, eps = 0.01, verbose = TRUE) {
 
   # in today's dollars
   # estimation of propabe yearly_expenses, very simplified
@@ -17,7 +17,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
 
   repeat {
 
-    message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
+    if (verbose) message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
     # reinitiate assets
     source(data_filepath)
     strategy <- real_strategy
@@ -51,5 +51,6 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
     # stop condition
     if (abs(old_yearly_expenses - yearly_expenses) < eps) break
   }
+
   old_yearly_expenses
 }

@@ -1,3 +1,6 @@
+library(ggplot2)
+library(scales)
+
 plot_actifs_hist <- function(actifs_hist, key_moments) {
   ggplot() +
     theme_bw() +
