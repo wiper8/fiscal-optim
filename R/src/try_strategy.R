@@ -23,7 +23,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     dispo_nonenr <- sum(c(
       strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
     ))
-    if (length(strategy[i, "SELL_NONENR"] > dispo_nonenr) <= 0) browser()
+    if (length(strategy[i, "SELL_NONENR"] > dispo_nonenr) <= 0) browser() # TODO débogguer ici
     if (strategy[i, "SELL_NONENR"] > dispo_nonenr) {
       warning("attention, retraits trop importants dans le NONENR")
       strategy[i, "SELL_NONENR"] <- dispo_nonenr
