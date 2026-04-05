@@ -19,13 +19,6 @@ if [ -n "$TODO_LINES" ]; then
     printf "%s\n" "$TODO_LINES" | while read line; do
         echo "  - $line"
     done
-    echo ""
-    echo "Do you want to continue with the push anyway? (y/n)"
-    read -r response
-    if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
-        echo "Push cancelled."
-        exit 1
-    fi
 else
     echo "No TODO items found!"
 fi
