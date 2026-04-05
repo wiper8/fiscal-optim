@@ -1,7 +1,5 @@
 source("R/src/impot/fed/solde_du_impot.R")
 
-# TODO
-
 # rien de spécial
 expect_equal(
   solde_du_impot(

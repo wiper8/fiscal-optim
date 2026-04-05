@@ -1,7 +1,5 @@
 source("R/src/try_strategy.R")
 
-# TODO ajouter des tests, et possiblement restructurer la fonction try_strategy
-
 start_age <- 25
 max_age <- 25
 inflation <- 1.0275
@@ -248,7 +246,6 @@ expect_equal(
   # nolint (cash + nonenr - celi + reer + salaire - impotestim&RRQ&rente - depenses + dividendes_interest) * rendement_cash
   (20000 + (7500 - 10000) - 4000 + 10000 + revenus$revenu_emploi - (15093 + 3616 + 3000) - depenses$depenses +
      (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
-  # TODO
   tolerance = 500,
   scale = 1
 )
