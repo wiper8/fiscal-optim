@@ -201,14 +201,14 @@ expect_equal(
 
 # cash
 actifs$cash <- 20000
-fake_cotis_rente <- mock(4000, 4000)
+fake_get_cotis_rente <- mock(4000, 4000)
 fake_get_cotis_ae <- mock(250, 250)
 fake_get_cotis_rqap <- mock(750, 750)
 fake_get_cotis_rrq <- mock(list(box17 = 2000, box17A = 1500), list(box17 = 2000, box17A = 1500))
 fake_solde_du_impot <- mock(list(l48500 = 6000, l23500 = 0), list(l48500 = 6000, l23500 = 0))
 fake_impot_provincial <- mock(8000, 8000)
 
-stub(get_revenu_disponible, "cotis_rente", fake_cotis_rente)
+stub(get_revenu_disponible, "get_cotis_rente", fake_get_cotis_rente)
 stub(get_revenu_disponible, "get_cotis_ae", fake_get_cotis_ae)
 stub(get_revenu_disponible, "get_cotis_rqap", fake_get_cotis_rqap)
 stub(get_revenu_disponible, "get_cotis_rrq", fake_get_cotis_rrq)

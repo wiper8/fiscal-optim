@@ -1,5 +1,5 @@
 # cotisation annuelle au régime de rente employeur
-cotis_rente <- function(salaire) {
+get_cotis_rente <- function(salaire) {
   mga <- 71300
   # TODO petit incohérence si revenu très élevé : la rente pourrait être limitées vers 200k, mais les cotisations
   # continueraient à augmenter (payer dans le vide)

@@ -1,4 +1,4 @@
-source("R/src/cotis_rente.R")
+source("R/src/get_cotis_rente.R")
 source("R/src/get_cotis_rrq.R")
 source("R/src/get_cotis_ae.R")
 source("R/src/get_cotis_rqap.R")
@@ -19,7 +19,7 @@ get_revenu_disponible <- function(
   ...
 ) {
 
-  cotis_rente <- cotis_rente(revenu_emploi)
+  cotis_rente <- get_cotis_rente(revenu_emploi)
   cotis_rrq <- get_cotis_rrq(revenu_emploi, ...)
   cotis_ae <- get_cotis_ae(revenu_emploi)
   cotis_rqap <- get_cotis_rqap(revenu_emploi)
