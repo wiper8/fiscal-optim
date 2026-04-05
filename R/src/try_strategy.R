@@ -62,8 +62,8 @@ try_stategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       revenus$revenu_emploi[i],
       new_nonenr$capital_vendu,
       new_nonenr$gain_en_capital_vendu,
-      max(0, -strategy[i, "NET_COTIS_REER"]),
-      l20800 = tmp_reer$l20800,
+      max(0, -strategy[i, "NET_COTIS_REER"]), # retrait REER
+      l20800 = tmp_reer$l20800, # déduction REER
       dividendes_recus,
       interet_recu,
       rente_emploi = get_rente(start_age + i - 1, revenus$revenu_emploi, passed_work_years, ipc),

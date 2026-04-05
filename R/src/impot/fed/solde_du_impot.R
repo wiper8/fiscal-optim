@@ -10,7 +10,7 @@ source("R/src/impot/fed/grille_l31400.R")
 source("R/src/impot/fed/grille_l34990.R")
 
 solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_reer, l20800, dividends, interests,
-                           rente_emploi, cotis_rente, pension_psv, prestation_rrq, cotis_rrq) {
+                           rente_emploi, cotis_rente, pension_psv, prestation_rrq) {
   # revenu total
   l10100 <- revenu_emploi
   l11300 <- pension_psv
@@ -26,7 +26,7 @@ solde_du_impot <- function(age, revenu_emploi, gain_capital_imposable, revenus_r
   l20700 <- cotis_rente # déduction régime de pension agréés (RPA)
 
   l20800 <- l20800 # déduction reer demandée (en argument)
-  tmp_annexe_8 <- annexe_8(age, revenu_emploi)
+  tmp_annexe_8 <- annexe_8(age, revenu_emploi) # déduction cotis supp RRQ
   l22215 <- tmp_annexe_8$l22215
   l23300 <- l20700 + l20800 + l22215
   l23400 <- l15000 - l23300 # revenu net avant rajustements

@@ -22,7 +22,7 @@ get_revenu_disponible <- function(
   solde_impot_fed <- solde_du_impot(
     revenu_emploi = revenu_emploi, gain_capital_imposable = nonenr_gain_vendu, revenus_reer = revenus_reer,
     dividends = dividends, interests = interests, rente_emploi = rente_emploi, cotis_rente = cotis_rente,
-    pension_psv = pension_psv, prestation_rrq = prestation_rrq, cotis_rrq = cotis_rrq,
+    pension_psv = pension_psv, prestation_rrq = prestation_rrq,
     ...
   )
 
