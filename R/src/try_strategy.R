@@ -28,11 +28,12 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
 
     # celi : contribution, retraits, nouveaux droits
-    actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
-    if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     if (-strategy[i, "NET_COTIS_CELI"] > actifs$celi$current_value) {
       warning("attention, retraits trop importants dans le CELI")
+      strategy[i, "NET_COTIS_CELI"] <- -actifs$celi$current_value
     }
+    actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
+    if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
     # reer
@@ -47,6 +48,10 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       warning("Retraits du REER insuffisants car FERR. Retrait forcé")
     }
 
+    if (-strategy[i, "NET_COTIS_REER"] > actifs$reer$current_value) {
+      warning("attention, retraits trop importants dans le REER.")
+      strategy[i, "NET_COTIS_REER"] <- -actifs$reer$current_value
+    }
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
       strategy[i, "NET_COTIS_REER"],
@@ -56,9 +61,6 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     actifs$reer$droits_cotis_inutilises <- actifs$reer$droits_cotis_inutilises - max(0, strategy[i, "NET_COTIS_REER"]) +
       get_droits_reer(revenus$revenu_emploi[i], age = start_age + i - 1, ipc = ipc)
     actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
-    if (-strategy[i, "NET_COTIS_REER"] > actifs$reer$current_value) {
-      warning("attention, retraits trop importants dans le REER.")
-    }
     actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
 
     dividendes_recus <- (new_nonenr$new_actifs$nonenr_capital + new_nonenr$new_actifs$nonenr_gain) * dividend_yield
