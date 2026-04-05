@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Install this file at: .git/hooks/pre-push
+# Make it executable: chmod +x .git/hooks/pre-push
+
+echo "Pre-push : running lintr"
+
+Rscript .git/hooks/linter_script.R
+
+
+
+echo "Pre-push : report TODOs"
+
+TODO_LINES=$(grep -r "TODO" . --exclude-dir=".git" --exclude-dir=".github" 2>/dev/null || true)
+
+if [ -n "$TODO_LINES" ]; then
+    TODO_COUNT=$(printf "%s\n" "$TODO_LINES" | wc -l)
+    echo "⚠️  Found $TODO_COUNT TODO items:"
+    printf "%s\n" "$TODO_LINES" | while read line; do
+        echo "  - $line"
+    done
+    echo ""
+    echo "Do you want to continue with the push anyway? (y/n)"
+    read -r response
+    if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
+        echo "Push cancelled."
+        exit 1
+    fi
+else
+    echo "No TODO items found!"
+fi
+
+exit 0

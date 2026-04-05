@@ -37,3 +37,8 @@ https://cqff.com/courbes-cqff/
 To contribute to R files, code must be linted.
 
 `lintr::lint_dir("R")`
+
+## Setting up git hooks (optional)
+After cloning the repository, run:
+```bash
+bash .github/hooks/setup-hooks.sh
