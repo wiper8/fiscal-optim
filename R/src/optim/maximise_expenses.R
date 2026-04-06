@@ -35,7 +35,7 @@ maximise_expenses <- function(start_age, max_age, ..., limit_itr = 100) {
     byrow = TRUE,
     dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
   )
-  ci_constr <- rep(0, nrow(ui_constr_mat)) - 0.01 # une cenne pour epsilon à cause du >= vs >
+  ci_constr <- rep(0, nrow(ui_constr_mat)) - 0.01 # une cenne pour epsilon à cause du >= vs > dans ui %*% theta - ci > 0
   theta <- rep(0, ncol(ui_constr_mat))
   # nolint end
 
@@ -78,6 +78,7 @@ maximise_expenses <- function(start_age, max_age, ..., limit_itr = 100) {
     strategy, passed_revenus
   )
   if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
+    browser()
     stop("Impossible de recréer le résultat de l'optimisation")
   }
 

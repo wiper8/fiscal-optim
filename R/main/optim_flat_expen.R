@@ -12,7 +12,7 @@ data_filepath <- if (file.exists(private_filename)) {
 }
 
 source(data_filepath)
-# debug(maximise_expenses)
+
 tmp <- maximise_expenses(start_age, max_age, data_filepath = data_filepath, inflation_over_ipc = inflation, eps = 1,
                          verbose = FALSE, limit_itr = 1000)
 

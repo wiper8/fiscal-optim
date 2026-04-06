@@ -64,7 +64,6 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
     }
 
     ## finally
-    old_yearly_expenses <- yearly_expenses
     # next value to try
     yearly_expenses <- if (is.na(bounds[2])) {
       (yearly_expenses + eps) * 1.05
@@ -73,8 +72,8 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
     }
 
     # stop condition
-    if (abs(old_yearly_expenses - yearly_expenses) < eps) break
+    if (isTRUE(diff(bounds) < eps)) break
   }
 
-  old_yearly_expenses - eps
+  bounds[1]
 }
