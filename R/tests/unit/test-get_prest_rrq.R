@@ -1,7 +1,7 @@
 source("R/src/get_prest_rrq.R")
 
 fake_date <- mock(as.Date("2026-03-30"), as.Date("2026-03-30"), as.Date("2028-03-30"), as.Date("2026-03-30"),
-                  as.Date("2026-03-30"), as.Date("2026-03-30"))
+                  as.Date("2026-03-30"), as.Date("2072-03-30"))
 
 # remplacer les fonctions internes dans get_revenu_disponible()
 stub(get_prest_rrq, "Sys.Date", fake_date)
@@ -93,12 +93,21 @@ rev <- c(
   47200, 48300, 50100, 51100, 52500, 53600, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 85000
 ) * c(rep(1.02, 37), rep(1, 10))^(46:0)
 
-cible <- 0 # nolint TODO le résultat était le suivant, mais < 65 pas de rente : (0.3333 * sum(tail(sort(rev), -7))) / 40
+cible <- (0.3333 * sum(tail(sort(rev), -7))) / 40
 
 expect_equal(
   get_prest_rrq(
     rev,
     19,
+    1.02
+  ),
+  0
+)
+# un jeune de 19 ans aujourd'hui, mais dans le futur
+expect_equal(
+  get_prest_rrq(
+    rev,
+    65,
     1.02
   ),
   cible,
