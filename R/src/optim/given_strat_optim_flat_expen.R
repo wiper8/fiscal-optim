@@ -3,7 +3,7 @@ source("R/src/get_flat_expenses_ipc.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation_over_ipc, eps = 0.01, verbose = TRUE,
+given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
                                          previous_min_bound = NULL, ...) {
 
   # in today's dollars
@@ -18,7 +18,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
     previous <- if (is.null(previous_min_bound)) 0 else previous_min_bound * 0.95
 
     # set expenses level
-    depenses <- get_flat_expenses_ipc(start_age, max_age, previous, inflation_over_ipc, ipc)
+    depenses <- get_flat_expenses_ipc(start_age, max_age, previous, ...)
     res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
@@ -45,7 +45,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
     strategy <- real_strategy # override la stratégie dans data/
 
     # set expenses level
-    depenses <- get_flat_expenses_ipc(start_age, max_age, yearly_expenses, inflation_over_ipc, ipc)
+    depenses <- get_flat_expenses_ipc(start_age, max_age, yearly_expenses, ...)
 
     # try to live while spending `depenses` schedule
     res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)

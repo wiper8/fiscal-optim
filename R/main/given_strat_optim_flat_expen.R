@@ -10,4 +10,4 @@ data_filename <- if (file.exists(private_filename)) {
   template_filename
 }
 
-given_strat_optim_flat_expen(data_filename, strategy, inflation, eps = 100)
+given_strat_optim_flat_expen(data_filename, strategy, eps = 100, inflation = inflation, ipc = ipc)
