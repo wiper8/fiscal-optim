@@ -10,6 +10,7 @@ mandatory_work_years <- function(df, total_expenses = NULL, additional_expenses 
 }
 
 years_to_months <- function(x) {
+  x <- pmax(0, x)
   years <- floor(x)
   x <- 12 * (x - years)
   months <- floor(x)
