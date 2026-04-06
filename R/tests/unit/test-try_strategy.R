@@ -11,10 +11,10 @@ rendement_cash <- 1.0055
 cotis_rente_yield1 <- 0.05
 cotis_rente_yield2 <- 0.06
 
-fake_get_rente <- mock(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 passed_work_years <- NULL
-fake_get_prest_psv <- mock(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-fake_get_prest_rrq <- mock(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+fake_get_rente <- mock(0, cycle = TRUE)
+fake_get_prest_psv <- mock(0, cycle = TRUE)
+fake_get_prest_rrq <- mock(0, cycle = TRUE)
 stub(try_strategy, "get_rente", fake_get_rente)
 stub(try_strategy, "get_prest_psv", fake_get_prest_psv)
 stub(try_strategy, "get_prest_rrq", fake_get_prest_rrq)
@@ -120,7 +120,7 @@ expect_equal(
 )
 
 # cotisation REER trop grande
-expect_error(
+expect_warning(
   try_strategy(
     actifs = actifs,
     revenus = revenus,
@@ -168,21 +168,6 @@ expect_equal(
   tolerance = 0.001
 )
 
-# retrait REER suivi d'une grande cotisation : on ne récupère pas ses droits de cotisation
-expect_error(
-  try_strategy(
-    actifs = actifs,
-    revenus = revenus,
-    depenses = depenses,
-    strategy = matrix(
-      c(0, 0, 0, -50000, 17000),
-      nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
-    ),
-    passed_revenus = NULL
-  )
-)
-
 # retrait REER
 expect_equal(
   try_strategy(
@@ -198,6 +183,25 @@ expect_equal(
   )[2, 5],
   0
 )
+
+# retrait REER suivi d'une grande cotisation : on ne récupère pas ses droits de cotisation
+max_age <- max_age + 1
+expect_warning(
+  try_strategy(
+    actifs = actifs,
+    revenus = rbind(revenus, revenus),
+    depenses = rbind(depenses, depenses),
+    strategy = matrix(
+      c(0, 0, 0, -50000, 0,
+        0, 0, 0, 17000, 0),
+      nrow = 2,
+      byrow = TRUE,
+      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+    ),
+    passed_revenus = NULL
+  )
+)
+max_age <- max_age - 1
 
 # cash
 actifs$cash <- 20000
