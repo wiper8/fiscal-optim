@@ -93,7 +93,7 @@ rev <- c(
   47200, 48300, 50100, 51100, 52500, 53600, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 75000, 85000
 ) * c(rep(1.02, 37), rep(1, 10))^(46:0)
 
-cible <- (0.3333 * sum(tail(sort(rev), -7))) / 40
+cible <- 0 # nolint TODO le résultat était le suivant, mais < 65 pas de rente : (0.3333 * sum(tail(sort(rev), -7))) / 40
 
 expect_equal(
   get_prest_rrq(

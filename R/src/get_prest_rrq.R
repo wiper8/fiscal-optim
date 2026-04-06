@@ -1,5 +1,6 @@
 # rente RRQ
 get_prest_rrq <- function(revenus_travail, jan_1_age, ipc) {
+  if (jan_1_age < 65) return(0)
   mga <- 71300
   msga <- 81200
   pct_retranch <- 0.15

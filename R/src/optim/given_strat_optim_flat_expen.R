@@ -4,12 +4,13 @@ source("R/src/get_flat_expenses_ipc.R")
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
 given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
-                                         previous_min_bound = NULL, ...) {
+                                         previous_min_bound = NULL, ..., real_revenus = NULL) {
 
   # in today's dollars
   # estimation of propabe yearly_expenses, very simplified
   source(data_filepath)
   strategy <- real_strategy # override la stratégie dans data/
+  revenus <- real_revenus %||% revenus # override la stratégie dans data/
   yearly_expenses <- actifs$cash + actifs$nonenr_capital + actifs$nonenr_gain + actifs$celi$current_value
   yearly_expenses <- yearly_expenses * (rendement_brut / ipc - 1)
 
@@ -43,6 +44,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
     # reinitiate assets
     source(data_filepath)
     strategy <- real_strategy # override la stratégie dans data/
+    revenus <- real_revenus %||% revenus # override la stratégie dans data/
 
     # set expenses level
     depenses <- get_flat_expenses_ipc(start_age, max_age, yearly_expenses, ...)

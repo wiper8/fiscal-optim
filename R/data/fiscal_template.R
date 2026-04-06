@@ -6,6 +6,7 @@ rendement_brut <- 1.07 # capital gain (excludes dividends)
 dividend_yield <- 0.01 # yearly
 rendement <- rendement_brut / inflation
 rendement_cash <- 1.0055
+salaire <- 62000
 passed_work_years <- 25 # nombre d'années cotisées de travail avec salaire au régime de rente employeur
 cotis_rente_yield1 <- 0.05 # under MGA
 cotis_rente_yield2 <- 0.06 # over MGA
