@@ -22,8 +22,7 @@ annexe_7 <- function(cotis_inutil_vers_dispo_deduc,
   # déduction pour REER
   l11 <- max_deductible_reer
   l17 <- pmin(l10, l11)
-  l18 <- deduction_reer
-  stopifnot(l18 <= l17)
+  l18 <- pmin(deduction_reer, l17)
   l20800 <- l20 <- pmin(l10, l18)
 
   # partie D

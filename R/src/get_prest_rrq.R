@@ -35,7 +35,6 @@ get_prest_rrq <- function(revenus_travail, jan_1_age, ipc) {
   # divisé par 480 normalement, mais à long terme : flusher des mois comme le régime de base pour conserver le meilleur
   # 40 ans
   if (length(rev_travail_reajus) != length(fact_ajust_cotis_reduit)) {
-    browser()
     stop("not equal lengths")
   }
   supp_rev_travail_reajus <- rev_travail_reajus * fact_ajust_cotis_reduit

@@ -14,21 +14,31 @@ expect_equal(
   )
 )
 
-expect_error(
+expect_equal(
   annexe_7(
     cotis_inutil_vers_dispo_deduc = 3,
     cotisations_versees_reer = 2,
     deduction_reer = 5.1,
     max_deductible_reer = Inf
+  ),
+  list(
+    l20800 = 5,
+    l24500 = 2,
+    cotis_inutil_vers_disp_deduc = 0
   )
 )
 
-expect_error(
+expect_equal(
   annexe_7(
     cotis_inutil_vers_dispo_deduc = 100,
     cotisations_versees_reer = 2,
     deduction_reer = 8.1,
     max_deductible_reer = 8
+  ),
+  list(
+    l20800 = 8,
+    l24500 = 2,
+    cotis_inutil_vers_disp_deduc = 94
   )
 )
 
