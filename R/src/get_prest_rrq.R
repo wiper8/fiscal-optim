@@ -1,10 +1,10 @@
 # rente RRQ
-get_prest_rrq <- function(revenus_travail, jan_1_age, ipc) {
+get_prest_rrq <- function(revenus_travail, jan_1_age, today_year, ipc) {
+  if (jan_1_age < 65) return(0)
   mga <- 71300
   msga <- 81200
   pct_retranch <- 0.15
   mgam5 <- mga * mean(ipc^-(0:4))
-  today_year <- as.numeric(format(Sys.Date(), "%Y"))
 
   if (length(revenus_travail) != (65 - 18)) stop("revenus_travail doit être de longueur 47")
 

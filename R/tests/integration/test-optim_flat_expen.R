@@ -4,6 +4,6 @@ template_filename <- "R/data/fiscal_template.R"
 source(template_filename)
 
 maximise_expenses(start_age, max_age, data_filepath = template_filename, eps = 100, inflation = inflation, ipc = ipc,
-                  verbose = FALSE, limit_itr = 40)
+                  verbose = FALSE, limit_itr = 20)
 
 TRUE

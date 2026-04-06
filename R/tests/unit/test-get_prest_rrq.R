@@ -1,17 +1,12 @@
 source("R/src/get_prest_rrq.R")
 
-fake_date <- mock(as.Date("2026-03-30"), as.Date("2026-03-30"), as.Date("2028-03-30"), as.Date("2026-03-30"),
-                  as.Date("2026-03-30"), as.Date("2026-03-30"))
-
-# remplacer les fonctions internes dans get_revenu_disponible()
-stub(get_prest_rrq, "Sys.Date", fake_date)
-
 # les cibles sont approximatives (des tests de gros bon sens)
 cible <- (0.3333 * 71300 + 0.3333 * 9900) / 40
 expect_equal(
   get_prest_rrq(
     c(rep(0, 46), 85000),
     65,
+    2026,
     1.02
   ),
   cible,
@@ -26,6 +21,7 @@ expect_equal(
       rep(0, 39), 55900, 57400, 58700, 61600, 64900, 66600, 75000, 85000
     ) * 1.02^(46:0),
     65,
+    2026,
     1.02
   ),
   cible,
@@ -41,10 +37,10 @@ expect_equal(
       rep(0, 39), 55900, 57400, 58700, 61600, 64900, 66600, 75000, 85000
     ) * 1.02^(46:0),
     67,
+    2028,
     1.02
   ),
   cible,
-  # TODO améliorer la précision
   tolerance = 0.02 * cible,
   scale = 1
 )
@@ -62,6 +58,7 @@ expect_equal(
       47200, 48300, 50100, 51100, 52500, 53600, 54900, 55300, 55900, 57400, 58700, 61600, 64900, 66600, 75000, 85000
     ) * 1.02^(46:0),
     65,
+    2026,
     1.02
   ),
   cible,
@@ -79,6 +76,7 @@ expect_equal(
       47200, 48300, 50100, 51100, 52500, 53600, 54900, 55300, 55900, 57400, 58700, 61600, 64900, 66600, 75000, 85000
     ) * 1.02^(46:0),
     72,
+    2026,
     1.02
   ),
   cible,
@@ -99,6 +97,17 @@ expect_equal(
   get_prest_rrq(
     rev,
     19,
+    2026,
+    1.02
+  ),
+  0
+)
+# un jeune de 19 ans aujourd'hui, mais dans le futur
+expect_equal(
+  get_prest_rrq(
+    rev,
+    65,
+    2072,
     1.02
   ),
   cible,
