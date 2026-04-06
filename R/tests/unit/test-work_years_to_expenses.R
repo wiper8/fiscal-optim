@@ -1,6 +1,6 @@
 source("R/src/optim/work_years_to_expenses.R")
 
-fake_expenses <- lapply(c(seq(30000, 40000, 1000), seq(40500, 42000, 500), 50000), function(x) list(depenses = x))
+fake_expenses <- lapply(c(seq(30000, 32000, 1000), seq(35500, 37000, 500), 50000), function(x) list(depenses = x))
 fake_maximise_expenses <- do.call(mock, fake_expenses)
 stub(work_years_to_expenses, "maximise_expenses", fake_maximise_expenses)
 

@@ -1,4 +1,4 @@
-start_age <- 50 # en date du 1er janvier
+start_age <- 58 # en date du 1er janvier
 max_age <- 100 # en date du 1er janvier
 inflation <- 1.0275
 ipc <- 1.02

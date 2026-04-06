@@ -94,6 +94,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
           revenus$revenu_emploi[18 <= revenus$age & revenus$age < 65]
         ),
         start_age + i - 1,
+        as.numeric(format(Sys.Date(), "%Y")) + i - 1,
         ipc
       ),
       age = start_age + i - 1
