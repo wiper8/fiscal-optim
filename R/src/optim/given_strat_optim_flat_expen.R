@@ -27,7 +27,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
       minimum <- previous
       yearly_expenses <- pmax(yearly_expenses, minimum)
     } else {
-      browser() # bogue probablement
+      browser() # si ça déclanche, c'est un bogue probablement
     }
   } else {
     minimum <- 0
@@ -60,7 +60,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, inflation
       # if success, increment lower bound
       bounds <- c(yearly_expenses, bounds[2])
     } else {
-      browser() # bogue probablement
+      browser() # si ça déclanche, c'est un bogue probablement
     }
 
     ## finally

@@ -64,25 +64,28 @@ maximise_expenses <- function(start_age, max_age, ..., limit_itr = 100) {
   # est évidemment faux.¾
 
   # calculer avec précision les dépenses disponibles (objectif de l'optimisation)
-  strategy <- get_strat(best_strat, start_age, max_age)
   args <- list(...)
-  args$real_strategy <- strategy
+  args$real_strategy <- get_strat(best_strat, start_age, max_age)
   args$eps <- 0.01
   args$previous_min_bound <- 0
   args$verbose <- TRUE
-  expenses <- do.call(given_strat_optim_flat_expen, args) - args$eps
+  expenses <- do.call(given_strat_optim_flat_expen, args)
 
   # s'assurer que la stratégie fonctionne
   res_strat <- try_strategy(
-    actifs, revenus, get_flat_expenses_ipc(start_age, max_age, expenses, inflation, ipc),
+    actifs, revenus, get_flat_expenses_ipc(start_age, max_age, previous_min_bound, inflation, ipc),
     strategy, passed_revenus
   )
   if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
     browser()
+    all.equal(
+      get_flat_expenses_ipc(start_age, max_age, previous_min_bound, inflation, ipc),
+      args
+    )
     stop("Impossible de recréer le résultat de l'optimisation")
   }
 
-  list(depenses = expenses, strategy = get_strat(best_strat, start_age, max_age))
+  list(depenses = expenses, strategy = args$real_strategy)
 }
 
 get_strat <- function(flat_strategy, start_age, max_age) {
