@@ -13,14 +13,16 @@ data_filepath <- if (file.exists(private_filename)) {
 
 source(data_filepath)
 
-tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(45, 65), data_filepath = data_filepath, eps = 1,
+age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
+tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(age_retraite, 65), data_filepath = data_filepath, eps = 1,
                          inflation = inflation, ipc = ipc, verbose = FALSE, limit_itr = 2000)
 
+debug(try_strategy)
 actifs_hist <- try_strategy(
   actifs, revenus, get_flat_expenses_ipc(start_age, max_age, tmp$depenses, inflation, ipc),
   tmp$strategy, passed_revenus
 )
 
-key_moments <- c(start_age, revenus$age[head(which(revenus$revenu_emploi == 0), 1)], 65, 71, 75, max_age)
+key_moments <- c(start_age, age_retraite, 65, 71, 75, max_age)
 
 plot_actifs_hist(actifs_hist, key_moments)
