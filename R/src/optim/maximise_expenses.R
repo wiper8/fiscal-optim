@@ -80,8 +80,8 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
 get_strat <- function(flat_strategy, start_age, max_age, bloc_splits = NULL) {
   dimnm <- list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
 
-  stopifnot(all(bloc_splits < max_age & start_age < bloc_splits))
-  ages <- c(start_age, sort(bloc_splits), max_age)
+  stopifnot(all(bloc_splits <= max_age & start_age <= bloc_splits))
+  ages <- unique(c(start_age, sort(bloc_splits), max_age))
   res <- matrix(
     flat_strategy[1:5 + 5 * (1 - 1)],
     nrow = ages[1 + 1] - ages[1] + 1 * (max_age == ages[2]),
