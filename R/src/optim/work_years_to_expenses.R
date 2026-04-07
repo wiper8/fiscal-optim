@@ -20,8 +20,8 @@ work_years_to_expenses <- function(data_filepath, yearly_income, ...) {
       )
     )
     tmp <- maximise_expenses(start_age, max_age, previous_solution = previous_solution, data_filepath = data_filepath,
-                             eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, verbose_max = TRUE,
-                             real_revenus = revenus, ...) # TODO verbose FALSE
+                             eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, verbose_max = FALSE,
+                             real_revenus = revenus, ...)
     work_years_expenses$expenses[i] <- tmp$depenses
     previous_solution <- tmp$theta
   }

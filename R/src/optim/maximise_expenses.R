@@ -1,7 +1,8 @@
 source("R/src/optim/given_strat_optim_flat_expen.R")
 
 # maximiser une quantitée d'argent flat dans le temps en optimisant une stratégie de cotisations/retraits fiscaux
-maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_solution = NULL, ..., limit_itr = 100, verbose_max = TRUE) {
+maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_solution = NULL, ..., limit_itr = 100,
+                              verbose_max = TRUE) {
   counter <- 1
 
   to_optim <- function(flat_strategy) {
@@ -23,8 +24,10 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
     if (verbose_max) print(paste0("Lower bound : ", round(previous_min_bound, 2)))
     -expenses
   }
-  
-  base_ui <- matrix(c(
+
+  # nolint start: commented_code_linter
+  base_ui <- matrix(
+    c(
       1, 0, 0, 0, 0, # COTIS_NONENR >= 0
       0, 1, 0, 0, 0, # SELL_NONENR >= 0
       0, 0, 0, 0, 1 # DEDUCE_REER >= 0
@@ -33,7 +36,6 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
     byrow = TRUE
   )
 
-  # nolint start: commented_code_linter
   # ui %*% theta - ci > 0
   ui_constr_mat <- kronecker(diag(length(bloc_splits) + 1), base_ui)
   ci_constr <- rep(0, nrow(ui_constr_mat)) - 0.01 # une cenne pour epsilon à cause du >= vs > dans ui %*% theta - ci > 0
