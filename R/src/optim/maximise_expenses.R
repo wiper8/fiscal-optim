@@ -1,7 +1,7 @@
 source("R/src/optim/given_strat_optim_flat_expen.R")
 
 # maximiser une quantitée d'argent flat dans le temps en optimisant une stratégie de cotisations/retraits fiscaux
-maximise_expenses <- function(start_age, max_age, previous_solution = NULL, ..., limit_itr = 100, verbose_max = TRUE) {
+maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_solution = NULL, ..., limit_itr = 100, verbose_max = TRUE) {
   counter <- 1
 
   to_optim <- function(flat_strategy) {
@@ -9,7 +9,7 @@ maximise_expenses <- function(start_age, max_age, previous_solution = NULL, ...,
     if (verbose_max) print(paste0("Counter : ", counter, " / ", limit_itr))
     counter <<- counter + 1
     if (verbose_max) print(round(flat_strategy, 2))
-    strategy <- get_strat(flat_strategy, start_age, max_age)
+    strategy <- get_strat(flat_strategy, start_age, max_age, bloc_splits)
     expenses <- given_strat_optim_flat_expen(real_strategy = strategy, ..., previous_min_bound = previous_min_bound)
     if (is.null(previous_min_bound)) {
       previous_min_bound <<- expenses
@@ -23,18 +23,19 @@ maximise_expenses <- function(start_age, max_age, previous_solution = NULL, ...,
     if (verbose_max) print(paste0("Lower bound : ", round(previous_min_bound, 2)))
     -expenses
   }
-
-  # nolint start: commented_code_linter
-  # ui %*% theta - ci > 0
-  ui_constr_mat <- matrix(c(
+  
+  base_ui <- matrix(c(
       1, 0, 0, 0, 0, # COTIS_NONENR >= 0
-      0, 1, 0, 0, 0,  # SELL_NONENR >= 0
+      0, 1, 0, 0, 0, # SELL_NONENR >= 0
       0, 0, 0, 0, 1 # DEDUCE_REER >= 0
     ),
     ncol = 5,
-    byrow = TRUE,
-    dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+    byrow = TRUE
   )
+
+  # nolint start: commented_code_linter
+  # ui %*% theta - ci > 0
+  ui_constr_mat <- kronecker(diag(length(bloc_splits) + 1), base_ui)
   ci_constr <- rep(0, nrow(ui_constr_mat)) - 0.01 # une cenne pour epsilon à cause du >= vs > dans ui %*% theta - ci > 0
   theta <- previous_solution %||% rep(0, ncol(ui_constr_mat))
   # nolint end
@@ -65,7 +66,7 @@ maximise_expenses <- function(start_age, max_age, previous_solution = NULL, ...,
 
   # calculer avec précision les dépenses disponibles (objectif de l'optimisation)
   args <- list(...)
-  args$real_strategy <- get_strat(best_strat, start_age, max_age)
+  args$real_strategy <- get_strat(best_strat, start_age, max_age, bloc_splits)
   args$eps <- 0.01
   args$previous_min_bound <- NULL # pour une optimisation complète from scratch
   args$verbose <- TRUE
@@ -74,12 +75,30 @@ maximise_expenses <- function(start_age, max_age, previous_solution = NULL, ...,
   list(depenses = expenses, strategy = args$real_strategy, theta = best_strat)
 }
 
-get_strat <- function(flat_strategy, start_age, max_age) {
-  matrix(
-    flat_strategy,
-    nrow = max_age - start_age + 1,
+get_strat <- function(flat_strategy, start_age, max_age, bloc_splits = NULL) {
+  dimnm <- list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+
+  stopifnot(all(bloc_splits < max_age & start_age < bloc_splits))
+  ages <- c(start_age, sort(bloc_splits), max_age)
+  res <- matrix(
+    flat_strategy[1:5 + 5 * (1 - 1)],
+    nrow = ages[1 + 1] - ages[1] + 1 * (max_age == ages[2]),
     ncol = 5,
     byrow = TRUE,
-    dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+    dimnames = dimnm
   )
+
+  for (i in seq_len(length(ages) - 2)) {
+    res <- rbind(
+      res,
+      matrix(
+        flat_strategy[1:5 + 5 * i],
+        nrow = ages[i + 2] - ages[i + 1] + 1 * (max_age == ages[i + 2]),
+        ncol = 5,
+        byrow = TRUE,
+        dimnames = dimnm
+      )
+    )
+  }
+  res
 }

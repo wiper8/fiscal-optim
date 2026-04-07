@@ -13,8 +13,8 @@ data_filepath <- if (file.exists(private_filename)) {
 
 source(data_filepath)
 
-tmp <- maximise_expenses(start_age, max_age, data_filepath = data_filepath, eps = 1, inflation = inflation, ipc = ipc,
-                         verbose = FALSE, limit_itr = 1000)
+tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(45, 65), data_filepath = data_filepath, eps = 1, inflation = inflation, ipc = ipc,
+                         verbose = FALSE, limit_itr = 2000)
 
 actifs_hist <- try_strategy(
   actifs, revenus, get_flat_expenses_ipc(start_age, max_age, tmp$depenses, inflation, ipc),
