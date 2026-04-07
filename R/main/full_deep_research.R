@@ -13,7 +13,7 @@ data_filepath <- if (file.exists(private_filename)) {
 
 source(data_filepath)
 
-df <- work_years_to_expenses(data_filepath, salaire, limit_itr = 100,
+df <- work_years_to_expenses(data_filepath, salaire, limit_itr = 1000,
                              bloc_splits = c(30, 35, 40, 45, 50, 55, 65, 71, 75, 80, 85, 90, 95))
 
 plot_work_years_expenses(df)
