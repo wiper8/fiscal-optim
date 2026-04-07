@@ -19,7 +19,8 @@ work_years_to_expenses <- function(data_filepath, yearly_income, ...) {
         rep(0, max_age - start_age + 1 - work_years_expenses$work_years[i])
       )
     )
-    tmp <- maximise_expenses(start_age, max_age, bloc_splits = work_years_expenses$work_years[i] + start_age,
+    tmp <- maximise_expenses(start_age, max_age,
+                             bloc_splits = c(work_years_expenses$work_years[i] + start_age, retraite_age),
                              previous_solution = previous_solution, data_filepath = data_filepath,
                              eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, verbose_max = FALSE,
                              real_revenus = revenus, ...)

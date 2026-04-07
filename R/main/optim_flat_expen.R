@@ -17,7 +17,6 @@ age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(age_retraite, 65), data_filepath = data_filepath, eps = 1,
                          inflation = inflation, ipc = ipc, verbose = FALSE, limit_itr = 2000)
 
-debug(try_strategy)
 actifs_hist <- try_strategy(
   actifs, revenus, get_flat_expenses_ipc(start_age, max_age, tmp$depenses, inflation, ipc),
   tmp$strategy, passed_revenus
