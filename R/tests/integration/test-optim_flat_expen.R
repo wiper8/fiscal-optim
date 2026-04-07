@@ -6,4 +6,8 @@ source(template_filename)
 maximise_expenses(start_age, max_age, data_filepath = template_filename, eps = 100, inflation = inflation, ipc = ipc,
                   verbose = FALSE, limit_itr = 20)
 
+# tester le feature bloc_splits
+maximise_expenses(start_age, max_age, bloc_splits = c(65, 71), data_filepath = template_filename, eps = 100,
+                  inflation = inflation, ipc = ipc, verbose = FALSE, limit_itr = 20)
+
 TRUE

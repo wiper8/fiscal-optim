@@ -3,6 +3,16 @@
 # Install this file at: .git/hooks/pre-push
 # Make it executable: chmod +x .git/hooks/pre-push
 
+echo "Pre-push : running lintr"
+
+Rscript .git/hooks/linter_script.R
+LINTER_STATUS=$?
+if [ "$LINTER_STATUS" -ne 0 ]; then
+    exit $LINTER_STATUS
+fi
+
+echo ""
+
 echo "Pre-push : report TODOs"
 
 TODO_LINES=$(grep -r "TODO" . --exclude-dir=".git" --exclude-dir=".github" 2>/dev/null || true)
@@ -16,8 +26,3 @@ if [ -n "$TODO_LINES" ]; then
 else
     echo "No TODO items found!"
 fi
-echo ""
-
-echo "Pre-push : running lintr"
-
-Rscript .git/hooks/linter_script.R
