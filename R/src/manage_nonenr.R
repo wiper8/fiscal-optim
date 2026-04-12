@@ -1,5 +1,6 @@
 # gestion du capital et gain dans des comptes non enregistré selon des achats et ventes
 manage_nonenr <- function(nonenr_capital, nonenr_gain, cotis, sell) {
+  stopifnot(all(cotis >= 0 & sell >= 0))
   if (sell > (nonenr_capital + nonenr_gain + cotis)) stop("Fonds insuffisants de non-enregistré")
   useless_share_price <- 100 # présent juste pour aider à interpréter les calculs
 
