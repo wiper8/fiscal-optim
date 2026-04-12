@@ -16,7 +16,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
 
   ## warmup
   if (!is.null(previous_min_bound)) {
-    previous <- if (is.null(previous_min_bound)) 0 else previous_min_bound * 0.95
+    previous <- previous_min_bound * 0.95
 
     # set expenses level
     depenses <- get_flat_expenses_ipc(start_age, max_age, previous, ...)
