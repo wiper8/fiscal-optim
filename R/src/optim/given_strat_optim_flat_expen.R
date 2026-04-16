@@ -6,6 +6,7 @@ source("R/src/get_flat_expenses_ipc.R")
 given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
                                          previous_min_bound = NULL, ..., real_revenus = NULL) {
 
+  # browser()
   # in today's dollars
   # estimation of propabe yearly_expenses, very simplified
   source(data_filepath)
