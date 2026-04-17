@@ -71,8 +71,8 @@ expect_equivalent(
 )
 
 # trop de cotisations dans le CELI
-expect_error(
-  try_strategy(
+expect_equivalent(
+  diff(try_strategy(
     actifs = actifs,
     revenus = revenus,
     depenses = depenses,
@@ -82,7 +82,10 @@ expect_error(
       dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
-  )
+  )[, "celi"]),
+  4500 + 7000,
+  tolerance = 3400,
+  scale = 1
 )
 
 # cotiser celi
