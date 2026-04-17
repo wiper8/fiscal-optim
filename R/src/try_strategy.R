@@ -19,6 +19,10 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
 
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
+    # borner le nonenr
+    strategy[i, "COTIS_NONENR"] <- pmax(0, strategy[i, "COTIS_NONENR"])
+    strategy[i, "SELL_NONENR"] <- pmax(0, strategy[i, "SELL_NONENR"])
+
     # changer la part de capital et de gain selon les achats et ventes
     dispo_nonenr <- sum(c(
       strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
@@ -35,12 +39,15 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
 
     # celi : contribution, retraits, nouveaux droits
-    if (-strategy[i, "NET_COTIS_CELI"] > actifs$celi$current_value) {
+    if (strategy[i, "NET_COTIS_CELI"] < -actifs$celi$current_value) {
       warning("attention, retraits trop importants dans le CELI")
       strategy[i, "NET_COTIS_CELI"] <- -(actifs$celi$current_value - 0.01)
     }
+    if ((actifs$celi$contrib_lim + actifs$celi$contrib_yearly) < strategy[i, "NET_COTIS_CELI"]) {
+      warning("attention, cotisations trop importantes dans le CELI")
+      strategy[i, "NET_COTIS_CELI"] <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - 0.01
+    }
     actifs$celi$contrib_lim <- actifs$celi$contrib_lim + actifs$celi$contrib_yearly - strategy[i, "NET_COTIS_CELI"]
-    if (actifs$celi$contrib_lim < 0) stop("attention, droits de cotisations au celi dépassés")
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
     # reer
@@ -59,7 +66,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       warning("Retraits du REER insuffisants car FERR. Retrait forcé")
     }
 
-    if (-strategy[i, "NET_COTIS_REER"] > actifs$reer$current_value) {
+    if (strategy[i, "NET_COTIS_REER"] < -actifs$reer$current_value) {
       warning("attention, retraits trop importants dans le REER.")
       strategy[i, "NET_COTIS_REER"] <- -(actifs$reer$current_value - 0.01)
     }
@@ -133,5 +140,6 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       new_actifs
     )
   }
+
   actifs_history
 }
