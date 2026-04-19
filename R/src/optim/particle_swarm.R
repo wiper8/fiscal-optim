@@ -74,29 +74,3 @@ particle_swarm <- function(theta, f, lower_bounds, upper_bounds,
 
   list(par = gbest_position, value = gbest_value)
 }
-
-get_bounds <- function(bloc_splits = NULL) {
-  fake_i <- rendement_brut + rendement_cash - 1
-
-  fake_n_years <- 90
-  actuariat_factor <- (fake_i^fake_n_years - 1) / (fake_i - 1)
-  mins <- c(
-    0,
-    0,
-    -(actifs$celi$current_value * fake_i^fake_n_years + actifs$celi$contrib_yearly * actuariat_factor),
-    -(actifs$reer$current_value * fake_i^fake_n_years + actifs$reer$plafond * actuariat_factor),
-    0
-  )
-  maxes <- c(
-    actifs$cash + salaire,
-    (actifs$nonenr_capital + actifs$nonenr_gain) * fake_i^fake_n_years + salaire * actuariat_factor,
-    actifs$celi$contrib_yearly * (max_age - start_age + 1) + actifs$celi$contrib_lim,
-    actifs$reer$current_value * fake_i^fake_n_years + actifs$reer$plafond * actuariat_factor,
-    actifs$reer$current_value * fake_i^fake_n_years + actifs$reer$plafond * actuariat_factor
-  )
-  list(
-    lower = replicate(length(bloc_splits) + 1, mins),
-    upper = replicate(length(bloc_splits) + 1, maxes)
-  )
-}
-

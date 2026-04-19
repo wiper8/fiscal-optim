@@ -1,6 +1,7 @@
 source("R/src/optim/given_strat_optim_flat_expen.R")
 source("R/src/optim/initial_solution.R")
 source("R/src/optim/particle_swarm.R")
+source("R/src/optim/get_bounds.R")
 
 # maximiser une quantitée d'argent flat dans le temps en optimisant une stratégie de cotisations/retraits fiscaux
 maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_solution = NULL, ..., limit_itr = 100,
@@ -47,7 +48,8 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
   previous_min_bound <- -to_optim(theta)
 
   #tryCatch({
-    tmp_bounds <- get_bounds(bloc_splits = bloc_splits)
+    browser()
+    tmp_bounds <- get_bounds(bloc_splits = bloc_splits, ...)
     particle_swarm(
       theta = theta,
       f = to_optim,
