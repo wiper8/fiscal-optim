@@ -26,7 +26,7 @@ jobs:
         
       - name: Restore dependencies
         run: |
-          renv::restore()
+          renv::restore("R")
         shell: Rscript {0}
       
       - name: Run tests
