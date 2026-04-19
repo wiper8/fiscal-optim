@@ -19,23 +19,19 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
 
   # itérer à chaque année, au 1er janvier.
   for (i in seq_len(max_age - start_age + 1)) {
-    # borner le nonenr
-    strategy[i, "COTIS_NONENR"] <- pmax(0, strategy[i, "COTIS_NONENR"])
-    strategy[i, "SELL_NONENR"] <- pmax(0, strategy[i, "SELL_NONENR"])
-
     # changer la part de capital et de gain selon les achats et ventes
     dispo_nonenr <- sum(c(
-      strategy[i, "COTIS_NONENR"], actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
+      max(0, strategy[i, "NET_COTIS_NONENR"]), actifs_history[nrow(actifs_history), c("nonenr_capital", "nonenr_gain")]
     ))
-    if (strategy[i, "SELL_NONENR"] > dispo_nonenr) {
+    if (-strategy[i, "NET_COTIS_NONENR"] > dispo_nonenr) {
       warning("attention, retraits trop importants dans le NONENR")
-      strategy[i, "SELL_NONENR"] <- dispo_nonenr - 0.01
+      strategy[i, "NET_COTIS_NONENR"] <- -(dispo_nonenr - 0.01)
     }
     new_nonenr <- manage_nonenr(
       tail(actifs_history[, "nonenr_capital"], 1),
       tail(actifs_history[, "nonenr_gain"], 1),
-      strategy[i, "COTIS_NONENR"],
-      strategy[i, "SELL_NONENR"]
+      max(0, strategy[i, "NET_COTIS_NONENR"]),
+      -min(0, strategy[i, "NET_COTIS_NONENR"])
     )
 
     # celi : contribution, retraits, nouveaux droits
@@ -112,7 +108,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
 
     remaining_cash <- actifs_history[i, "cash"] + revenu_disponible - depenses$depenses[i] -
-      strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - strategy[i, "COTIS_NONENR"]
+      strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - max(0, strategy[i, "NET_COTIS_NONENR"])
 
     if (remaining_cash < 0) return(paste0("argent insuffisant à i=", i))
 
