@@ -29,11 +29,9 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
   # nolint start: commented_code_linter
   base_ui <- matrix(
     c(
-      1, 0, 0, 0, 0, # COTIS_NONENR >= 0
-      0, 1, 0, 0, 0, # SELL_NONENR >= 0
-      0, 0, 0, 0, 1 # DEDUCE_REER >= 0
+      0, 0, 0, 1 # DEDUCE_REER >= 0
     ),
-    ncol = 5,
+    ncol = 4,
     byrow = TRUE
   )
 
@@ -79,14 +77,15 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
 }
 
 get_strat <- function(flat_strategy, start_age, max_age, bloc_splits = NULL) {
-  dimnm <- list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+  dimnm <- list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+  n_col <- length(dimnm[[2]])
 
   stopifnot(all(bloc_splits <= max_age & start_age <= bloc_splits))
   ages <- unique(c(start_age, sort(bloc_splits), max_age))
   res <- matrix(
-    flat_strategy[1:5 + 5 * (1 - 1)],
+    flat_strategy[1:n_col + n_col * (1 - 1)],
     nrow = ages[1 + 1] - ages[1] + 1 * (max_age == ages[2]),
-    ncol = 5,
+    ncol = n_col,
     byrow = TRUE,
     dimnames = dimnm
   )
@@ -95,9 +94,9 @@ get_strat <- function(flat_strategy, start_age, max_age, bloc_splits = NULL) {
     res <- rbind(
       res,
       matrix(
-        flat_strategy[1:5 + 5 * i],
+        flat_strategy[1:n_col + n_col * i],
         nrow = ages[i + 2] - ages[i + 1] + 1 * (max_age == ages[i + 2]),
-        ncol = 5,
+        ncol = n_col,
         byrow = TRUE,
         dimnames = dimnm
       )
