@@ -46,9 +46,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(50000, 0, 0, 0, 0),
+      c(50000, 0, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 1],
@@ -61,9 +61,9 @@ expect_equivalent(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 300000, 0, 0, 0),
+      c(-300000, 0, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 1:2],
@@ -77,9 +77,9 @@ expect_equivalent(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 50000, 0, 0),
+      c(0, 50000, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[, "celi"]),
@@ -95,9 +95,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 7000, 0, 0),
+      c(0, 7000, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 4],
@@ -113,9 +113,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, -48000, 0, 0),
+      c(0, -48000, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 4],
@@ -129,9 +129,9 @@ expect_warning(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 0, 17000, 0),
+      c(0, 0, 17000, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )
@@ -144,9 +144,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 0, 3300, 0),
+      c(0, 0, 3300, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 5],
@@ -161,9 +161,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 0, 3300, 3300),
+      c(0, 0, 3300, 3300),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 5],
@@ -178,9 +178,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 0, -50000, 0),
+      c(0, 0, -50000, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 5],
@@ -195,11 +195,11 @@ expect_warning(
     revenus = rbind(revenus, revenus),
     depenses = rbind(depenses, depenses),
     strategy = matrix(
-      c(0, 0, 0, -50000, 0,
-        0, 0, 0, 17000, 0),
+      c(0, 0, -50000, 0,
+        0, 0, 17000, 0),
       nrow = 2,
       byrow = TRUE,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )
@@ -228,9 +228,9 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(0, 0, 0, 0, 0),
+      c(0, 0, 0, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 3],
@@ -248,15 +248,15 @@ expect_equal(
     revenus = revenus,
     depenses = depenses,
     strategy = matrix(
-      c(10000, 7500, 4000, -10000, 0),
+      c(2500, 4000, -10000, 0),
       nrow = 1,
-      dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+      dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
     passed_revenus = NULL
   )[2, 3],
   # nolint (cash + nonenr - celi + reer + salaire - impotestim&AE&RQAP&RRQ&rente - depenses + dividendes_interest) *
   #   rendement_cash
-  (20000 + (7500 - 10000) - 4000 + 10000 + revenus$revenu_emploi - (6000 + 8000 + 250 + 750 + 4000 + 3500) -
+  (20000 - 2500 - 4000 + 10000 + revenus$revenu_emploi - (6000 + 8000 + 250 + 750 + 4000 + 3500) -
      depenses$depenses + (actifs$nonenr_capital + actifs$nonenr_gain) * dividend_yield) * rendement_cash / ipc,
   tolerance = 500,
   scale = 1

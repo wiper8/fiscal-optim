@@ -52,11 +52,10 @@ depenses <- data.frame(
 strategy <- matrix(
   NA,
   nrow = 1,
-  ncol = 5,
-  dimnames = list(NULL, c("COTIS_NONENR", "SELL_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
+  ncol = 4,
+  dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
 )
-strategy[1, "COTIS_NONENR"] <- 0
-strategy[1, "SELL_NONENR"] <- 13500
+strategy[1, "NET_COTIS_NONENR"] <- -13500
 strategy[1, "NET_COTIS_CELI"] <- -2175
 strategy[1, "NET_COTIS_REER"] <- -1900
 strategy[1, "DEDUCE_REER"] <- 0
