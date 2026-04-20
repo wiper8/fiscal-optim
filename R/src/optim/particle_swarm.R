@@ -1,28 +1,41 @@
 particle_swarm <- function(theta, f, lower_bounds, upper_bounds,
-                           n_particles = 20,
-                           max_iter = 100,
+                           n_particles = 50,
+                           swarm_iter = 10,
                            w = 0.7,
-                           c1 = 1.5,
-                           c2 = 1.5,
+                           c1 = 1.2,
+                           c2 = 1.8,
                            ...) {
-  
   d <- length(theta)
   stopifnot(length(lower_bounds) == d && length(upper_bounds) == d)
 
   # Initialize positions (particles x dimensions)
-  positions <- matrix(runif(n_particles * d), n_particles, d)
-  positions <- sweep(positions, 2, (upper_bounds - lower_bounds), `*`)
-  positions <- sweep(positions, 2, lower_bounds, `+`)
+  feasable_solution <- rep(FALSE, n_particles * d)
+  positions_init <- matrix(runif(n_particles * d), n_particles, d)
+  positions <- positions_init
+  repeat {
+    positions_init <- matrix(runif(n_particles * d), n_particles, d)
+    positions[!feasable_solution] <- positions_init[!feasable_solution]
+
+    positions <- sweep(positions, 2, c(upper_bounds - lower_bounds), `*`)
+    positions <- sweep(positions, 2, c(lower_bounds), `+`)
+    # custom : move the matrix a little closer to initial theta
+    alpha <- 0.4
+    positions <- (1 - alpha) * positions + alpha * matrix(theta, nrow(positions), ncol = d, byrow = TRUE)
   
+    # Evaluate fitness
+    fitness <- apply(positions, 1, f, ...)
+    feasable_solution[fitness < 0] <- TRUE
+
+    # make sure initial positions give non-zeros results to start
+    if (all(feasable_solution)) break
+  }
+
   # Initialize velocity
   velocity <- matrix(
     runif(n_particles * d, -abs(upper_bounds - lower_bounds), abs(upper_bounds - lower_bounds)),
     n_particles,
     d
   )
-
-  # Evaluate fitness
-  fitness <- apply(positions, 1, f, ...)
 
   # Personal best
   pbest_positions <- positions
@@ -33,7 +46,7 @@ particle_swarm <- function(theta, f, lower_bounds, upper_bounds,
   gbest_position <- positions[gbest_index, ]
   gbest_value <- fitness[gbest_index]
 
-  for (iter in seq_len(max_iter)) {
+  for (iter in seq_len(swarm_iter)) {
 
     # Random matrices
     r_p <- matrix(runif(n_particles * d), n_particles, d)

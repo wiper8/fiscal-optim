@@ -12,8 +12,11 @@ data_filepath <- if (file.exists(private_filename)) {
 }
 
 source(data_filepath)
-debugonce(maximise_expenses)
-df <- work_years_to_expenses(data_filepath, salaire, limit_itr = Inf,
+
+df <- work_years_to_expenses(data_filepath, salaire,
+                             # car le temps est multiplié par le nombre d'années
+                             limit_time = 120 / (65 - start_age + 1),
+                             optimiser = "swarm",
                              bloc_splits = c(30, 35, 40, 45, 50, 55, 65, 71, 75, 80, 85, 90, 95))
 
 plot_work_years_expenses(df)

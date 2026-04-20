@@ -15,6 +15,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
   yearly_expenses <- yearly_expenses * (rendement_brut / ipc - 1)
 
   ## warmup
+  warmup_success <- NA
   if (!is.null(previous_min_bound)) {
     previous <- previous_min_bound * 0.95
 
@@ -24,14 +25,17 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
       minimum <- 0 # ignore warmup
+      warmup_success <- FALSE
     } else if (is.matrix(res_strat)) {
       minimum <- previous
       yearly_expenses <- pmax(yearly_expenses, minimum)
+      warmup_success <- TRUE
     } else {
       browser() # si ça déclanche, c'est un bogue probablement
     }
   } else {
     minimum <- 0
+    warmup_success <- FALSE
   }
 
   # bounds on the yearly_expenses amount
@@ -68,7 +72,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
     ## finally
     # next value to try
     yearly_expenses <- if (is.na(bounds[2])) {
-      (yearly_expenses + eps) * 1.05
+      (yearly_expenses + eps) * ifelse(is.null(previous_min_bound) || !isTRUE(warmup_success), 1.6, 1.05)
     } else {
       mean(bounds)
     }
