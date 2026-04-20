@@ -21,7 +21,7 @@ particle_swarm <- function(theta, f, lower_bounds, upper_bounds,
     # custom : move the matrix a little closer to initial theta
     alpha <- 0.4
     positions <- (1 - alpha) * positions + alpha * matrix(theta, nrow(positions), ncol = d, byrow = TRUE)
-  
+
     # Evaluate fitness
     fitness <- apply(positions, 1, f, ...)
     feasable_solution[fitness < 0] <- TRUE
