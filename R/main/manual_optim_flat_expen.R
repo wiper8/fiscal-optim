@@ -22,7 +22,7 @@ tmp <- maximise_expenses(
     rep(c(0, 0, -1000, 0), 19),
     rep(c(-2000, -4000, -1000, 0), 35)
   ),
-  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 30,
+  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 5,
   optimiser = "swarm"
 )
 
