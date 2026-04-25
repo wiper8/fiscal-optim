@@ -47,24 +47,28 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     actifs$celi$current_value <- actifs$celi$current_value + strategy[i, "NET_COTIS_CELI"]
 
     # reer
-    # trop de cotisation
-    if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) {
-      warning("attention, droits de cotisations au reer dépassés")
-      strategy[i, "NET_COTIS_REER"] <- actifs$reer$droits_cotis_inutilises - 0.01
-    }
     # car FERR
     if (start_age + i - 1 >= 71 && strategy[i, "NET_COTIS_REER"] > 0) {
-      strategy[i, "NET_COTIS_REER"] <- 0
       warning("Pas le droit de cotiser au REER, car FERR. Limité à 0.")
+      strategy[i, "NET_COTIS_REER"] <- 0
     }
     if (-min(0, strategy[i, "NET_COTIS_REER"]) < (retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)) {
-      strategy[i, "NET_COTIS_REER"] <- -(retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value + 0.01)
       warning("Retraits du REER insuffisants car FERR. Retrait forcé")
+      strategy[i, "NET_COTIS_REER"] <- -(retrait_min_ferr(start_age + i - 1) * actifs$reer$current_value)
     }
 
     if (strategy[i, "NET_COTIS_REER"] < -actifs$reer$current_value) {
       warning("attention, retraits trop importants dans le REER.")
-      strategy[i, "NET_COTIS_REER"] <- -(actifs$reer$current_value - 0.01)
+      strategy[i, "NET_COTIS_REER"] <- -pmax(0, actifs$reer$current_value - 0.01)
+    }
+    # trop de cotisation
+    if (strategy[i, "DEDUCE_REER"] < 0) {
+      warning("attention, déductions REER négatives impossibles")
+      strategy[i, "DEDUCE_REER"] <- 0
+    }
+    if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) {
+      warning("attention, droits de cotisations au reer dépassés")
+      strategy[i, "NET_COTIS_REER"] <- pmax(0, actifs$reer$droits_cotis_inutilises - 0.01)
     }
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,

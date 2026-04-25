@@ -13,7 +13,12 @@ data_filepath <- if (file.exists(private_filename)) {
 
 source(data_filepath)
 
-df <- work_years_to_expenses(data_filepath, salaire, limit_itr = 100)
+df <- work_years_to_expenses(data_filepath, salaire,
+                             work_years = seq(0, 65 - start_age, 5),
+                             # car le temps est multiplié par le nombre d'années
+                             limit_time = 30 / length(work_years),
+                             optimiser = "swarm")
+
 
 plot_work_years_expenses(df)
 

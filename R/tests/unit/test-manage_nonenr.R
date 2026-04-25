@@ -65,4 +65,12 @@ expect_error(
   manage_nonenr(nonenr_capital = 1, nonenr_gain = 3, cotis = 2, sell = 6.01)
 )
 
+# échecs si montants négatifs
+expect_error(
+  manage_nonenr(nonenr_capital = 1, nonenr_gain = 3, cotis = -0.1, sell = 0.5)
+)
+expect_error(
+  manage_nonenr(nonenr_capital = 1, nonenr_gain = 3, cotis = 0, sell = -0.5)
+)
+
 TRUE
