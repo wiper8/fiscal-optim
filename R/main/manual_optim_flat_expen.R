@@ -18,11 +18,12 @@ age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 tmp <- maximise_expenses(
   start_age, max_age, bloc_splits = start_age:max_age,
   previous_solution = c(
-    rep(c(0, 7000, 20000, 20000), 21),
+    rep(c(0, -1000, 0, 0), 5),
+    rep(c(0, 0, 20000, 20000), 16),
     rep(c(0, 0, -1000, 0), 19),
-    rep(c(-2000, -4000, -1000, 0), 35)
+    rep(c(-12000, -12000, -1000, 0), 35)
   ),
-  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 5,
+  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 0.1,
   optimiser = "swarm"
 )
 
