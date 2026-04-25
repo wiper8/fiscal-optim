@@ -4,7 +4,7 @@ source("R/src/get_expenses_ipc.R")
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
 given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
-                                         previous_min_bound = NULL, ..., real_revenus = NULL) {
+                                    previous_min_bound = NULL, ..., real_revenus = NULL) {
 
   # in today's dollars
   # estimation of probable base_yearly_expenses, very simplified
