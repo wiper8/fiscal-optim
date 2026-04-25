@@ -32,6 +32,7 @@ work_years_to_expenses <- function(data_filepath, yearly_income, bloc_splits, wo
                              real_revenus = revenus, ...)
     work_years_expenses$expenses[i] <- tmp$depenses
     previous_solution <- tmp$theta
+    message(round(tmp$depenses, 2))
   }
   work_years_expenses
 }

@@ -1,6 +1,6 @@
 source("R/src/plot_actifs_hist.R")
 source("R/src/optim/maximise_expenses.R")
-source("R/src/get_flat_expenses_ipc.R")
+source("R/src/get_expenses_ipc.R")
 
 private_filename <- "R/data/fiscal_private.R"
 template_filename <- "R/data/fiscal_template.R"
@@ -19,7 +19,7 @@ tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(age_retraite, 65), 
                          inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 30, optimiser = "swarm")
 
 actifs_hist <- try_strategy(
-  actifs, revenus, get_flat_expenses_ipc(start_age, max_age, tmp$depenses, inflation, ipc),
+  actifs, revenus, get_expenses_ipc(start_age, max_age, tmp$depenses + depenses_variables$depenses, inflation, ipc),
   tmp$strategy, passed_revenus
 )
 
