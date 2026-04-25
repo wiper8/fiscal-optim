@@ -91,7 +91,6 @@ maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_s
   args$real_strategy <- get_strat(best_strat, start_age, max_age, bloc_splits)
   args$eps <- 0.01
   args$previous_min_bound <- NULL # pour une optimisation complète from scratch
-  args$verbose <- TRUE
   expenses <- do.call(given_strat_optim_expen, args)
 
   list(depenses = expenses, strategy = args$real_strategy, theta = best_strat)
