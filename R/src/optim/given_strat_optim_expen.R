@@ -1,18 +1,18 @@
 source("R/src/try_strategy.R")
-source("R/src/get_flat_expenses_ipc.R")
+source("R/src/get_expenses_ipc.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
+given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
                                          previous_min_bound = NULL, ..., real_revenus = NULL) {
 
   # in today's dollars
-  # estimation of propabe yearly_expenses, very simplified
+  # estimation of probable base_yearly_expenses, very simplified
   source(data_filepath)
   strategy <- real_strategy # override la stratégie dans data/
   revenus <- real_revenus %||% revenus # override la stratégie dans data/
-  yearly_expenses <- actifs$cash + actifs$nonenr_capital + actifs$nonenr_gain + actifs$celi$current_value
-  yearly_expenses <- yearly_expenses * (rendement_brut / ipc - 1)
+  base_yearly_expenses <- actifs$cash + actifs$nonenr_capital + actifs$nonenr_gain + actifs$celi$current_value
+  base_yearly_expenses <- base_yearly_expenses * (rendement_brut / ipc - 1)
 
   ## warmup
   warmup_success <- NA
@@ -20,7 +20,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
     previous <- previous_min_bound * 0.95
 
     # set expenses level
-    depenses <- get_flat_expenses_ipc(start_age, max_age, previous, ...)
+    depenses <- get_expenses_ipc(start_age, max_age, previous + depenses_variables$depenses, ...)
     res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
@@ -28,7 +28,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
       warmup_success <- FALSE
     } else if (is.matrix(res_strat)) {
       minimum <- previous
-      yearly_expenses <- pmax(yearly_expenses, minimum)
+      base_yearly_expenses <- pmax(base_yearly_expenses, minimum)
       warmup_success <- TRUE
     } else {
       browser() # si ça déclanche, c'est un bogue probablement
@@ -38,7 +38,7 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
     warmup_success <- FALSE
   }
 
-  # bounds on the yearly_expenses amount
+  # bounds on the base_yearly_expenses amount
   # upper will be set after first failure
   bounds <- c(minimum, NA)
 
@@ -51,28 +51,28 @@ given_strat_optim_flat_expen <- function(data_filepath, real_strategy, eps = 0.0
     revenus <- real_revenus %||% revenus # override la stratégie dans data/
 
     # set expenses level
-    depenses <- get_flat_expenses_ipc(start_age, max_age, yearly_expenses, ...)
+    depenses <- get_expenses_ipc(start_age, max_age, base_yearly_expenses + depenses_variables$depenses, ...)
 
     # try to live while spending `depenses` schedule
     res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
       if (is.na(bounds[2])) {
-        bounds <- c(bounds[1], yearly_expenses)
+        bounds <- c(bounds[1], base_yearly_expenses)
       } else {
-        bounds <- c(bounds[1], min(bounds[2], yearly_expenses))
+        bounds <- c(bounds[1], min(bounds[2], base_yearly_expenses))
       }
     } else if (is.matrix(res_strat)) {
       # if success, increment lower bound
-      bounds <- c(yearly_expenses, bounds[2])
+      bounds <- c(base_yearly_expenses, bounds[2])
     } else {
       browser() # si ça déclanche, c'est un bogue probablement
     }
 
     ## finally
     # next value to try
-    yearly_expenses <- if (is.na(bounds[2])) {
-      (yearly_expenses + eps) * ifelse(is.null(previous_min_bound) || !isTRUE(warmup_success), 1.6, 1.05)
+    base_yearly_expenses <- if (is.na(bounds[2])) {
+      (base_yearly_expenses + eps) * ifelse(is.null(previous_min_bound) || !isTRUE(warmup_success), 1.6, 1.05)
     } else {
       mean(bounds)
     }

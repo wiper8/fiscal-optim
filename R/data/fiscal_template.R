@@ -47,6 +47,18 @@ depenses <- data.frame(
   age = start_age:max_age,
   depenses = 40000
 )
+depenses_variables <- data.frame(
+  age = start_age:max_age,
+  depenses = c( # hypothèque
+    rep(0, 5),
+    rep(2300, 25),
+    rep(1500, max_age - 25 - 5 - start_age + 1)
+  ) + c( # autre comme enfants / voyages, projet, chalet, etc.
+    rep(0, 7),
+    rep(20000, 20),
+    rep(0, max_age - 20 - 7 - start_age + 1)
+  )
+)
 
 # strategy of withdrawals
 strategy <- matrix(
