@@ -62,17 +62,13 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
       strategy[i, "NET_COTIS_REER"] <- -pmax(0, actifs$reer$current_value - 0.01)
     }
     # trop de cotisation
-    if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) {
-      warning("attention, droits de cotisations au reer dépassés")
-      strategy[i, "NET_COTIS_REER"] <- pmax(0, actifs$reer$droits_cotis_inutilises - 0.01)
-    }
     if (strategy[i, "DEDUCE_REER"] < 0) {
       warning("attention, déductions REER négatives impossibles")
       strategy[i, "DEDUCE_REER"] <- 0
     }
-    if (actifs$reer$droits_cotis_inutilises < 0) {
-      print("A")
-      print(actifs$reer$droits_cotis_inutilises)
+    if (strategy[i, "NET_COTIS_REER"] > actifs$reer$droits_cotis_inutilises) {
+      warning("attention, droits de cotisations au reer dépassés")
+      strategy[i, "NET_COTIS_REER"] <- pmax(0, actifs$reer$droits_cotis_inutilises - 0.01)
     }
     tmp_reer <- annexe_7(
       actifs$reer$cotis_versees_non_deduites,
@@ -82,11 +78,6 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus) {
     )
     actifs$reer$droits_cotis_inutilises <- actifs$reer$droits_cotis_inutilises - max(0, strategy[i, "NET_COTIS_REER"]) +
       get_droits_reer(revenus$revenu_emploi[i], age = start_age + i - 1, ipc = ipc)
-    if (actifs$reer$droits_cotis_inutilises < 0) {
-      print("B")
-      print(max(0, strategy[i, "NET_COTIS_REER"]))
-      print(actifs$reer$droits_cotis_inutilises)
-    }
     actifs$reer$cotis_versees_non_deduites <- tmp_reer$cotis_inutil_vers_disp_deduc
     actifs$reer$current_value <- actifs$reer$current_value + strategy[i, "NET_COTIS_REER"]
 
