@@ -5,7 +5,7 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
   depenses$depenses <- depenses$depenses * 0 # si je ne dépense rien, je pourrais cotiser plus (bornes max)
   strategy <- strategy * 0 # reset la stratégie pour ne rien cotiser
 
-  actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+  actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus, start_age, max_age)
 
   # group by bloc splits
   groups <- matrix(
