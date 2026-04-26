@@ -15,12 +15,14 @@ source(data_filepath)
 
 age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 
-tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(age_retraite, 65), data_filepath = data_filepath, eps = 10,
-                         inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 30, optimiser = "swarm")
+tmp <- maximise_expenses(start_age, max_age, bloc_splits = c(age_retraite, 65), data_filepath = data_filepath,
+                         eps = 10, inflation = inflation, ipc = ipc, verbose = FALSE, limit_time = 30,
+                         optimiser = "swarm")
 
 actifs_hist <- try_strategy(
   actifs, revenus, get_expenses_ipc(start_age, max_age, tmp$depenses + depenses_variables$depenses, inflation, ipc),
-  tmp$strategy, passed_revenus
+  tmp$strategy, passed_revenus,
+  start_age, max_age
 )
 
 key_moments <- c(start_age, age_retraite, 65, 71, 75, max_age)
