@@ -29,7 +29,8 @@ tmp <- maximise_expenses(
 
 actifs_hist <- try_strategy(
   actifs, revenus, get_expenses_ipc(start_age, max_age, tmp$depenses + depenses_variables$depenses, inflation, ipc),
-  tmp$strategy, passed_revenus
+  tmp$strategy, passed_revenus,
+  start_age, max_age
 )
 
 key_moments <- c(start_age, age_retraite, 65, 71, 75, max_age)
