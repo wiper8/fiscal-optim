@@ -204,8 +204,10 @@ expect_warning(
     revenus = rbind(revenus, revenus),
     depenses = rbind(depenses, depenses),
     strategy = matrix(
-      c(0, 0, -50000, 0,
-        0, 0, 17000, 0),
+      c(
+        0, 0, -50000, 0,
+        0, 0, 17000, 0
+      ),
       nrow = 2,
       byrow = TRUE,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))

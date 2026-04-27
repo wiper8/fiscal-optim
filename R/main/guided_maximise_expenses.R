@@ -1,5 +1,5 @@
 source("R/src/plot_actifs_hist.R")
-source("R/src/optim/maximise_expenses.R")
+source("R/src/optim/guided_maximise_expenses.R")
 source("R/src/get_expenses_ipc.R")
 
 private_filename <- "R/data/fiscal_private.R"
@@ -15,10 +15,12 @@ source(data_filepath)
 
 age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 
-tmp <- maximise_expenses(start_age, max_age,
-  bloc_splits = c(age_retraite, 65), data_filepath = data_filepath,
-  eps = 10, inflation = inflation, ipc = ipc, verbose = 5, limit_time = 30,
-  optimiser = "swarm"
+tmp <- guided_maximise_expenses(start_age, max_age,
+  bloc_splits = NULL,
+  data_filepath = data_filepath,
+  eps = 10, inflation = inflation, ipc = ipc, verbose = 4,
+  limit_time = 30,
+  optimiser = "constrOptim"
 )
 
 actifs_hist <- try_strategy(
