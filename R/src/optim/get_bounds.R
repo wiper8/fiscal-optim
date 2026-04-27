@@ -39,10 +39,11 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
           tmp * actuariat_factor) / (1 + apply(groups, 1, diff)),
       -(actifs$celi$current_value * fake_i^groups[, 2] +
           actifs$celi$contrib_yearly * actuariat_factor) / (1 + apply(groups, 1, diff)),
-      -((actifs$reer$current_value +
+      -((
+        actifs$reer$current_value +
           actifs$reer$droits_cotis_inutilises +
           actifs$reer$cotis_versees_non_deduites
-        ) * fake_i^groups[, 2] + actifs$reer$plafond * actuariat_factor) / (1 + apply(groups, 1, diff)),
+      ) * fake_i^groups[, 2] + actifs$reer$plafond * actuariat_factor) / (1 + apply(groups, 1, diff)),
       rep(0, nrow(groups))
     ),
     nrow = 4,
