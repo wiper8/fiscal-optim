@@ -15,5 +15,5 @@ years_to_months <- function(x) {
   x <- 12 * (x - years)
   months <- floor(x)
   work_days <- ceiling(260 * (x - months))
-  paste0(years, " ans ", months,  " mois ", work_days, " jours")
+  paste0(years, " ans ", months, " mois ", work_days, " jours")
 }

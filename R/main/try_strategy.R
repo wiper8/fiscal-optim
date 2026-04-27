@@ -10,7 +10,7 @@ if (file.exists(private_filename)) {
   source(template_filename)
 }
 
-actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus, start_age, max_age)
 
 key_moments <- c(start_age, revenus$age[head(which(revenus$revenu_emploi == 0), 1)], 65, 71, 75, max_age)
 

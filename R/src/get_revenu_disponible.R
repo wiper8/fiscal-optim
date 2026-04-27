@@ -18,7 +18,6 @@ get_revenu_disponible <- function(
   prestation_rrq = 0,
   ...
 ) {
-
   cotis_rente <- get_cotis_rente(revenu_emploi)
   cotis_rrq <- get_cotis_rrq(revenu_emploi, ...)
   cotis_ae <- get_cotis_ae(revenu_emploi)

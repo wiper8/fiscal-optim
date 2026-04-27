@@ -50,7 +50,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 1],
   150000
 )
@@ -65,7 +66,8 @@ expect_equivalent(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 1:2],
   c(0, 0)
 )
@@ -81,7 +83,8 @@ expect_equivalent(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[, "celi"]),
   4500 + 7000,
   tolerance = 3400,
@@ -99,7 +102,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 4],
   57824.97,
   tolerance = 1,
@@ -117,7 +121,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 4],
   0
 )
@@ -133,7 +138,8 @@ expect_warning(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )
 )
 
@@ -148,7 +154,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 5],
   56037.62,
   tolerance = 0.001
@@ -165,7 +172,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 5],
   56037.62,
   tolerance = 0.001
@@ -182,7 +190,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 5],
   0
 )
@@ -195,13 +204,16 @@ expect_warning(
     revenus = rbind(revenus, revenus),
     depenses = rbind(depenses, depenses),
     strategy = matrix(
-      c(0, 0, -50000, 0,
-        0, 0, 17000, 0),
+      c(
+        0, 0, -50000, 0,
+        0, 0, 17000, 0
+      ),
       nrow = 2,
       byrow = TRUE,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )
 )
 max_age <- max_age - 1
@@ -232,7 +244,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 3],
   # nolint (cash + salaire - impotestim&AE&RQAP&RRQ&rente - depenses + dividendes_interest) * rendement_cash
   (20000 + revenus$revenu_emploi - (6000 + 8000 + 250 + 750 + 4000 + 3500) - depenses$depenses +
@@ -252,7 +265,8 @@ expect_equal(
       nrow = 1,
       dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER"))
     ),
-    passed_revenus = NULL
+    passed_revenus = NULL,
+    start_age, max_age
   )[2, 3],
   # nolint (cash + nonenr - celi + reer + salaire - impotestim&AE&RQAP&RRQ&rente - depenses + dividendes_interest) *
   #   rendement_cash

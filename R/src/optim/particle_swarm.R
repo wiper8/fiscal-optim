@@ -47,7 +47,6 @@ particle_swarm <- function(theta, f, lower_bounds, upper_bounds,
   gbest_value <- fitness[gbest_index]
 
   for (iter in seq_len(swarm_iter)) {
-
     # Random matrices
     r_p <- matrix(runif(n_particles * d), n_particles, d)
     r_g <- matrix(runif(n_particles * d), n_particles, d)

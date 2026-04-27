@@ -5,7 +5,7 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
   depenses$depenses <- depenses$depenses * 0 # si je ne dépense rien, je pourrais cotiser plus (bornes max)
   strategy <- strategy * 0 # reset la stratégie pour ne rien cotiser
 
-  actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+  actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus, start_age, max_age)
 
   # group by bloc splits
   groups <- matrix(
@@ -39,10 +39,11 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
           tmp * actuariat_factor) / (1 + apply(groups, 1, diff)),
       -(actifs$celi$current_value * fake_i^groups[, 2] +
           actifs$celi$contrib_yearly * actuariat_factor) / (1 + apply(groups, 1, diff)),
-      -((actifs$reer$current_value +
-            actifs$reer$droits_cotis_inutilises +
-            actifs$reer$cotis_versees_non_deduites
-        ) * fake_i^groups[, 2] + actifs$reer$plafond * actuariat_factor) / (1 + apply(groups, 1, diff)),
+      -((
+        actifs$reer$current_value +
+          actifs$reer$droits_cotis_inutilises +
+          actifs$reer$cotis_versees_non_deduites
+      ) * fake_i^groups[, 2] + actifs$reer$plafond * actuariat_factor) / (1 + apply(groups, 1, diff)),
       rep(0, nrow(groups))
     ),
     nrow = 4,

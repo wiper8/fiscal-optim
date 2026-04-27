@@ -12,7 +12,8 @@ plot_actifs_hist <- function(actifs_hist, key_moments = NULL) {
     geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "nonenr_gain"], color = "Non-enr gain")) +
     geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "celi"], color = "CELI")) +
     geom_line(aes(x = start_age:(max_age + 1), y = actifs_hist[, "reer"], color = "REER")) +
-    xlab("Âge") + ylab("Actifs") +
+    xlab("Âge") +
+    ylab("Actifs") +
     scale_color_manual(
       values = c(
         "Total" = "black",
@@ -23,8 +24,12 @@ plot_actifs_hist <- function(actifs_hist, key_moments = NULL) {
         "REER" = "#00bbbb"
       )
     )
-  if (is.null(key_moments)) return(p)
+  if (is.null(key_moments)) {
+    return(p)
+  }
   p +
-    geom_segment(aes(x = key_moments, xend = key_moments,
-                     y = 0, yend = max(actifs_hist)), linetype = "dashed", alpha = 0.4)
+    geom_segment(aes(
+      x = key_moments, xend = key_moments,
+      y = 0, yend = max(actifs_hist)
+    ), linetype = "dashed", alpha = 0.4)
 }

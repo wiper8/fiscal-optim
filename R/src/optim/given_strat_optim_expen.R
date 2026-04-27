@@ -3,14 +3,14 @@ source("R/src/get_expenses_ipc.R")
 
 # according to a specific strategy of investments/withdrawal/work/retirement, how much can i spend each year
 # (flat except for inflation) to fulfill my needs?
-given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = TRUE,
-                                    previous_min_bound = NULL, ..., real_revenus = NULL) {
-
+given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, verbose = 7,
+                                    previous_min_bound = NULL, ..., real_revenus = NULL,
+                                    subset = seq_len(nrow(real_strategy))) {
   # in today's dollars
   # estimation of probable base_yearly_expenses, very simplified
   source(data_filepath)
   strategy <- real_strategy # override la stratégie dans data/
-  revenus <- real_revenus %||% revenus # override la stratégie dans data/
+  revenus <- real_revenus %||% revenus # override les revenus dans data/
   base_yearly_expenses <- actifs$cash + actifs$nonenr_capital + actifs$nonenr_gain + actifs$celi$current_value
   base_yearly_expenses <- base_yearly_expenses * (rendement_brut / ipc - 1)
 
@@ -20,8 +20,15 @@ given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, ve
     previous <- previous_min_bound * 0.95
 
     # set expenses level
-    depenses <- get_expenses_ipc(start_age, max_age, previous + depenses_variables$depenses, ...)
-    res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+    depenses <- get_expenses_ipc(
+      start_age, tail(subset, 1) - head(subset, 1) + start_age,
+      previous + depenses_variables$depenses[subset], ...
+    )
+    res_strat <- try_strategy(
+      actifs,
+      revenus[subset, , drop = FALSE], depenses[subset, , drop = FALSE], strategy[subset, , drop = FALSE],
+      passed_revenus, start_age, tail(subset, 1) - head(subset, 1) + start_age
+    )
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
       minimum <- 0 # ignore warmup
@@ -43,18 +50,27 @@ given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, ve
   bounds <- c(minimum, NA)
 
   repeat {
-
-    if (verbose) message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
+    if (verbose >= 7) message(c("[", round(bounds[1], 2), ", ", round(bounds[2], 2), "]"))
     # reinitiate assets
     source(data_filepath)
     strategy <- real_strategy # override la stratégie dans data/
-    revenus <- real_revenus %||% revenus # override la stratégie dans data/
+    revenus <- real_revenus %||% revenus # override les revenus dans data/
 
     # set expenses level
-    depenses <- get_expenses_ipc(start_age, max_age, base_yearly_expenses + depenses_variables$depenses, ...)
+    depenses <- get_expenses_ipc(
+      start_age, tail(subset, 1) - head(subset, 1) + start_age,
+      base_yearly_expenses + depenses_variables$depenses[subset], ...
+    )
 
     # try to live while spending `depenses` schedule
-    res_strat <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus)
+    res_strat <- try_strategy(
+      actifs,
+      revenus[subset, , drop = FALSE],
+      depenses[subset, , drop = FALSE],
+      strategy[subset, , drop = FALSE],
+      passed_revenus, start_age,
+      tail(subset, 1) - head(subset, 1) + start_age
+    )
 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
       if (is.na(bounds[2])) {
