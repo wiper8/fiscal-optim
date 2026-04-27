@@ -26,6 +26,3 @@ plot_work_years_expenses(df)
 
 mandatory_work_years(df, total_expenses = depenses[1, "depenses"])
 mandatory_work_years(df, additional_expenses = 1000, current_expenses = depenses[1, "depenses"])
-# char financé à l'infini
-mandatory_work_years(df, additional_expenses = 24144.75 * 0.07, current_expenses = depenses[1, "depenses"])
-mandatory_work_years(df, additional_expenses = (24144.75 - 8850) * 0.07, current_expenses = depenses[1, "depenses"])
