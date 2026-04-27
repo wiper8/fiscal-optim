@@ -15,12 +15,10 @@ source(data_filepath)
 
 age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 
-tmp <- guided_maximise_expenses(start_age, max_age,
-                                bloc_splits = c(35, 45, 55, 65, 71, 75, 80, 85, 90, 95),
-                                data_filepath = data_filepath,
-                                eps = 10, inflation = inflation, ipc = ipc, verbose = 4,
-                                limit_time = 120,
-                                optimiser = "swarm"
+tmp <- guided_maximise_expenses(
+  start_age, max_age, data_filepath = data_filepath, inflation = inflation, ipc = ipc,
+  bloc_splits = c(35, 45, 55, 65, 71, 75, 80, 85, 90, 95),
+  eps = 10, verbose = 4, limit_time = 120, optimiser = "swarm"
 )
 
 actifs_hist <- try_strategy(
