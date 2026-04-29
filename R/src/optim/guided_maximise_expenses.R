@@ -10,6 +10,7 @@ source("R/src/try_strategy.R")
 guided_maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, previous_solution = NULL, ..., eps = 0.01,
                                      limit_time = 10, verbose = 3) {
   scale_factor <- 1.05
+  max_scale_absolute <- 500
   timer_start <- Sys.time()
 
   # warmup
@@ -24,7 +25,7 @@ guided_maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, pre
   starting_lower_bound <- do.call(given_strat_optim_expen, args)
 
   lower_bound <- starting_lower_bound # lower bound
-  base_yearly_expenses <- (lower_bound + eps) * scale_factor
+  base_yearly_expenses <- min((lower_bound + eps) * scale_factor, lower_bound + max_scale_absolute)
 
   repeat {
     if (verbose >= 3) message(paste0("Lower bound : ", round(lower_bound, 2)))
@@ -45,7 +46,7 @@ guided_maximise_expenses <- function(start_age, max_age, bloc_splits = NULL, pre
     # réussi à faire toute la retraite
     if (try_res$success) {
       # augmenter mes bounds, puis tenter selon le * scale_factor
-      base_yearly_expenses <- (base_yearly_expenses + eps) * scale_factor
+      base_yearly_expenses <- min((lower_bound + eps) * scale_factor, lower_bound + max_scale_absolute)
     } else if (isTRUE(diff(c(lower_bound, base_yearly_expenses)) < eps)) {
       break
     } else {
