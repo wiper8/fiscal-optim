@@ -59,8 +59,8 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
 
 # TODO retirer test
 data_filepath <- "R/data/fiscal_private.R"
-real_revenus <- data.frame(age=25, revenu_emploi=104700)
-real_depenses <- data.frame(age=25, depenses=25704)
+real_revenus <- data.frame(age = 25, revenu_emploi = 104700)
+real_depenses <- data.frame(age = 25, depenses = 25704)
 real_strategy <- matrix(
   c(
     0, 0, 0, 0
@@ -68,8 +68,8 @@ real_strategy <- matrix(
   dimnames = list(NULL, c("NET_COTIS_NONENR", "NET_COTIS_CELI", "NET_COTIS_REER", "DEDUCE_REER")),
   byrow = TRUE
 )
-subset = 1
-ages = c(25, 100)
+subset <- 1
+ages <- c(25, 100)
 
 get_guided_bounds <- function(data_filepath, real_revenus, real_depenses, real_strategy, subset, ages = NULL) {
   source(data_filepath)
@@ -84,8 +84,10 @@ get_guided_bounds <- function(data_filepath, real_revenus, real_depenses, real_s
   ages <- pmin(ages, start_age + max(subset) - 1)
   depenses$depenses <- depenses$depenses * 0 # si je ne dépense rien, je pourrais cotiser plus (bornes max)
   strategy <- strategy * 0 # reset la stratégie pour ne rien cotiser
-  actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus, start_age, start_age + max(subset) - 1)
-  
+  actifs_hist <- try_strategy(
+    actifs, revenus, depenses, strategy, passed_revenus, start_age, start_age + max(subset) - 1
+  )
+
   # group by bloc splits
   groups <- matrix(
     c(
@@ -95,10 +97,10 @@ get_guided_bounds <- function(data_filepath, real_revenus, real_depenses, real_s
     ),
     ncol = 2
   )
-  
+
   fake_i <- rendement + dividend_yield
   actuariat_factor <- (fake_i^groups[, 2] - 1) / (fake_i - 1)
-  
+
   tmp <- apply(groups, 1, function(idx) max(actifs_hist[idx[1]:idx[2], "cash"]) / (diff(idx) + 1))
   maxes <- matrix(
     c(
@@ -112,7 +114,7 @@ get_guided_bounds <- function(data_filepath, real_revenus, real_depenses, real_s
     nrow = 4,
     byrow = TRUE
   )
-  
+
   mins <- matrix(
     c(
       -((actifs$nonenr_capital + actifs$nonenr_gain) * fake_i^groups[, 2] +
@@ -129,10 +131,9 @@ get_guided_bounds <- function(data_filepath, real_revenus, real_depenses, real_s
     nrow = 4,
     byrow = TRUE
   )
-  
+
   list(
     lower = mins,
     upper = maxes
   )
 }
-
