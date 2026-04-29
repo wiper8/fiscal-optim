@@ -30,7 +30,7 @@ given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, ve
       passed_revenus, start_age, tail(subset, 1) - head(subset, 1) + start_age
     )
 
-    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
+    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) { # TODO gérer $ si déficit
       minimum <- 0 # ignore warmup
       warmup_success <- FALSE
     } else if (is.matrix(res_strat)) {
@@ -72,7 +72,7 @@ given_strat_optim_expen <- function(data_filepath, real_strategy, eps = 0.01, ve
       tail(subset, 1) - head(subset, 1) + start_age
     )
 
-    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
+    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) { # TODO gérer $ si déficit
       if (is.na(bounds[2])) {
         bounds <- c(bounds[1], base_yearly_expenses)
       } else {
