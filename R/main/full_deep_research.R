@@ -33,11 +33,12 @@ plot_actifs_hist(actifs_hist, key_moments)
 
 ###
 
-df2 <- work_years_to_expenses(data_filepath, salaire,
-                              limit_time = 120,
-                              method = "guided_maximise",
-                              bloc_splits = c(30, 35, 40, 45, 50, 55, 65, 71, 75, 80, 85, 90, 95),
-                              verbose = 4
+df2 <- work_years_to_expenses(
+  data_filepath, salaire,
+  limit_time = 120,
+  method = "guided_maximise",
+  bloc_splits = c(30, 35, 40, 45, 50, 55, 65, 71, 75, 80, 85, 90, 95),
+  verbose = 4
 )
 
 plot_work_years_expenses(df2)
