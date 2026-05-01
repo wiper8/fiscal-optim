@@ -2,8 +2,7 @@ source("R/src/optim/maximise_utils.R")
 
 try_expense <- function(start_age, max_age, base_yearly_expenses, bloc_splits = NULL,
                         data_filepath, previous_solution = NULL, previous_min_bound = NULL, ...,
-                        limit_time = 10, verbose = 4, optimiser = c("swarm", "constrOptim"),
-                        eps = 0.01, timer_start, real_revenus = NULL) {
+                        limit_time = 10, verbose = 4, eps = 0.01, timer_start, real_revenus = NULL) {
   res <- tryCatch(
     {
       stop_limit_time(timer_start, limit_time, verbose)
@@ -41,7 +40,6 @@ try_expense <- function(start_age, max_age, base_yearly_expenses, bloc_splits = 
     -expenses
   }
 
-  optimiser <- match.arg(optimiser)
   stopifnot(all(bloc_splits <= max_age & start_age <= bloc_splits))
   ages <- unique(c(start_age, sort(bloc_splits), max_age))
   best_strat_orig <- previous_solution %||% initial_solution(ages, actifs)
@@ -74,67 +72,27 @@ try_expense <- function(start_age, max_age, base_yearly_expenses, bloc_splits = 
     if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
       if (verbose >= 4) message(paste0(" Optimisation dès i : ", i))
 
-      # optimiser swarm ou constrOptim seulement 1:i avec des critères limites de recherche.
+      # optimiser swarm seulement 1:i avec des critères limites de recherche.
       min_expenses <- base_yearly_expenses
 
       tryCatch(
         {
-          if (optimiser == "swarm") {
-            tmp_bounds <- get_bounds(data_filepath = data_filepath, ages = ages, ...)
-            particle_swarm(
-              theta = subset_strat(best_strat, subset, ages),
-              f = to_optim,
-              swarm_iter = 100000000, # car la limite de temps s'appliquera
-              lower_bounds = subset_strat(tmp_bounds$lower, subset, ages),
-              upper_bounds = subset_strat(tmp_bounds$upper, subset, ages),
-              limit_time = limit_time,
-              timer_start = timer_start,
-              verbose = verbose,
-              max_age = tmp_max_age,
-              subset = subset,
-              bloc_splits = pmin(bloc_splits, tmp_max_age),
-              real_revenus = revenus,
-              ...
-            )
-          } else if (optimiser == "constrOptim") {
-            # nolint start: commented_code_linter
-            base_ui <- matrix(
-              c(
-                0, 0, 0, 1 # DEDUCE_REER >= 0
-              ),
-              ncol = 4,
-              byrow = TRUE
-            )
-
-            # ui %*% theta - ci > 0
-            ui_constr_mat <- kronecker(diag(length(ages)), base_ui)
-
-            # une cenne pour epsilon à cause du >= vs > dans ui %*% theta - ci > 0
-            ci_constr <- rep(0, nrow(ui_constr_mat)) - 0.01
-            # nolint end
-
-            subsetted_theta <- subset_strat(best_strat, subset, ages)
-            constrOptim(
-              theta = subsetted_theta,
-              f = to_optim,
-              grad = NULL,
-              ui = ui_constr_mat[, subset_strat(seq_along(best_strat), subset, ages), drop = FALSE],
-              ci = ci_constr,
-              control = list(
-                reltol = 0.0001, # 10$ / ~50000$
-                parscale = rep(10000, length(subsetted_theta)),
-                ndeps = 10 # eps pour estimation du gradient
-              ),
-              limit_time = limit_time,
-              timer_start = timer_start,
-              verbose = verbose,
-              max_age = tmp_max_age,
-              subset = subset,
-              bloc_splits = pmin(bloc_splits, tmp_max_age),
-              real_revenus = revenus,
-              ...
-            )
-          }
+          tmp_bounds <- get_bounds(data_filepath = data_filepath, ages = ages, ...)
+          particle_swarm(
+            theta = subset_strat(best_strat, subset, ages),
+            f = to_optim,
+            swarm_iter = 100000000, # car la limite de temps s'appliquera
+            lower_bounds = subset_strat(tmp_bounds$lower, subset, ages),
+            upper_bounds = subset_strat(tmp_bounds$upper, subset, ages),
+            limit_time = limit_time,
+            timer_start = timer_start,
+            verbose = verbose,
+            max_age = tmp_max_age,
+            subset = subset,
+            bloc_splits = pmin(bloc_splits, tmp_max_age),
+            real_revenus = revenus,
+            ...
+          )
         },
         error = function(e) {
           if (verbose >= 4) message("Stopped early: ", e$message)
