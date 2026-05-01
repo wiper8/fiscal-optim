@@ -111,7 +111,7 @@ try_strategy <- function(actifs, revenus, depenses, strategy, passed_revenus, st
       strategy[i, "NET_COTIS_CELI"] - strategy[i, "NET_COTIS_REER"] - max(0, strategy[i, "NET_COTIS_NONENR"])
 
     if (remaining_cash < 0) {
-      return(paste0("argent insuffisant à i=", i))
+      return(paste0("argent insuffisant à i=", i)) # TODO retourner aussi le déficit
     }
 
     # update les actifs

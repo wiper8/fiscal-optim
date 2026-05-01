@@ -69,15 +69,21 @@ try_expense <- function(start_age, max_age, base_yearly_expenses, bloc_splits = 
       start_age, tmp_max_age
     )
     # si fail
-    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) {
+    if (length(res_strat) == 1 && grepl("argent insuffisant", res_strat)) { # TODO gérer $ si déficit
       if (verbose >= 4) message(paste0(" Optimisation dès i : ", i))
 
       # optimiser swarm seulement 1:i avec des critères limites de recherche.
       min_expenses <- base_yearly_expenses
-
       tryCatch(
         {
-          tmp_bounds <- get_bounds(data_filepath = data_filepath, ages = ages, ...)
+          tmp_bounds <- get_guided_bounds(
+            data_filepath = data_filepath,
+            real_revenus, real_depenses, real_strategy,
+            subset = subset,
+            ages = ages
+          )
+          print(subset_strat(tmp_bounds$lower, subset, ages)) # TODO remove
+          print(subset_strat(tmp_bounds$upper, subset, ages)) # TODO remove
           particle_swarm(
             theta = subset_strat(best_strat, subset, ages),
             f = to_optim,
