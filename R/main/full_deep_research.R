@@ -18,7 +18,7 @@ age_retraite <- revenus$age[head(which(revenus$revenu_emploi == 0), 1)]
 tmp <- guided_maximise_expenses(
   start_age, max_age, data_filepath = data_filepath, inflation = inflation, ipc = ipc,
   bloc_splits = c(35, 45, 55, 65, 71, 75, 80, 85, 90, 95),
-  eps = 10, verbose = 4, limit_time = 120, optimiser = "swarm"
+  eps = 10, verbose = 4, limit_time = 120
 )
 
 actifs_hist <- try_strategy(
@@ -33,9 +33,9 @@ plot_actifs_hist(actifs_hist, key_moments)
 
 ###
 
-df2 <- work_years_to_expenses(data_filepath, salaire,
+df2 <- work_years_to_expenses(
+  data_filepath, salaire,
   limit_time = 120,
-  optimiser = "swarm",
   method = "guided_maximise",
   bloc_splits = c(30, 35, 40, 45, 50, 55, 65, 71, 75, 80, 85, 90, 95),
   verbose = 4
