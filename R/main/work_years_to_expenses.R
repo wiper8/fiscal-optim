@@ -16,7 +16,6 @@ source(data_filepath)
 df <- work_years_to_expenses(data_filepath, salaire,
   work_years = seq(0, 65 - start_age, 5),
   limit_time = 70,
-  optimiser = "swarm",
   method = "guided_maximise",
   verbose = 4
 )

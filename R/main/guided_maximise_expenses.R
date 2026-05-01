@@ -19,8 +19,7 @@ tmp <- guided_maximise_expenses(start_age, max_age,
   bloc_splits = NULL,
   data_filepath = data_filepath,
   eps = 10, inflation = inflation, ipc = ipc, verbose = 4,
-  limit_time = 30,
-  optimiser = "swarm"
+  limit_time = 30
 )
 
 actifs_hist <- try_strategy(

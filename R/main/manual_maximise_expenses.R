@@ -24,8 +24,7 @@ tmp <- maximise_expenses(
     rep(c(0, 0, -1000, 0), 19),
     rep(c(-12000, -12000, -1000, 0), 35)
   ),
-  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, limit_time = 0.1,
-  optimiser = "swarm"
+  data_filepath = data_filepath, eps = 10, inflation = inflation, ipc = ipc, limit_time = 0.1
 )
 
 actifs_hist <- try_strategy(
