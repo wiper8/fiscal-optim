@@ -8,7 +8,8 @@ get_bounds <- function(data_filepath, ages = NULL, ...) {
   actifs_hist <- try_strategy(actifs, revenus, depenses, strategy, passed_revenus, start_age, max_age)
 
   # group by bloc splits
-  groups <- matrix(
+  # TODO redéfini group_ends pour seulement utiliser la longueur (et positionnement) des fins de groupes?
+  group_ends <- matrix(
     c(
       head(ages - min(ages) + 1, -1),
       # TODO ajuster les bornes? ne fonctionne pas si start_age = 25, max_age = 25
